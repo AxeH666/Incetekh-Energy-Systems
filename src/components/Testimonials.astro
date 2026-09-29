@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import MotionToggle from './MotionToggle.astro';
 import { reviewSamples } from '../data/review-samples';
 ---
 
@@ -17,15 +18,12 @@ import { reviewSamples } from '../data/review-samples';
         Good work. Word of mouth.
       </h2>
     </div>
-    <button
+    <MotionToggle
       class="review-toggle"
-      data-strip-toggle
-      type="button"
-      aria-controls="feedback-track"
-      hidden
-    >
-      Pause scrolling
-    </button>
+      label="Pause scrolling"
+      controls="feedback-track"
+      strip
+    />
   </div>
   <p class="sr-only" id="review-instructions">
     Reviews move automatically. Use Pause scrolling to stop them, or focus this
@@ -88,17 +86,8 @@ import { reviewSamples } from '../data/review-samples';
     color: var(--color-accent);
     margin-bottom: 1rem;
   }
-  .review-toggle {
-    flex-shrink: 0;
-    min-height: 2.75rem;
-    padding: 0.5rem 0;
-    border: 0;
-    border-bottom: 1px solid currentColor;
-    color: var(--color-ink);
-    background: transparent;
-    font: inherit;
-    font-size: var(--text-small);
-    cursor: pointer;
+  .review-intro :global(.review-toggle) {
+    color: var(--color-muted);
   }
   .review-track {
     width: min(100% - var(--gutter) * 2, var(--content-width));
@@ -108,8 +97,10 @@ import { reviewSamples } from '../data/review-samples';
     overflow-x: auto;
     overscroll-behavior-x: contain;
     padding-block: 1.25rem 2.5rem;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-muted) transparent;
+    scrollbar-width: none;
+  }
+  .review-track::-webkit-scrollbar {
+    display: none;
   }
   .review-list {
     display: flex;
@@ -185,7 +176,7 @@ import { reviewSamples } from '../data/review-samples';
     }
   }
   @media print {
-    .review-toggle {
+    :global(.review-toggle) {
       display: none;
     }
     .review-track,

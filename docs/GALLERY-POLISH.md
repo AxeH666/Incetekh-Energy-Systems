@@ -4,29 +4,31 @@ The founder approved a four-photo floating homepage gallery, review enlargement
 on hover, lifting linked headings, removal of diagonal arrows, refined WhatsApp
 artwork placement and a more balanced footer across the whole website.
 
-## Design and behavior
+## Current slideshow and controls
 
-- The opening gallery moves continuously at 30 CSS pixels/second, with staggered
-  frames and a glimpse of the next photograph. The real installation leads.
-  A persistent Pause/Resume control, keyboard scrolling and touch/manual scrolling
-  remain available. All four photos remain reachable without JavaScript.
-- Gallery and reviews share one small homepage-only inline script. Review speed
-  remains 45 CSS pixels/second. Hover does not stop the stream; each review lifts
-  8px and enlarges 3.5%, with vertical space for the shadow. Touch, horizontal
-  wheel and keyboard interaction pause until Resume is chosen.
-- Repeated visual lists are hidden from assistive technology. They contain no
-  links, controls or tab stops. They deliberately remain pointer-hoverable so
-  repeated review cards lift just like originals. Reduced motion removes copies
-  and automatic scrolling; hidden tabs and offscreen strips stop animating.
-- Navigation, text links, service links and buttons lift gently on pointer hover
-  and keyboard focus. Reduced motion suppresses these transforms. Touch screens
-  keep the normal static presentation and visible focus outlines remain intact.
-- Decorative diagonal arrows are removed throughout. WhatsApp uses the existing
-  unmodified official glyph at 22px, aligned with the label in a minimum 48px
-  control. The confirmed click-to-chat and phone destinations remain unchanged.
-- The shared footer uses three balanced columns, clearer company identification,
-  smaller telephone type, cleaner navigation and a compact lower copyright row.
-  Tablet and mobile stack the same content without hiding navigation.
+The founder subsequently requested one photograph at a time, using the supplied
+Adani Solar screenshot as the interaction reference. The sideways hero track,
+caption strips, numbered labels, gallery eyebrow, visible pause text and native
+scrollbar chrome have been removed.
+
+- Four images occupy the same fixed frame. The active photo changes every five
+  seconds with a 700ms fade. Four small dots select individual photos. The gallery
+  has no repeated photo list, sideways animation or peek of an adjacent image.
+- A compact pause/play icon replaces the gallery text control. Choosing a dot,
+  focusing the photos/dots, using arrow keys or swiping pauses automatic playback
+  until Resume is selected. Hidden tabs and offscreen photos stop their timer.
+- Reduced motion disables autoplay and fading, keeping the dots and keyboard
+  navigation. Without JavaScript the original four photos remain in a native
+  scrollable, snapping single-photo frame with hidden scrollbar chrome.
+- Reviews still move continuously at 45 CSS pixels/second and enlarge on hover.
+  Their visible Pause/Resume text is replaced by an accessible icon button, and
+  the scrollbar is hidden while touch, trackpad and keyboard scrolling remain.
+  The visual duplicate remains hidden from assistive technology with no tab stops.
+- All icon controls have accessible Pause/Resume names. Dots have descriptive
+  labels, selected state and 44px targets. The homepage still emits one small
+  CSP-hashed inline module with no framework or added dependency.
+- Existing sitewide link/heading hover lift, arrow removal, WhatsApp proportions
+  and the balanced footer remain part of this focused polish component.
 
 ## Supplied image provenance
 
@@ -39,10 +41,10 @@ preserved in Git:
 | `project photos/3.png` | `hf_20260926_083457_6e725e64-f109-428c-8342-21a4e4babfb0.png` | Unconfirmed original/generated/enhanced rooftop scene |
 | `project photos/4.png` | `ChatGPT Image Sep 29, 2026, 03_11_42 PM.png`                 | Generated supporting installation scene               |
 
-Each numbered photo has a visible "Illustrative image" caption and descriptive
-illustrative alt text. None is attributed to a customer or treated as documentary
-Incetekh project evidence. The original real hero photograph retains its archive
-caption. The Projects page still contains only the two original documentary images.
+The founder requested removal of visible caption strips. Each numbered photo
+retains descriptive illustrative alt text, and the gallery description identifies
+photographs and illustrative supporting imagery. None is attributed to a customer or treated as documentary
+Incetekh project evidence. No generic supporting scene is labeled as an Incetekh project. The Projects page still contains only the two original documentary images.
 
 Astro serves 480/800/1280px WebP derivatives. Original PNGs are not shipped.
 The total static-output budget increases from 1.5 MB to 2.5 MB to accommodate

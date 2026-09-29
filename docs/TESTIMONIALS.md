@@ -16,13 +16,15 @@ The native horizontal region moves at 45 CSS pixels/second and repeats seamlessl
 One runtime visual copy is hidden from assistive technology and has no tab stops.
 It remains pointer-hoverable so every visible card can lift and enlarge. There are
 ten source entries, not twenty reviews. The loop does not stop at its boundary.
-Normal hover and vertical page scrolling continue the movement. Pause/Resume,
+Normal hover and vertical page scrolling continue the movement. A compact
+pause/play icon replaces visible Pause/Resume text; scrollbar chrome is hidden.
+Accessible Pause/Resume labels,
 keyboard focus, touch and horizontal wheel interaction give explicit control.
 The script stops offscreen and in hidden tabs. Reduced motion disables automatic
 movement and removes the copy. No-JS readers retain the native original list.
 
-The small shared script in `src/scripts/floating-strips.ts` controls the gallery
-and reviews. Astro inlines and CSP-hashes it; no library or external requests are added.
+The small script in `src/scripts/floating-strips.ts` controls the reviews;
+`photo-slideshow.ts` controls the single-photo hero. Astro inlines and CSP-hashes it; no library or external requests are added.
 See [GALLERY-POLISH.md](GALLERY-POLISH.md) for current behavior and
 [HOMEPAGE-REFRESH.md](HOMEPAGE-REFRESH.md) for earlier design rationale and sources.
 

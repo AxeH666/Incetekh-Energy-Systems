@@ -17,7 +17,6 @@ for (const section of document.querySelectorAll<HTMLElement>(
     copy.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
     copy.querySelectorAll('img').forEach((img) => (img.alt = ''));
     const speed = Number(section.dataset.speed ?? 45) / 1000;
-    const action = section.dataset.action ?? 'scrolling';
     let paused = false;
     let visible = false;
     let frame: number | null = null;
@@ -59,8 +58,13 @@ for (const section of document.querySelectorAll<HTMLElement>(
         frame = requestAnimationFrame(tick);
       }
     };
-    const updateLabel = () =>
-      (toggle.textContent = `${paused ? 'Resume' : 'Pause'} ${action}`);
+    const updateLabel = () => {
+      toggle.setAttribute(
+        'aria-label',
+        `${paused ? 'Resume' : 'Pause'} scrolling`,
+      );
+      toggle.dataset.paused = String(paused);
+    };
     toggle.addEventListener('click', () => {
       paused = !paused;
       updateLabel();
