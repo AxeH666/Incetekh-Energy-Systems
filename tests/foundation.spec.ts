@@ -3,9 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
-test('semantic shell, metadata, and intentionally limited navigation', async ({
-  page,
-}) => {
+test('semantic shell, metadata, and main navigation', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle('Incetekh Energy | Solar Engineering & EPC');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -175,7 +173,10 @@ test('text scaling and forced-colors retain usable controls', async ({
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await page.addStyleTag({ content: 'html { font-size: 200%; }' });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '200%';
+  });
+  await expect(page.locator('html')).toHaveCSS('font-size', '32px');
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
