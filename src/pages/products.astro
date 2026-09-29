@@ -1,0 +1,215 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import WhatsAppLink from '../components/WhatsAppLink.astro';
+import { productGroups } from '../data/products';
+---
+
+<SiteLayout
+  title="Solar Panels, Inverters & Water Heaters | Incetekh Energy"
+  description="Explore solar panels, inverters and solar water heaters, including Andhra Pradesh options. Discuss product suitability and availability with Incetekh on WhatsApp."
+>
+  <PageIntro
+    eyebrow="Equipment & selection"
+    title="Products we install."
+    description="Panels, power conversion and hot water. Build a system around what your property actually needs."
+  />
+  <nav class="container product-navigation" aria-label="Product categories">
+    {productGroups.map((group) => (
+      <a class="text-link" href={`#${group.id}`}>
+        {group.title}
+      </a>
+    ))}
+    <a class="text-link" href="/#solar-planner">
+      Find your solar size
+    </a>
+  </nav>
+  <div class="container">
+    <p class="availability">
+      Explore these product and supplier options with us. Specific models, local
+      availability, installation support and written warranty terms are
+      confirmed in your proposal. Listings do not imply an authorised dealership
+      for every brand.
+    </p>
+    {productGroups.map((group) => (
+      <section
+        id={group.id}
+        class="product-section"
+        aria-labelledby={`${group.id}-heading`}
+      >
+        <div class="category-intro">
+          <p class="eyebrow">{group.number} / Equipment</p>
+          <h2 class="section-title" id={`${group.id}-heading`}>
+            {group.title}
+          </h2>
+          <p>{group.description}</p>
+        </div>
+        <div>
+          <div class="product-list">
+            {group.products.map((product) => (
+              <article>
+                <p class="product-type">{product.type}</p>
+                <h3>{product.name}</h3>
+                <p class="product-description">{product.detail}</p>
+                <div class="product-actions">
+                  <WhatsAppLink
+                    label={`Enquire about ${product.name}`}
+                    message={`Hi Incetekh, I am interested in ${product.name} ${group.title.toLowerCase()}. Please confirm suitable models, availability and installation options for my property.`}
+                  />
+                  <a class="text-link" href={product.source}>
+                    Product source
+                    <span class="sr-only">
+                      : {product.name} {group.title}
+                    </span>
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p class="selection-note">{group.guidance}</p>
+        </div>
+      </section>
+    ))}
+    <section class="selection-help section" aria-labelledby="selection-heading">
+      <div>
+        <p class="eyebrow">A better fit starts with a conversation</p>
+        <h2 class="section-title" id="selection-heading">
+          Not sure which to choose?
+        </h2>
+        <p>
+          Have a recent electricity bill and a few roof photos ready. For water
+          heating, add your household size and water source. We can discuss the
+          next step during a free site visit.
+        </p>
+      </div>
+      <WhatsAppLink
+        label="Talk to an expert"
+        message="Hi Incetekh, please help me choose suitable solar equipment and arrange a free site visit."
+      />
+    </section>
+  </div>
+</SiteLayout>
+
+<style>
+  .product-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .availability {
+    max-width: 65rem;
+    margin-top: 1.5rem;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+  }
+  .product-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-block: clamp(3rem, 5vw, 5rem);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .category-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+    align-items: end;
+  }
+  .category-intro .eyebrow {
+    grid-column: 1;
+  }
+  .category-intro h2 {
+    grid-column: 1;
+    margin: 1rem 0 0;
+  }
+  .category-intro > p:last-child {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    color: var(--color-muted);
+    max-width: 26rem;
+  }
+  .product-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+  article {
+    background: #fff;
+    border: 1px solid var(--color-line);
+    padding: clamp(1.25rem, 2vw, 2rem);
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+  }
+  .product-type {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+  h3 {
+    font-size: 1.625rem;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    margin: 0.75rem 0 1rem;
+  }
+  .product-description {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    margin-bottom: 1.5rem;
+  }
+  .product-actions {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.5rem;
+  }
+  .selection-note {
+    margin-top: 1.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+  .selection-help {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .selection-help h2 {
+    margin-block: 1rem;
+  }
+  .selection-help p {
+    max-width: 40rem;
+    color: var(--color-muted);
+  }
+  .selection-help :global(.button) {
+    flex-shrink: 0;
+  }
+  @media (max-width: 64rem) {
+    .product-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .product-section {
+      grid-template-columns: 1fr;
+    }
+    .category-intro > p:last-child {
+      max-width: 40rem;
+    }
+  }
+  @media (max-width: 44rem) {
+    .category-intro {
+      display: block;
+    }
+    .category-intro h2 {
+      margin-bottom: 1.5rem;
+    }
+    .product-list {
+      grid-template-columns: 1fr;
+    }
+    .selection-help {
+      flex-direction: column;
+      align-items: start;
+    }
+  }
+</style>

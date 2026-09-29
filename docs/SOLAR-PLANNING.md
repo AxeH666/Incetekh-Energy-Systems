@@ -1,0 +1,47 @@
+# Solar planning and equipment selection
+
+This component adds a homepage estimator and capacity choices, plus a Products page. It preserves the photo slideshow, reviews, free services and existing visual direction. No deployment, remote calculator service, lead database, WhatsApp automation or dependency was added.
+
+## Scope and user confirmation
+
+On 30 September 2026 the founder requested the example's panel/inverter brands and Andhra Pradesh water-heater companies. The planner is explicitly an Andhra Pradesh estimate, not an all-India tariff engine or a claim of nationwide service coverage. Product listings are enquiry options. Manufacturer authorisation, stock, pricing, specific warranty terms and vendor registration are not inferred.
+
+The homepage groups the calculator and four capacity choices into one planning section. The existing manufacturer section links to the complete catalogue, and Products appears in the shared header/footer. The added catalogue uses restrained typography and written product descriptions without invented branded imagery.
+
+## Calculation contract
+
+- Units mode accepts monthly kWh. Bill mode estimates monthly kWh as bill / editable assumed price per kWh. Default ₹8 is explicitly an assumption, not a DISCOM slab calculation. Fixed charges, credits and arrears make bill division less accurate; the UI recommends actual units and averaging 12 months.
+- Capacity = ceiling(monthly kWh / (4 kWh per kW per day × 30 days)), minimum 1 kW. Whole-kW rounding is a planning choice, not a restriction on actual module capacity.
+- Monthly generation = capacity × 120 kWh. Roof allowance = capacity × 10 m²; square feet use 10.7639 ft²/m². Neither output is site-specific or guaranteed.
+- Maximum consumption is 12,000 units/month (100 kW estimate). Invalid/empty/nonfinite/over-limit inputs hide stale outputs and replace the contextual WhatsApp draft with a generic enquiry. Commercial results show no household subsidy.
+- Standard central assistance = ₹30,000 × min(kW, 2) + ₹18,000 × min(max(kW − 2, 0), 1), capped at ₹78,000. This is for a new eligible individual residential rooftop PV system in Andhra Pradesh; no state top-ups, special-category uplifts, expansion claims, RWA calculation or water-heater subsidy are modelled.
+- No system prices, payback, appliance counts, tariff-slab accuracy or 25-year savings are asserted. A physical survey, sanctioned load, shading, equipment and DISCOM requirements determine the final design.
+- Calculation occurs locally without persistence or network submission. WhatsApp links encode the selected inputs and estimate as a draft; clicking does not send it automatically. Privacy copy explains this. Without JS, controls remain disabled and an explicit example notice plus contact links remain usable.
+
+## Sources checked 30 September 2026
+
+The subsidy is still described as operating by the government sources below. This is a dated editorial check, not a live eligibility or disbursement API. Recheck before launch and when scheme rules change.
+
+- [PIB energy factsheet, 13 August 2026](https://www.pib.gov.in/FactsheetDetails.aspx?id=150868&lang=2&reg=48): ongoing PM Surya Ghar installations and subsidy disbursements.
+- [MNRE / PIB, 24 March 2026](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2244670&lang=2&reg=3): residential programme, National Portal application and FY 2026–27 objective.
+- [Official central subsidy rates](https://solar.delhi.gov.in/page/central-subsidy): ₹30,000/kW first 2 kW, ₹18,000 next kW, ₹78,000 cap. Only central figures used; Delhi local incentives are not applied to Andhra Pradesh.
+- [MNRE operational guidelines hosted by Meghalaya's electricity corporation](https://www.meecl.nic.in/wp-content/uploads/2024/08/Annexure-C-Operational-Guidelines-for-the-Implementation-of-PM-Surya-Ghar-Muft-Bijli-Yojana.pdf): standard and special-category schedules, partial-kW examples. The AP-only calculator uses standard rates.
+- [MNRE domestic-content clarification](https://cdnbbsr.s3waas.gov.in/s3716e1b8c6cd17b771da77391355749f3/uploads/2024/12/20241202808263895.pdf): domestic-content requirements apply under PM Surya Ghar.
+- [NDMC rooftop FAQ](https://online.ndmc.gov.in/solar/FAQs.aspx): indicative 4–5 units/kW/day and 10 m²/kW. We choose 4 as a disclosed planning assumption; square-foot conversion is calculated independently. Delhi-specific net-metering rules are not copied.
+- [National Portal](https://pmsuryaghar.gov.in/): user application destination. Direct tool retrieval was unavailable; current status/rates were verified through the government sources above, not through a claimed live portal transaction.
+
+Exact product source URLs live next to each entry in `src/data/products.ts` and are exposed on the Products page. These are manufacturer/supplier sources, not evidence of an Incetekh dealership:
+
+- Waaree official shop: PV module families. Its 2023–24 annual report lists water heaters within solar solutions, but a current heater model range was not verified; the UI explicitly asks customers to confirm it.
+- Tata Power renewables and Adani Solar downloads: panel portfolios. No blanket wattage or warranty claims.
+- Deye official inverter site, Polycab solar brochures, Enphase India IQ8 launch, Solis India technical brochure, SolarEdge India: inverter categories, with model compatibility qualified.
+- NIKSOL water-heaters page: Vijayawada supplier, 100/200 LPD ETC offerings. Its savings/monsoon/temperature claims are not repeated.
+- Solariq water-heaters page: Visakhapatnam supplier offering solar water heating. No invented partnership or manufacturer status.
+
+## Validation and release boundary
+
+Focused model tests cover subsidy tiers, fractional capacities, cap, commercial exclusion, sizing boundaries and invalid inputs. Browser checks cover input-mode changes, stale-result removal, WhatsApp draft context/navigation interception, no remote submission, no-JS fallback, product links and responsive accessibility. Existing gallery, review, navigation, metadata, CSP and static-output checks remain in the suite.
+
+Verified: formatting lint, Astro/TypeScript check (zero diagnostics), production build and all 72 Playwright checks pass. Calculator and equipment sections were visually inspected at 390, 768 and 1440 px; the suite also covers 320 and 1920 px homepage accessibility. Output is approximately 2.11 MB with no added dependencies or external calculator requests. Two no-JS assertions were corrected to target the disabled input and visible fallback paragraph; the final full run is clean.
+
+No publication is authorised by this component. Existing pre-launch testimonial replacement/permission requirements in `TESTIMONIALS.md` remain in force. Final product availability, subsidy eligibility and written equipment terms must be confirmed per project.

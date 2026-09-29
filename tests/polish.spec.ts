@@ -1,9 +1,11 @@
+import { isAllowedExternal } from './support/links';
 import { test, expect } from '@playwright/test';
 
 const routes = [
   '/',
   '/about/',
   '/services/',
+  '/products/',
   '/projects/',
   '/contact/',
   '/privacy/',
@@ -66,7 +68,7 @@ test('every visible action resolves, including service fragments and branded res
     }
     await expect(
       page.locator(
-        'button:not([data-strip-toggle]):not(.gallery-dot):not(.gallery-toggle), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
+        'button:not([data-strip-toggle]):not(.gallery-dot):not(.gallery-toggle):not([type="submit"]), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
       ),
     ).toHaveCount(0);
     const links = await page
@@ -78,7 +80,11 @@ test('every visible action resolves, including service fragments and branded res
         continue;
       }
       if (href.startsWith('https://wa.me/')) {
-        expect(href).toBe('https://wa.me/919441259786');
+        expect(isAllowedExternal(href)).toBe(true);
+        continue;
+      }
+      if (href.startsWith('https://')) {
+        expect(isAllowedExternal(href)).toBe(true);
         continue;
       }
       const url = new URL(href, `${baseURL}${path}`);
