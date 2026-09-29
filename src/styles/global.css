@@ -1,0 +1,139 @@
+@font-face {
+  font-family: 'Manrope Variable';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2')
+    format('woff2');
+}
+
+/* Shared design tokens. Page-specific composition stays with its Astro page. */
+:root {
+  color-scheme: light;
+  --color-paper: #f5f4ef;
+  --color-ink: #202622;
+  --color-muted: #5b625c;
+  --color-line: #d1d3ca;
+  --color-accent: #a33b1e;
+  --color-accent-bright: #ee865e;
+  --color-on-dark-muted: #bec4bb;
+  --font-body: 'Manrope Variable', 'Segoe UI', sans-serif;
+  --text-small: 0.8125rem;
+  --text-body: 1rem;
+  --text-lead: clamp(1rem, 1.35vw, 1.1875rem);
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --gutter: clamp(1.25rem, 4.5vw, 5rem);
+  --content-width: 90rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  scroll-padding-block: var(--space-6);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+p,
+figure {
+  margin: 0;
+}
+h1,
+h2 {
+  font-weight: 500;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+a {
+  color: inherit;
+}
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+::selection {
+  color: var(--color-paper);
+  background: var(--color-accent);
+}
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 5px;
+}
+.site-footer :focus-visible,
+.site-footer:focus-visible {
+  outline-color: var(--color-accent-bright);
+}
+.container {
+  width: min(100% - var(--gutter) * 2, var(--content-width));
+  margin-inline: auto;
+}
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: 2.875rem;
+  padding: 0.75rem 1.125rem;
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.35;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background-color 160ms ease;
+}
+.button-dark {
+  color: var(--color-paper);
+  background: var(--color-ink);
+}
+.button-dark:hover {
+  background: var(--color-accent);
+}
+.skip-link {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--gutter);
+  z-index: 10;
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .button {
+    border-color: ButtonText;
+  }
+}
