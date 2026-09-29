@@ -25,7 +25,9 @@ test('semantic shell, metadata, and main navigation', async ({ page }) => {
     'content',
     /^https:\/\/incetekhenergy\.com\/_astro\/.+\.jpg$/,
   );
-  await expect(page.locator('nav [aria-current="page"]')).toHaveText('Home');
+  await expect(
+    page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link'),
+  ).toHaveText(['About', 'Services', 'Projects', 'Reviews']);
   await expect(page.locator('form, script[src]')).toHaveCount(0);
 });
 
@@ -38,7 +40,7 @@ test('keyboard skip link and contact navigation work', async ({ page }) => {
   await expect(skip).toHaveCSS('outline-style', 'solid');
   await page.keyboard.press('Enter');
   await expect(page.getByRole('main')).toBeFocused();
-  await page.getByRole('link', { name: 'Get in touch' }).focus();
+  await page.getByRole('link', { name: 'Contact Us' }).focus();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL('/contact/');
   const call = page.getByRole('link', {
@@ -109,6 +111,7 @@ for (const width of [320, 390, 768, 1440, 1920]) {
 test('all local links and assets resolve without external browser requests', async ({
   page,
   request,
+  baseURL,
 }) => {
   const failures: string[] = [];
   const external: string[] = [];
@@ -117,8 +120,7 @@ test('all local links and assets resolve without external browser requests', asy
     if (response.status() >= 400) failures.push(response.url());
   });
   page.on('request', (request) => {
-    if (!request.url().startsWith('http://127.0.0.1:4321'))
-      external.push(request.url());
+    if (new URL(request.url()).origin !== baseURL) external.push(request.url());
   });
   await page.goto('/');
   await page.evaluate(() => document.fonts.ready);
@@ -148,20 +150,22 @@ test('all local links and assets resolve without external browser requests', asy
 
 test('works without JavaScript and with reduced motion', async ({
   browser,
+  baseURL,
 }) => {
   const context = await browser.newContext({
     javaScriptEnabled: false,
     reducedMotion: 'reduce',
     viewport: { width: 390, height: 844 },
+    baseURL,
   });
   const page = await context.newPage();
-  await page.goto('http://127.0.0.1:4321/');
+  await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Get in touch' })).toHaveCSS(
+  await expect(page.getByRole('link', { name: 'Contact Us' })).toHaveCSS(
     'transition-duration',
     '0s',
   );
-  await page.getByRole('link', { name: 'Get in touch' }).click();
+  await page.getByRole('link', { name: 'Contact Us' }).click();
   await expect(
     page.getByRole('link', { name: 'Call +91 94412 59786', exact: true }),
   ).toBeInViewport();
@@ -183,7 +187,7 @@ test('text scaling and forced-colors retain usable controls', async ({
     ),
   ).toBe(true);
   await page.emulateMedia({ forcedColors: 'active' });
-  await expect(page.getByRole('link', { name: 'Get in touch' })).toHaveCSS(
+  await expect(page.getByRole('link', { name: 'Contact Us' })).toHaveCSS(
     'border-top-style',
     'solid',
   );

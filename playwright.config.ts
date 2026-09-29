@@ -1,5 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
+const port = process.env.PLAYWRIGHT_PORT || '4321';
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -9,13 +11,13 @@ export default defineConfig({
   reporter: 'list',
   use: {
     channel: process.env.PLAYWRIGHT_CHANNEL,
-    baseURL: 'http://127.0.0.1:4321',
+    baseURL: `http://127.0.0.1:${port}`,
     viewport: { width: 1440, height: 1000 },
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run preview -- --port 4321',
-    url: 'http://127.0.0.1:4321',
+    command: `npm run preview -- --port ${port}`,
+    url: `http://127.0.0.1:${port}`,
     reuseExistingServer: false,
   },
 });

@@ -1,7 +1,7 @@
 # Incetekh Energy
 
-Complete local Phase 1 public website: home, company, services, project photographs,
-labelled review previews, contact, privacy and a custom 404. Built with static
+Complete local Phase 1 public website: home, about, services, project photographs,
+a dedicated page for labelled review previews, contact, privacy and a custom 404. Built with static
 Astro, TypeScript and plain CSS. Read [AGENTS.md](AGENTS.md) and [SCOPE.md](SCOPE.md)
 before changes. No public deployment, DNS changes or business-email setup has
 been performed. [Delivery report](docs/DELIVERY.md).
@@ -31,20 +31,22 @@ npm run preview    # Manual inspection of the current build
 
 If the browser download is unavailable, use installed Chrome. In PowerShell:
 `$env:PLAYWRIGHT_CHANNEL = 'chrome'`. Stop any manual preview before tests.
+If port 4321 is occupied, set `$env:PLAYWRIGHT_PORT = '4323'`; the tests use an
+isolated preview without stopping the existing development server.
 Screenshots/traces go to ignored `test-results/`. The default full suite expects
 preview settings; launch-mode checks use `tests/seo.spec.ts` with matching build
 and test environment values. [Configuration details](docs/VISIBILITY.md).
 
 ## Structure and maintenance
 
-- `src/pages/`: six content pages, 404, sitemap and robots endpoints rendered at build time.
+- `src/pages/`: seven content pages, 404, sitemap and robots endpoints rendered at build time.
 - `src/layouts/SiteLayout.astro`: semantic shell, metadata, schema and optional analytics.
 - `src/components/`: navigation, footer, page introduction, call to action and review preview.
 - `src/styles/global.css`: typography, color, spacing, layout and accessibility tokens.
 - `src/data/site.ts`: confirmed identity/contact and selected project images.
 - `src/data/review-samples.ts`: three clearly labelled temporary comments to replace.
 - `src/data/visibility.ts`: validated public build settings.
-- `public/`: favicon, font license and compatible static-host response headers.
+- `public/`: font license and compatible static-host response headers. Branding derivatives are generated from the supplied logo at build time.
 - `tests/`: production-output, responsive, accessibility, contact, evidence and SEO checks.
 - `docs/`: design, evidence, validation and owner handoff.
 
@@ -59,14 +61,16 @@ photographs. Self-hosted Manrope, no remote fonts, no client app runtime. The
 navigation remains visible on narrow screens and FAQs use native HTML controls.
 The optional Cloudflare analytics beacon is the only external script when enabled.
 
-The founder confirmed the phone, approximately 15 years of history, solar EPC,
+The founder confirmed the phone, more than 13 years of experience and 500+ completed projects, solar EPC,
 free site visits, system performance checks, annual yield audits and a five-year
-warranty subject to written proposal terms. No unverified mailbox, office, project
-statistics or customer identities are published. Sample testimonials remain
+warranty subject to written proposal terms. No unverified mailbox, office, additional project
+statistics or customer identities are published. Waaree, Adani Solar and Tata Power Solar are presented as manufacturer sales
+channels through confirmed dealership relationships. Sample testimonials remain
 visibly unverified and are not attributed to people in the photos.
 
 ## Handoff
 
+- [Pre-deployment polish and research](docs/POLISH.md)
 - [Design rules](docs/DESIGN.md)
 - [Asset and claims register](docs/ASSETS.md)
 - [Review replacement instructions](docs/TESTIMONIALS.md)

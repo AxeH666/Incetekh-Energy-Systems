@@ -6,15 +6,33 @@ import SiteCTA from '../components/SiteCTA.astro';
 
 <SiteLayout
   title="Solar EPC & System Care | Incetekh Energy"
-  description="Explore solar EPC, free site visits, system performance checks, annual yield audits and a five-year warranty subject to written proposal terms."
+  description="Solar EPC, free site visits, system performance checks, annual yield audits and a five-year warranty subject to written proposal terms."
 >
   <PageIntro
     eyebrow="Services & capabilities"
     title="From a rooftop idea to a working system."
     description="Solar engineering, procurement and construction, with services for the system after installation."
   />
+  <nav class="container service-navigation" aria-label="On this page">
+    <a class="text-link" href="#epc">
+      Solar EPC
+    </a>
+    <a class="text-link" href="#site-visit">
+      Free site visits
+    </a>
+    <a class="text-link" href="#system-care">
+      System care
+    </a>
+    <a class="text-link" href="#warranty">
+      Warranty
+    </a>
+  </nav>
   <div class="container services">
-    <section class="section-grid service-detail" aria-labelledby="epc-heading">
+    <section
+      id="epc"
+      class="section-grid service-detail"
+      aria-labelledby="epc-heading"
+    >
       <p class="eyebrow">01 / Solar EPC</p>
       <div class="prose">
         <h2 id="epc-heading" class="section-title">
@@ -57,9 +75,10 @@ import SiteCTA from '../components/SiteCTA.astro';
     </section>
     <section
       class="section-grid service-detail"
+      id="site-visit"
       aria-labelledby="visit-heading"
     >
-      <p class="eyebrow">02 / Get started</p>
+      <p class="eyebrow">02 / Site visits</p>
       <div class="prose">
         <h2 id="visit-heading" class="section-title">
           A free site visit.
@@ -77,6 +96,7 @@ import SiteCTA from '../components/SiteCTA.astro';
     </section>
     <section
       class="section-grid service-detail"
+      id="system-care"
       aria-labelledby="checks-heading"
     >
       <p class="eyebrow">03 / System care</p>
@@ -97,14 +117,11 @@ import SiteCTA from '../components/SiteCTA.astro';
           An annual review of energy generation. Ask about the information
           needed and the scope of the audit for your system.
         </p>
-        <p>
-          These services are not a promise of a particular generation figure,
-          saving or financial return.
-        </p>
       </div>
     </section>
     <section
       class="section-grid service-detail"
+      id="warranty"
       aria-labelledby="warranty-heading"
     >
       <p class="eyebrow">04 / Warranty</p>
@@ -120,8 +137,7 @@ import SiteCTA from '../components/SiteCTA.astro';
         </p>
         <p>
           Before proceeding, confirm what is covered, any exclusions, when the
-          warranty begins and how to request support. Coverage is not an
-          unconditional promise for every part of every system.
+          warranty begins and how to request support.
         </p>
       </div>
     </section>
@@ -130,6 +146,12 @@ import SiteCTA from '../components/SiteCTA.astro';
 </SiteLayout>
 
 <style>
+  .service-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 2rem;
+    padding-bottom: 2rem;
+  }
   .service-detail {
     padding-block: clamp(2.5rem, 5vw, 5rem);
     border-top: 1px solid var(--color-line);

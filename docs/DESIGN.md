@@ -7,8 +7,9 @@ quiet borders and a real installation photograph. Warm paper and charcoal form
 the surfaces; rust is an accent for focus and interaction. No gradients, cards,
 decorative motion or generated imagery are needed for the foundation.
 
-The wordmark is a typographic treatment of the supplied business name, not a
-claim that an official logo was provided. The favicon follows that treatment.
+The supplied Incetekh logo is displayed intact on white in the shared header and
+footer. Optimized versions also identify the social preview, favicon, touch icon
+and Organization schema. No recoloring, distortion or invented logo is used.
 
 ## Shared rules
 
@@ -35,8 +36,7 @@ and sizes. The foundation uses one imported original, generates 480/800/1280px
 WebP variants, and reserves the image's display space to avoid layout movement.
 The source is not upscaled during image generation. CSS crops its display for
 the wide desktop and narrower mobile composition; it does not retouch content.
-The homepage photograph loads eagerly. Offscreen imagery is lazy-loaded. A
-separate JPEG derivative supports social metadata. Company/projects also use
+The homepage photograph loads eagerly. Offscreen imagery is lazy-loaded. The supplied company logo supplies the square social preview. Company/projects also use
 the second real rooftop image. Review-preview photos use actual top-cropped
 WebP derivatives to exclude GPS/address overlays; see TESTIMONIALS.md.
 
@@ -53,3 +53,10 @@ the full review-photo folder or infer project identities from file names.
 These informed static output, scoped page styles, responsive assets and checks
 down to a 320px viewport. Automated accessibility checks supplement visual and
 keyboard inspection; they do not establish full WCAG conformance.
+
+## Pre-deployment refinement
+
+See [POLISH.md](POLISH.md) for current reference research, page hierarchy and
+review decisions. Reviews has its own page; projects remain documentary proof.
+The homepage introduces the company, services, manufacturer sales channels and
+contact path without repeating the full review section.
