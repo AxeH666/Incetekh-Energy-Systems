@@ -1,0 +1,31 @@
+{
+  "name": "incetekh-energy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1",
+    "build": "astro build",
+    "preview": "astro preview --host 127.0.0.1",
+    "check": "astro check",
+    "lint": "prettier --check .",
+    "format": "prettier --write .",
+    "test": "playwright test",
+    "verify": "npm run lint && npm run check && npm run build && npm test",
+    "release:check": "node scripts/release-check.mjs"
+  },
+  "dependencies": {
+    "astro": "7.3.5",
+    "@fontsource-variable/manrope": "5.3.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@axe-core/playwright": "latest",
+    "@playwright/test": "latest",
+    "prettier": "latest",
+    "prettier-plugin-astro": "latest",
+    "sharp": "latest",
+    "typescript": "latest"
+  }
+}

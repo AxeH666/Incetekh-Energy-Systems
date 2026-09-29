@@ -1,0 +1,10 @@
+package-lock.json
+dist
+node_modules
+.astro
+test-results
+playwright-report
+AGENTS.md
+SCOPE.md
+project photos
+review pictures
