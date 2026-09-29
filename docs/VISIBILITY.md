@@ -8,8 +8,8 @@ Copy `.env.example` to `.env` for local configuration, or set the same values in
 the chosen host's build environment. These are public identifiers, not secrets.
 Rebuild after any change.
 
-- `PUBLIC_SITE_INDEXABLE=false` is the safe default. All pages emit `noindex,
-follow`, sitemap has no URLs, and robots omits the sitemap announcement.
+- `PUBLIC_SITE_INDEXABLE=false` is the safe default. All pages emit
+  `noindex, follow`, sitemap has no URLs, and robots omits the sitemap announcement.
 - Set `PUBLIC_SITE_INDEXABLE=true` only for an approved launch build. The six
   content pages become indexable. The 404 remains noindex with no canonical.
 - `PUBLIC_GOOGLE_SITE_VERIFICATION` accepts the value from Google's HTML-tag

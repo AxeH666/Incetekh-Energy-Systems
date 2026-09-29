@@ -1,66 +1,80 @@
 # Incetekh Energy
 
-Phase 1 public website, delivered in sequential components. Read [AGENTS.md](AGENTS.md) and
-[SCOPE.md](SCOPE.md) before making changes. The public website includes search readiness and optional analytics configuration. External deployment is not authorized.
+Complete local Phase 1 public website: home, company, services, project photographs,
+labelled review previews, contact, privacy and a custom 404. Built with static
+Astro, TypeScript and plain CSS. Read [AGENTS.md](AGENTS.md) and [SCOPE.md](SCOPE.md)
+before changes. No public deployment, DNS changes or business-email setup has
+been performed. [Delivery report](docs/DELIVERY.md).
 
 ## Run locally
 
-Use Node **22.23.3** (see `.nvmrc`; minimum 22.19) and npm.
+Use Node **22.23.3** (`.nvmrc`; minimum 22.19) and npm.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open the local address printed by Astro. No environment variables or credentials are required; optional public build settings are in `.env.example`. No
-external APIs, or server-side services are needed.
+Open the address printed by Astro. No credentials or external APIs are required.
+Optional public build settings are documented in [.env.example](.env.example).
+Defaults are non-indexable previews with analytics disabled.
 
 ```sh
-npm run lint       # Formatting lint for source, styles, tests and docs
-npm run check      # Astro and strict TypeScript diagnostics
-npm run build     # Static output in dist/
+npm run lint       # Prettier formatting lint
+npm run check      # Astro and strict TypeScript checks
+npm run build      # Static output in dist/
 npx playwright install chromium
-npm test          # Starts its own production preview server
-npm run verify    # All four validation stages
-npm run preview   # Manually inspect the production output
+npm test           # Starts its own production preview on port 4321
+npm run verify     # Lint, types, build and browser tests
+npm run preview    # Manual inspection of the current build
 ```
 
-If the Playwright browser download is unavailable, use an installed Chrome with
-`PLAYWRIGHT_CHANNEL=chrome`. In PowerShell set
-`$env:PLAYWRIGHT_CHANNEL = 'chrome'` before `npm test`.
-Browser reports and screenshots are written to ignored `test-results/`.
-The tests use port 4321; stop your manual preview before running them.
+If the browser download is unavailable, use installed Chrome. In PowerShell:
+`$env:PLAYWRIGHT_CHANNEL = 'chrome'`. Stop any manual preview before tests.
+Screenshots/traces go to ignored `test-results/`. The default full suite expects
+preview settings; launch-mode checks use `tests/seo.spec.ts` with matching build
+and test environment values. [Configuration details](docs/VISIBILITY.md).
 
-## Structure
+## Structure and maintenance
 
-- `src/styles/global.css`: color, typography, spacing and layout tokens; shared
-  button and accessibility styles.
-- `src/layouts/SiteLayout.astro`: document metadata and shared semantic shell.
-- `src/components/`: shared navigation, footer, page introduction, call to action and labelled review preview.
-- `src/data/site.ts`: confirmed identity/contact data and the selected photograph.
-- `src/pages/`: home, company, services, projects, contact and a shared-layout 404 page.
-- `public/`: directly served favicon and font redistribution license.
-- `tests/`: focused checks against the production build.
-- `docs/`: design decisions, asset evidence and PR1 boundaries.
+- `src/pages/`: six content pages, 404, sitemap and robots endpoints rendered at build time.
+- `src/layouts/SiteLayout.astro`: semantic shell, metadata, schema and optional analytics.
+- `src/components/`: navigation, footer, page introduction, call to action and review preview.
+- `src/styles/global.css`: typography, color, spacing, layout and accessibility tokens.
+- `src/data/site.ts`: confirmed identity/contact and selected project images.
+- `src/data/review-samples.ts`: three clearly labelled temporary comments to replace.
+- `src/data/visibility.ts`: validated public build settings.
+- `public/`: favicon, font license and compatible static-host response headers.
+- `tests/`: production-output, responsive, accessibility, contact, evidence and SEO checks.
+- `docs/`: design, evidence, validation and owner handoff.
 
-## Design foundation
+Use source images through Astro's pipeline. Never copy the original asset folders
+into `public/`. Add future page paths to `sitemap.xml.ts` and its tests. Keep
+business facts, warranty qualifiers and sample labels aligned across pages.
 
-Static Astro pages, plain CSS and a self-hosted Manrope variable font. No React,
-CSS framework, animation library, client-side JavaScript, or remote fonts.
-The neutral palette, restrained rust accent, large typography and real rooftop
-photograph set the direction. [Design notes](docs/DESIGN.md) explain extension.
+## Design and content
 
-Only existing destinations appear in navigation. On small screens the navigation wraps below the brand and contact link; every destination stays visible without a menu script. The phone was confirmed by the founder. There is
-no invented mailbox, contact form, project data or attributed customer endorsement.
-The testimonial preview uses explicitly labelled sample copy pending verified
-reviews; see [replacement instructions](docs/TESTIMONIALS.md).
+Warm paper, charcoal, restrained rust accents, large type and real installation
+photographs. Self-hosted Manrope, no remote fonts, no client app runtime. The
+navigation remains visible on narrow screens and FAQs use native HTML controls.
+The optional Cloudflare analytics beacon is the only external script when enabled.
 
-## Delivery boundaries
+The founder confirmed the phone, approximately 15 years of history, solar EPC,
+free site visits, system performance checks, annual yield audits and a five-year
+warranty subject to written proposal terms. No unverified mailbox, office, project
+statistics or customer identities are published. Sample testimonials remain
+visibly unverified and are not attributed to people in the photos.
 
-The complete content and phone-first contact experience are implemented. Contact FAQs use native HTML disclosure controls and work without JavaScript. No form, email address, response-time promise or service area is invented. Technical SEO, privacy information, optional analytics and security configuration are included. Deployment/email preparation is the final handoff component.
+## Handoff
 
-Preview builds default to noindex with analytics disabled. See [visibility configuration](docs/VISIBILITY.md) for launch indexing, Search Console and the optional public analytics token. The intended canonical domain is https://incetekhenergy.com; configuration does not connect or deploy it. No account credentials are needed to build the site.
+- [Design rules](docs/DESIGN.md)
+- [Asset and claims register](docs/ASSETS.md)
+- [Review replacement instructions](docs/TESTIMONIALS.md)
+- [Validation and limits](docs/VALIDATION.md)
+- [Search and analytics configuration](docs/VISIBILITY.md)
+- [Deployment/domain checklist](docs/LAUNCH.md)
+- [Separate business-email preparation](docs/EMAIL.md)
 
-Raw supplied assets remain intact and are not served wholesale. See the
-[asset register](docs/ASSETS.md) before selecting further imagery or claims.
-See docs/PLAN.md for the current sequence. Each PR must be reviewed and merged before the next component.
+Publish only `dist/` after approval. Set launch indexing explicitly and verify the
+host's headers/404 behavior. Public hosting, domain/HTTPS verification, analytics
+activation and professional email remain external actions. No Phase 2 work is included.
