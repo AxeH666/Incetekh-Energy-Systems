@@ -5,13 +5,13 @@ supporting images and four newly supplied logos. No PDFs, brochures, certificate
 or written review spreadsheet were supplied. Original artwork and both source
 photo folders remain unchanged.
 
-| Material                                                                  | Observation                                                               | Final treatment                                                                |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `project photos/WhatsApp Image 2026-09-26 at 1.41.35 PM.jpeg` (1280×720)  | Raised solar array on a concrete rooftop                                  | Home/project gallery                                                           |
-| `project photos/WhatsApp Image 2026-09-26 at 1.41.36 PM.jpeg` (1080×1143) | Panels on a corrugated metal roof                                         | Home/company/project gallery                                                   |
-| Four `project photos/ChatGPT Image…png` files                             | Supporting scenes with generated provenance indicated by filename         | Excluded                                                                       |
-| Three `project photos/hf_…png` files                                      | Rooftop scenes with unconfirmed original/generated/enhanced provenance    | Excluded                                                                       |
-| Thirty `review pictures/WhatsApp Image…jpeg` files                        | People/installations, repeated views, water heaters, GPS/address overlays | Three top-cropped derivatives in the labelled review preview; remainder unused |
+| Material                                                                  | Observation                                                               | Final treatment                                                               |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `project photos/WhatsApp Image 2026-09-26 at 1.41.35 PM.jpeg` (1280×720)  | Raised solar array on a concrete rooftop                                  | Home/project gallery                                                          |
+| `project photos/WhatsApp Image 2026-09-26 at 1.41.36 PM.jpeg` (1080×1143) | Panels on a corrugated metal roof                                         | Home/company/project gallery                                                  |
+| Four `project photos/ChatGPT Image…png` files                             | Supporting scenes with generated provenance indicated by filename         | Excluded                                                                      |
+| Three `project photos/hf_…png` files                                      | Rooftop scenes with unconfirmed original/generated/enhanced provenance    | Excluded                                                                      |
+| Thirty `review pictures/WhatsApp Image…jpeg` files                        | People/installations, repeated views, water heaters, GPS/address overlays | Three top-cropped derivatives in the homepage archive strip; remainder unused |
 
 The four supplied root-level logos are now committed as original source assets:
 `incetekh_logo.png`, `waree-logo - final.jpg`, `adani_logo.png`, and
@@ -22,7 +22,7 @@ colors and wording, with individual display widths to balance the marks.
 
 The three selected review-photo filenames end in `1.41.24 PM.jpeg`,
 `1.41.25 PM.jpeg` and `1.41.31 PM.jpeg`. Their top 1200×1200 areas are converted to
-400/800px WebP files; GPS/address overlays below the crop are not downloadable in
+160/320/800px WebP files; GPS/address overlays below the crop are not downloadable in
 the build. No retouching changes the installations. See [TESTIMONIALS.md](TESTIMONIALS.md).
 
 ## Published facts
@@ -45,9 +45,11 @@ strategic partnership, dealer tier or territory is claimed.
 ## Temporary content and exclusions
 
 The founder explicitly authorized temporary short positive review copy while the
-verified spreadsheet is missing. All three comments are marked **Sample copy —
-not a verified review**, carry no names/ratings, and are not attributed to anyone
-pictured. They are excluded from structured review/rating data.
+verified spreadsheet is missing. The final brief requests natural presentation without sample labels. Thirteen
+illustrative comments are centralized and internally marked unverified, with no
+names/ratings or structured review data. Photographs sit in a separate archive
+strip with no author attribution. Replace the text with verified records or
+remove it before public deployment; see [TESTIMONIALS.md](TESTIMONIALS.md).
 
 No capacities, project dates, locations, customer identities, government/PSU
 relationships, certifications, strategic partnerships, exclusive dealership/empanelment claims,
@@ -58,4 +60,4 @@ addresses visible in originals are not used to infer those business details.
 
 The supplied Incetekh artwork replaces the earlier provisional wordmark/favicon.
 Publication permission for photos should be confirmed by the owner before external
-launch. Temporary reviews remain launch-compatible with their sample labels.
+launch. Temporary review copy is a deployment blocker until replaced or removed.

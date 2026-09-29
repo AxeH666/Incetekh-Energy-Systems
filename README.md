@@ -1,7 +1,7 @@
 # Incetekh Energy
 
 Complete local Phase 1 public website: home, about, services, project photographs,
-a dedicated page for labelled review previews, contact, privacy and a custom 404. Built with static
+homepage feedback, contact, privacy and a custom 404. Built with static
 Astro, TypeScript and plain CSS. Read [AGENTS.md](AGENTS.md) and [SCOPE.md](SCOPE.md)
 before changes. No public deployment, DNS changes or business-email setup has
 been performed. [Delivery report](docs/DELIVERY.md).
@@ -39,12 +39,12 @@ and test environment values. [Configuration details](docs/VISIBILITY.md).
 
 ## Structure and maintenance
 
-- `src/pages/`: seven content pages, 404, sitemap and robots endpoints rendered at build time.
+- `src/pages/`: six content pages plus a legacy Reviews redirect, 404, sitemap and robots endpoints rendered at build time.
 - `src/layouts/SiteLayout.astro`: semantic shell, metadata, schema and optional analytics.
 - `src/components/`: navigation, footer, page introduction, call to action and review preview.
 - `src/styles/global.css`: typography, color, spacing, layout and accessibility tokens.
 - `src/data/site.ts`: confirmed identity/contact and selected project images.
-- `src/data/review-samples.ts`: three clearly labelled temporary comments to replace.
+- `src/data/review-samples.ts`: 13 temporary comments to replace before public deployment.
 - `src/data/visibility.ts`: validated public build settings.
 - `public/`: font license and compatible static-host response headers. Branding derivatives are generated from the supplied logo at build time.
 - `tests/`: production-output, responsive, accessibility, contact, evidence and SEO checks.
@@ -52,7 +52,7 @@ and test environment values. [Configuration details](docs/VISIBILITY.md).
 
 Use source images through Astro's pipeline. Never copy the original asset folders
 into `public/`. Add future page paths to `sitemap.xml.ts` and its tests. Keep
-business facts, warranty qualifiers and sample labels aligned across pages.
+business facts, warranty qualifiers and feedback status aligned across pages.
 
 ## Design and content
 
@@ -65,8 +65,9 @@ The founder confirmed the phone, more than 13 years of experience and 500+ compl
 free site visits, system performance checks, annual yield audits and a five-year
 warranty subject to written proposal terms. No unverified mailbox, office, additional project
 statistics or customer identities are published. Waaree, Adani Solar and Tata Power Solar are presented as manufacturer sales
-channels through confirmed dealership relationships. Sample testimonials remain
-visibly unverified and are not attributed to people in the photos.
+channels through confirmed dealership relationships. Temporary feedback is founder-authorized design copy, not verified testimonials.
+It must be replaced with verified feedback or removed before public deployment.
+Archive photos are separate from comments and imply no authorship.
 
 ## Handoff
 

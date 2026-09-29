@@ -8,8 +8,10 @@ import { site } from '../data/site';
   <Image
     src={logo}
     alt="Incetekh Solar"
-    width={224}
-    height={224}
+    width={176}
+    height={140}
+    fit="cover"
+    position="center"
     format="webp"
     quality={90}
     loading="eager"
@@ -23,14 +25,13 @@ import { site } from '../data/site';
     background: #fff;
   }
   .wordmark img {
-    width: 7rem;
-    height: 7rem;
+    width: 5.5rem;
+    height: auto;
     object-fit: contain;
   }
   @media (max-width: 56rem) {
     .wordmark img {
-      width: 6rem;
-      height: 6rem;
+      width: 5rem;
     }
   }
 </style>

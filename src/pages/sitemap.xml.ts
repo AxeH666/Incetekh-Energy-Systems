@@ -6,7 +6,6 @@ const paths = [
   '/about/',
   '/services/',
   '/projects/',
-  '/reviews/',
   '/contact/',
   '/privacy/',
 ];

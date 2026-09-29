@@ -1,33 +1,39 @@
-# Temporary testimonial content
+# Homepage feedback and replacement
 
-The founder explicitly authorized short, positive temporary review copy and the
-use of supplied customer/project photos while the verified Excel review sheet
-is unavailable. This updates the earlier omission decision; it does not make
-the sample copy verified evidence.
+The final polish brief explicitly requests ten additional temporary comments and
+natural presentation without visible sample labels. That instruction supersedes
+the earlier labelled preview. There are now 13 founder-authorized illustrative
+entries in `src/data/review-samples.ts`, rendered once on Home by
+`Testimonials.astro`. They are not source testimonials or verified endorsements.
+The section retains `data-review-status="illustrative"` for maintenance/tests.
+There are no names, stars, dates, locations, quantified outcomes or review schema.
 
-`src/data/review-samples.ts` is the single replacement source. `Testimonials.astro`
-renders it on the dedicated `/reviews/` page. Home and navigation link to it. All three examples carry a visible
-**Sample copy — not a verified review** label. The section explains that the
-people pictured are not attributed authors. There are no names, star ratings,
-review schema, dates, capacities, savings or technical outcomes.
+## Before public deployment
 
-## Image treatment
+Replace the temporary entries with permissioned, verified spreadsheet statements,
+or remove the feedback text from the public build. Unlabelled invented comments
+must not be launched as actual customer endorsements. No deployment is authorized
+by this PR. Noindex is not a substitute for private preview access control.
 
-Source files in `review pictures/` are the images ending `1.41.24 PM.jpeg`,
-`1.41.25 PM.jpeg`, and `1.41.31 PM.jpeg` (each 1200×1600). Only their top 1200×1200
-area is rendered into 400px/800px square WebP derivatives using Astro's image
-pipeline. The GPS/address overlay starts below that crop. Originals are unchanged
-and are not copied into the public build. Inspect every derivative after changing
-crop settings; CSS-only cropping would leave the original private overlay downloadable.
+Check the source row, exact wording, permitted attribution and photo permission.
+Do not infer authorship from filenames, visual similarity or GPS labels. Update
+the data, status marker, regression expectations and evidence register together.
 
-## Replacement when the spreadsheet arrives
+## Interaction and photographs
 
-1. Check each actual statement against the source row, attribution and permission.
-2. Confirm whether a photograph belongs to that review and is approved for use.
-   Do not infer this from a filename, GPS label or visual similarity.
-3. Replace the sample data with the verified wording and permitted attribution.
-4. Remove preview/sample labels only for entries that have completed those checks.
-5. Update the tests and evidence register to reflect real verified records.
+A focusable, labelled native horizontal scroll region supports touch, trackpad,
+scrollbars and arrow keys. Tab exits to the next real action. There is no autoplay,
+client JavaScript, cloned feedback, live-region chatter or carousel dependency.
+Reduced motion disables scroll snapping. Content remains available without JS.
 
-Until then, preserve the visible sample disclosures. These examples must never
-be cited as real customer endorsements or included in review/rating structured data.
+The three supplied photographs form a separate installation-archive strip below
+all comments, never an author portrait attached to a comment. Source filenames
+end in `1.41.24 PM.jpeg`, `1.41.25 PM.jpeg` and `1.41.31 PM.jpeg` (1200 by 1600).
+Astro crops the top square into 160/320/800px WebP derivatives. GPS/address overlays
+below that area must stay out of every downloadable derivative. Originals remain
+unchanged outside the public directory. Inspect rendered derivatives after any
+crop change; CSS-only hiding is insufficient for private image overlays.
+
+`/reviews/` is a static Astro redirect to `/#reviews`, with a fallback link and
+noindex. No main/footer Reviews destination or sitemap entry remains. Verify the
+chosen host's behavior at launch; local static preview uses a meta refresh.

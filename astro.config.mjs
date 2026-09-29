@@ -4,6 +4,7 @@ export default defineConfig({
   site: 'https://incetekhenergy.com',
   output: 'static',
   trailingSlash: 'always',
+  redirects: { '/reviews/': '/#reviews' },
   build: { inlineStylesheets: 'never' },
   markdown: { syntaxHighlight: false },
   security: {

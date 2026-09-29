@@ -105,10 +105,16 @@ import { site, navigation } from '../data/site';
   }
   @media (max-width: 62rem) {
     .footer-main {
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
     }
     .footer-contact {
       max-width: 24rem;
+    }
+  }
+  @media (max-width: 36rem) {
+    .footer-main {
+      grid-template-columns: 1fr;
     }
   }
 </style>

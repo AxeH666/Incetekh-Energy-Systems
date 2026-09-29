@@ -10,7 +10,7 @@ Rebuild after any change.
 
 - `PUBLIC_SITE_INDEXABLE=false` is the safe default. All pages emit
   `noindex, follow`, sitemap has no URLs, and robots omits the sitemap announcement.
-- Set `PUBLIC_SITE_INDEXABLE=true` only for an approved launch build. The seven
+- Set `PUBLIC_SITE_INDEXABLE=true` only for an approved launch build. The six
   content pages become indexable. The 404 remains noindex with no canonical.
 - `PUBLIC_GOOGLE_SITE_VERIFICATION` accepts the value from Google's HTML-tag
   verification method. Omit it until a real Search Console property exists.
@@ -30,8 +30,9 @@ Each page has a distinct title/description, an absolute canonical, shared social
 metadata and one h1. Home includes Organization and WebSite JSON-LD with only
 confirmed identity/telephone and the supplied company logo. No address, service area, legal registration,
 founding date, rating or review is inferred. A small static sitemap endpoint
-keeps the seven explicit routes readable without a new dependency. Add future
-public routes there and update its regression test.
+keeps the six explicit routes readable without a new dependency. Add future
+public routes there and update its regression test. The old `/reviews/` route
+is a noindex static redirect to `/#reviews`, excluded from the sitemap.
 
 Robots allows crawling even for previews: Google must read a page's noindex
 instruction. Noindex is not access control; use host authentication for private

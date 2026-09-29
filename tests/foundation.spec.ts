@@ -27,7 +27,7 @@ test('semantic shell, metadata, and main navigation', async ({ page }) => {
   );
   await expect(
     page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link'),
-  ).toHaveText(['About', 'Services', 'Projects', 'Reviews']);
+  ).toHaveText(['About', 'Services', 'Projects']);
   await expect(page.locator('form, script[src]')).toHaveCount(0);
 });
 

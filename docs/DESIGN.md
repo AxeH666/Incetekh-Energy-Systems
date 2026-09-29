@@ -17,7 +17,7 @@ and Organization schema. No recoloring, distortion or invented logo is used.
   Fluid display sizes use `clamp()`. Body copy stays at least 16px at default
   settings. Small uppercase labels are used sparingly. Headings can wrap under
   text enlargement rather than forcing horizontal scrolling.
-- **Layout:** a maximum 90rem container and fluid page gutters. Spacing tokens
+- **Layout:** a maximum 84rem container and fluid page gutters. Spacing tokens
   use a small 8px-based scale with 12px for compact details. Composition changes
   follow content fit rather than specific device names.
 - **Color:** text uses ink/muted on paper and paper/muted-light on ink. The
@@ -37,7 +37,7 @@ WebP variants, and reserves the image's display space to avoid layout movement.
 The source is not upscaled during image generation. CSS crops its display for
 the wide desktop and narrower mobile composition; it does not retouch content.
 The homepage photograph loads eagerly. Offscreen imagery is lazy-loaded. The supplied company logo supplies the square social preview. Company/projects also use
-the second real rooftop image. Review-preview photos use actual top-cropped
+the second real rooftop image. Homepage archive photos use actual top-cropped
 WebP derivatives to exclude GPS/address overlays; see TESTIMONIALS.md.
 
 Keep originals outside `public/`. Import selected files explicitly; never publish
@@ -57,6 +57,6 @@ keyboard inspection; they do not establish full WCAG conformance.
 ## Pre-deployment refinement
 
 See [POLISH.md](POLISH.md) for current reference research, page hierarchy and
-review decisions. Reviews has its own page; projects remain documentary proof.
-The homepage introduces the company, services, manufacturer sales channels and
-contact path without repeating the full review section.
+review decisions. Feedback now lives on Home in a native horizontal scroll track;
+projects remain documentary proof. Archive photos are separate from feedback text.
+The old Reviews route redirects to the homepage section.

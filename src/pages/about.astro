@@ -21,7 +21,7 @@ import { metalRoofImage } from '../data/site';
         src={metalRoofImage.src}
         alt={metalRoofImage.alt}
         widths={[480, 800, 1080]}
-        sizes="(max-width: 704px) 90vw, 45vw"
+        sizes="(max-width: 896px) 90vw, 45vw"
         format="webp"
         quality={80}
       />
@@ -83,13 +83,13 @@ import { metalRoofImage } from '../data/site';
   .story {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    align-items: center;
+    align-items: start;
     gap: clamp(2rem, 7vw, 7rem);
     padding-bottom: var(--space-16);
   }
   .story img {
     width: 100%;
-    aspect-ratio: 1;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
   }
   figcaption {
@@ -101,7 +101,7 @@ import { metalRoofImage } from '../data/site';
     border-top: 1px solid var(--color-line);
     border-bottom: 1px solid var(--color-line);
   }
-  @media (max-width: 44rem) {
+  @media (max-width: 56rem) {
     .story {
       grid-template-columns: 1fr;
     }

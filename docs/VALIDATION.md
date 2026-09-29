@@ -1,75 +1,70 @@
-# Local validation
+# Final polish validation
 
-Pre-deployment polish validated on 2026-09-29 with Node 22.23.3 and installed
-Google Chrome through Playwright (`PLAYWRIGHT_CHANNEL=chrome`). Port 4323 was
-used through `PLAYWRIGHT_PORT` because the existing user development server
-occupied 4321; it was left running. Safari, Firefox and physical handsets have
-not been tested.
+Validated locally on 2026-09-29 with pinned Node 22.23.3 and installed Google
+Chrome through Playwright (`PLAYWRIGHT_CHANNEL=chrome`, isolated port 4323).
+No deployment, DNS, mailbox or analytics account was changed.
 
 ## Results
 
-- Formatting lint passed.
-- Astro / strict TypeScript: zero errors, warnings or hints.
-- Production build passed: seven content pages, custom 404, sitemap and robots.
-- All **40 default-mode browser/output tests passed**.
-- All **four launch-mode SEO tests passed**, including the new Reviews route and
-  Organization logo. Analytics used a local substitute; no service was contacted.
-- The default non-indexable, analytics-disabled build was restored afterward.
-- No new dependencies, client runtime, backend or CSP exceptions were added.
+- Formatting lint passed; Astro/strict TypeScript: zero errors, warnings or hints.
+- Production build passed: six content pages, custom 404, legacy Reviews redirect,
+  sitemap and robots. Default remains non-indexable and analytics-disabled.
+- All **48 default browser/output tests passed**.
+- All **four launch-mode SEO tests passed** with locally intercepted analytics.
+- Static output approximately **932 KB**, within the existing 1.5 MB budget.
+  No client JavaScript bundle, dependency or CSP exception added.
 
-## Covered behavior
+## Browser and visual checks
 
-Home was checked at 320, 390, 768, 1440 and 1920px. About, services, projects,
-reviews, contact and privacy were checked at 320, 768 and 1440px. Axe scans found
-no violations of the selected WCAG A/AA rules. Keyboard skip/main focus, contact
-navigation, call targets, native FAQ controls, reduced motion, forced colors,
-no-JavaScript use and mobile 200% text sizing passed. No tested horizontal overflow.
+Home: 320, 390, 768, 1440 and 1920px. All five other content pages: 320, 768 and
+1440px. Full-page rendered screenshots were inspected for hierarchy, image crop,
+header proportions, logo balance, spacing and mobile stacking. About's tablet
+photo alignment was refined after visual inspection. Wide Home is bounded to
+84rem so type and imagery remain composed on large screens.
 
-Every page, including the error shell, was audited for real links and branded
-resources. Service fragment destinations exist and the System care jump was
-exercised in the browser. All four supplied logos load, and manufacturer wording
-is checked for the conservative sales-channel description. Public claims use the
-latest confirmed experience/project count; no project capacity or location was
-added. Sample reviews remain labelled, unattributed and excluded from schema.
+Axe found no violations of the selected WCAG A/AA rules. Keyboard skip/focus,
+contact navigation, call targets, service fragments, native FAQ controls,
+reduced motion, forced colors, no-JavaScript use and 200% text scaling passed.
+Every visible link resolves; no empty buttons/links or page-level horizontal
+overflow at tested widths. Phone links were checked without placing calls.
 
-Full-page desktop and mobile screenshots were visually inspected. The shared
-shell, installation photos, manufacturer proportions, service layout, review
-photos, contact controls and privacy page were checked. Screenshot tests wait
-for lazy photos to load. Original photo/artwork files are unchanged; review
-crops still remove GPS/address overlays from the downloadable derivatives.
+New tests cover the 13-entry homepage feedback track, native arrow-key scrolling,
+focus exit, mobile touch swipe, reduced-motion snapping disabled, no-JS use,
+and the legacy `/reviews/` redirect into `/#reviews`. The feedback track alone
+scrolls horizontally. Archive photographs remain separate from feedback text.
 
-Each content page has unique title/description, a canonical, one h1 and social
-metadata. Tests verify sitemap/robots/indexing agreement, supported Organization
-schema with a working logo, no sample-review schema and a true noindex 404.
-Analytics is absent by default and locally intercepted when tested enabled.
-No browser console/CSP errors occurred in the configuration checks.
+Image requests were held back and released at 390/768/1440/1920px: image boxes,
+feedback position and footer position were unchanged before/after decoding.
+This verifies reserved layout space, not field Core Web Vitals. Inspected the
+actual downloadable logo crops and three largest archive derivatives; artwork
+is intact and no GPS/address overlays remain. Original assets are unchanged.
 
-## Performance and limits
+Confirmed business facts, qualified warranty, conservative manufacturer wording,
+public phone and schema boundaries are covered. No Review/AggregateRating schema.
+Six launch sitemap URLs; old review route is noindex and excluded. Preview mode
+keeps an empty sitemap. Launch analytics is intercepted in tests; no real beacon.
 
-Default static output is approximately **941 KB** before transfer compression,
-including all responsive variants, branding derivatives, font, HTML and CSS.
-The existing 1.5 MB total-output budget passes. No bundled client JavaScript is
-emitted. This is an artifact-size result, not measured Core Web Vitals.
+## Test-run corrections and limits
 
-Static `_headers` contents are tested, but Astro preview does not apply those
-response rules. HTTPS, redirects, caching, hosted 404 behavior, search verification,
-analytics ingestion and actual call completion still require launch checks. No
-phone call was placed. Automated checks do not prove full WCAG conformance.
+The first run collided with an unfinished rebuild, briefly producing 404s for
+Home (two failures). Tests were rerun only after build completion; all passed.
+A malformed arrow from Windows pipe encoding was caught in visual QA and replaced
+with an HTML entity. A formatting warning after the final About adjustment was
+corrected before final verification.
 
-## Review findings and fixes
+Only Chrome was tested; no physical handset, Safari or Firefox acceptance is
+claimed. Automated accessibility checks do not prove complete WCAG conformance.
+Astro static redirects use meta refresh locally; hosting status/redirect behavior,
+headers, HTTPS, cache policy, hosted 404 and real analytics/search acceptance still
+require an approved deployment and live verification.
 
-- Replaced obsolete experience wording and provisional branding throughout the
-  public shell and metadata; preserved source artwork and scope documents.
-- Removed duplicate review grids and made Reviews a real navigation destination;
-  added it to sitemap and SEO/accessibility coverage.
-- Balanced differing manufacturer artwork proportions without distortion or
-  color changes, and placed relationship wording alongside the marks.
-- Replaced vague CTA labels, retained warranty terms and removed repetitive copy.
-- Corrected text encoding during implementation before final build/visual QA.
-- Made browser tests accept a separate port and removed hardcoded test origins,
-  preserving the user's running development server.
-- Updated stale handoff facts, page counts, logo provenance and review locations.
+## Review and deployment boundary
 
-The implementing agent self-reviewed before push and separately reviewed the
-pushed PR; this is not an external human review or hosted CI approval. See the PR
-review record for the final pushed-head findings. Deployment was not performed.
+Self-review covers the complete diff, unchanged originals, minimal scope, content,
+responsive behavior and tests. The pushed PR receives a separate code review;
+its review record is the authority for findings and final-head disposition.
+
+Temporary comments are explicitly requested design copy, not verified customer
+feedback. Replace all 13 entries with verified permissioned statements, or remove
+the feedback text before public deployment. Confirm photo publication permissions.
+Hosting/domain/email remain separate tasks under [LAUNCH.md](LAUNCH.md).
