@@ -25,6 +25,8 @@ checks and annual yield audits.
 - Reviews move at 45 CSS pixels/second and loop continuously. A visual duplicate
   joins the boundary, marked `aria-hidden` and `inert`; assistive technology reads
   ten entries once. Normal hover and vertical page scrolling do not halt movement.
+  The gutter sits outside the scrolling content, and the visible track is bounded
+  to the content width so a full repeated cycle fits even on ultra-wide screens.
   Pause/Resume, touch, horizontal wheel and keyboard control remain available.
   Reduced motion removes the duplicate and disables automatic movement. No-JS
   visitors get the native scrollable original list. Offscreen/hidden-tab motion

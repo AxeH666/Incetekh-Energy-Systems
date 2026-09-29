@@ -98,11 +98,13 @@ import { reviewSamples } from '../data/review-samples';
     cursor: pointer;
   }
   .review-track {
+    width: min(100% - var(--gutter) * 2, var(--content-width));
+    margin-inline: auto;
     display: flex;
     gap: 1.5rem;
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    padding: 0 var(--gutter) 1rem;
+    padding-bottom: 1rem;
     scrollbar-width: thin;
     scrollbar-color: var(--color-muted) transparent;
   }

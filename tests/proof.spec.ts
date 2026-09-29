@@ -244,3 +244,42 @@ test('touch interaction stops automatic movement until Resume is chosen', async 
     .toBeGreaterThan(paused + 8);
   await context.close();
 });
+
+for (const width of [390, 1440, 3840]) {
+  test(`loop seam is visually identical and has enough content at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    const track = page.locator('.review-track');
+    await track.scrollIntoViewIfNeeded();
+    await page.locator('.review-toggle').click();
+    for (const img of await track.locator('img').all()) {
+      await img.evaluate((el: HTMLImageElement) => {
+        el.loading = 'eager';
+        return el.decode();
+      });
+    }
+    const cycle = await track.evaluate(
+      (el) =>
+        el.querySelector('ul')!.getBoundingClientRect().width +
+        parseFloat(getComputedStyle(el).columnGap),
+    );
+    expect(
+      await track.evaluate((el) => el.scrollWidth - el.clientWidth),
+    ).toBeGreaterThanOrEqual(cycle);
+    await track.evaluate((el) => (el.scrollLeft = 0));
+    const box = (await track.boundingBox())!;
+    const clip = {
+      x: box.x,
+      y: box.y,
+      width: box.width,
+      height: box.height - 32,
+    };
+    const start = await page.screenshot({ clip });
+    await track.evaluate((el, x) => (el.scrollLeft = x), cycle);
+    const loop = await page.screenshot({ clip });
+    expect(start.equals(loop)).toBe(true);
+  });
+}

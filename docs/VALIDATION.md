@@ -12,7 +12,7 @@ Chrome through Playwright. The earlier records below are historical.
 - A final photo-only crop adjustment was rebuilt, visually checked and passed
   the focused photo test. Its first rerun was blocked by our manual preview's
   server lock; stopping that preview resolved the local test setup. Current
-  default output is 1,218,875 bytes, within the 1.5 MB budget.
+  default output is approximately 1.22 MB, within the 1.5 MB budget.
 - Full-page desktop, tablet and mobile renders were inspected, with reviews and
   controls inspected separately at readable scale. Automated checks additionally
   cover 320/390/768/1440/1920px, no page overflow, selected axe rules, keyboard
@@ -34,6 +34,15 @@ Chrome through Playwright. The earlier records below are historical.
   the official downloaded white glyph byte-for-byte. Loading the site makes no
   WhatsApp requests. Real WhatsApp account reachability/handset handoff is not
   claimed by these local checks.
+
+Independent review identified two motion issues: the internal gutter produced a
+visible seam, and an unbounded ultra-wide viewport could exhaust the repeated
+content before the cycle ended. The gutter now sits outside a bounded track.
+All **14 focused review tests passed**, including byte-identical rendered seam
+comparisons at 390/1440/3840px and enough-content checks for each width.
+On 2026-09-30, all **18 foundation/polish checks** also passed after these fixes,
+including responsive accessibility and image layout reservation. Formatting and
+Astro/strict TypeScript were rerun clean.
 
 No deployment was performed. The requested temporary reviews still need verified
 replacement or removal before public launch. Separate source-file renames made
