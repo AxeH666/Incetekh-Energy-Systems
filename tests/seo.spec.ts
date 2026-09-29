@@ -6,6 +6,7 @@ const routes = [
   '/about/',
   '/services/',
   '/projects/',
+  '/reviews/',
   '/contact/',
   '/privacy/',
 ];
@@ -117,6 +118,9 @@ test('organization schema uses confirmed identity and never sample reviews', asy
     telephone: '+919441259786',
     url: 'https://incetekhenergy.com/',
   });
+  expect(schema['@graph'][0].logo).toBe(
+    await page.locator('meta[property="og:image"]').getAttribute('content'),
+  );
   expect(raw).not.toMatch(
     /Review|AggregateRating|address|foundingDate|award|sameAs|email/,
   );

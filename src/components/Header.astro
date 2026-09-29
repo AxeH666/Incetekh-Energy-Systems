@@ -1,18 +1,13 @@
 ---
 import Wordmark from './Wordmark.astro';
-const links = [
-  { href: '/', label: 'Home' },
-  { href: '/about/', label: 'Company' },
-  { href: '/services/', label: 'Services' },
-  { href: '/projects/', label: 'Projects' },
-];
+import { navigation } from '../data/site';
 ---
 
 <header class="site-header">
   <div class="container header-inner">
     <Wordmark />
     <nav aria-label="Main navigation">
-      {links.map((link) => (
+      {navigation.map((link) => (
         <a
           href={link.href}
           aria-current={Astro.url.pathname === link.href ? 'page' : undefined}
@@ -26,7 +21,7 @@ const links = [
       href="/contact/"
       aria-current={Astro.url.pathname === '/contact/' ? 'page' : undefined}
     >
-      Get in touch <span aria-hidden="true">↗</span>
+      Contact Us <span aria-hidden="true">↗</span>
     </a>
   </div>
 </header>
@@ -34,14 +29,15 @@ const links = [
 <style>
   .site-header {
     border-bottom: 1px solid var(--color-line);
+    background: #fff;
   }
   .header-inner {
-    min-height: 6.5rem;
+    min-height: 7.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    padding-block: var(--space-4);
+    padding-block: var(--space-2);
   }
   nav {
     display: flex;
@@ -60,7 +56,7 @@ const links = [
   nav a:not([aria-current]) {
     text-decoration: none;
   }
-  @media (max-width: 44rem) {
+  @media (max-width: 56rem) {
     .button {
       gap: var(--space-3);
       padding-inline: var(--space-3);

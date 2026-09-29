@@ -5,7 +5,7 @@ import metalRoof from '../../project photos/WhatsApp Image 2026-09-26 at 1.41.36
 export const site = {
   name: 'Incetekh Energy',
   description:
-    'Solar engineering, procurement and construction, backed by approximately 15 years of operating experience.',
+    'Solar engineering, procurement and construction, with more than 13 years of experience and 500+ projects completed.',
   phone: '+919441259786',
   phoneDisplay: '+91 94412 59786',
 };
@@ -19,3 +19,10 @@ export const metalRoofImage = {
   src: metalRoof,
   alt: 'Solar panels arranged along both slopes of a corrugated metal roof.',
 };
+
+export const navigation = [
+  { href: '/about/', label: 'About' },
+  { href: '/services/', label: 'Services' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/reviews/', label: 'Reviews' },
+];

@@ -55,7 +55,7 @@ Do not enable automatic analytics injection alongside the manual token option.
 - Load every route from the domain on desktop and a phone; check photos, font,
   header, footer, focus indicators and all call links. Arrange a real test call
   with the owner; automated tests did not place a call.
-- Verify HTTPS, canonical redirects, title/social tags, six sitemap URLs,
+- Verify HTTPS, canonical redirects, title/social tags, seven sitemap URLs,
   robots sitemap declaration and `index, follow` on content pages.
 - Request a nonexistent path: it must return HTTP 404 with the custom error
   page and noindex, not HTTP 200 or the homepage. Disable any SPA fallback.

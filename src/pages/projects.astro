@@ -3,17 +3,16 @@ import { Image } from 'astro:assets';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import SiteCTA from '../components/SiteCTA.astro';
-import Testimonials from '../components/Testimonials.astro';
 import { foundationImage, metalRoofImage } from '../data/site';
 ---
 
 <SiteLayout
-  title="Solar Installation Photographs | Incetekh Energy"
-  description="Explore real rooftop installation photographs from the Incetekh Energy project archive, with descriptive captions and no unverified project claims."
+  title="Projects | Incetekh Energy"
+  description="500+ projects completed. See selected real rooftop installation photographs from the Incetekh Energy project archive."
 >
   <PageIntro
-    eyebrow="Selected installation photographs"
-    title="Solar, out in the world."
+    eyebrow="Projects / selected photographs"
+    title="500+ projects completed."
     description="A closer look at rooftop installations from the Incetekh Energy project archive."
   />
   <section class="container gallery" aria-label="Installation gallery">
@@ -52,11 +51,10 @@ import { foundationImage, metalRoofImage } from '../data/site';
     </figure>
   </section>
   <p class="container evidence-note">
-    Photographs show the installations as supplied. Project capacities, client
-    identities, dates and performance figures are not published without verified
-    records.
+    A selection from the Incetekh project archive. Speak with us about the
+    installation you have in mind.
   </p>
-  <Testimonials />
+
   <SiteCTA />
 </SiteLayout>
 

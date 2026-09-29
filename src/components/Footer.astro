@@ -1,6 +1,6 @@
 ---
 import Wordmark from './Wordmark.astro';
-import { site } from '../data/site';
+import { site, navigation } from '../data/site';
 ---
 
 <footer class="site-footer" id="contact" tabindex="-1">
@@ -10,8 +10,15 @@ import { site } from '../data/site';
         <Wordmark />
         <p>Engineering. Procurement. Construction.</p>
       </div>
+      <nav aria-label="Footer navigation">
+        <p class="eyebrow">Incetekh Energy</p>
+        {navigation.map((link) => (
+          <a href={link.href}>{link.label}</a>
+        ))}
+        <a href="/contact/">Contact</a>
+      </nav>
       <div class="footer-contact">
-        <h2 class="eyebrow">Talk to Incetekh</h2>
+        <h2 class="eyebrow">Arrange a free site visit</h2>
         <a class="phone-link" href={`tel:${site.phone}`}>
           <span>{site.phoneDisplay}</span>
           <span aria-hidden="true">↗</span>
@@ -50,6 +57,24 @@ import { site } from '../data/site';
     font-size: var(--text-small);
     margin-top: var(--space-4);
   }
+  nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+    align-content: start;
+  }
+  nav p {
+    grid-column: 1 / -1;
+    color: var(--color-on-dark-muted);
+    margin-bottom: 0.75rem;
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: var(--text-small);
+    text-underline-offset: 0.3em;
+  }
   .footer-contact h2 {
     color: var(--color-on-dark-muted);
     margin-bottom: var(--space-4);
@@ -78,7 +103,7 @@ import { site } from '../data/site';
     color: var(--color-on-dark-muted);
     font-size: var(--text-small);
   }
-  @media (max-width: 44rem) {
+  @media (max-width: 62rem) {
     .footer-main {
       flex-direction: column;
     }

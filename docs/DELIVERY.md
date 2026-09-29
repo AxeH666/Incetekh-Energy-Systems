@@ -1,5 +1,9 @@
 # Phase 1 local delivery
 
+This records the initial delivery through PR #7. The subsequent pre-deployment
+polish, new confirmed facts and branding supersede the initial choices below;
+see [POLISH.md](POLISH.md) and [VALIDATION.md](VALIDATION.md).
+
 The complete local public website is implemented. The public launch, domain
 connection, analytics account activation and business mailboxes remain external
 actions. This is not a claim that the full live Phase 1 milestone is complete.

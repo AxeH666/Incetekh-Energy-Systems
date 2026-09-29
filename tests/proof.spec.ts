@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-for (const route of ['/', '/projects/']) {
+for (const route of ['/reviews/']) {
   test(`temporary reviews remain explicitly unverified on ${route}`, async ({
     page,
     request,

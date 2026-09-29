@@ -6,7 +6,7 @@ is unavailable. This updates the earlier omission decision; it does not make
 the sample copy verified evidence.
 
 `src/data/review-samples.ts` is the single replacement source. `Testimonials.astro`
-renders it on home and projects pages. All three examples carry a visible
+renders it on the dedicated `/reviews/` page. Home and navigation link to it. All three examples carry a visible
 **Sample copy — not a verified review** label. The section explains that the
 people pictured are not attributed authors. There are no names, star ratings,
 review schema, dates, capacities, savings or technical outcomes.

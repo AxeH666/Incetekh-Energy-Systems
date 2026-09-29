@@ -1,36 +1,36 @@
 ---
+import { Image } from 'astro:assets';
+import logo from '../../incetekh_logo.png';
 import { site } from '../data/site';
 ---
 
-<a class="wordmark" href="/" aria-label={`${site.name} — home`}>
-  <span class="wordmark-name">
-    INCETEKH<span aria-hidden="true">.</span>
-  </span>
-  <span class="wordmark-descriptor">ENERGY</span>
+<a class="wordmark" href="/" aria-label={`${site.name} - home`}>
+  <Image
+    src={logo}
+    alt="Incetekh Solar"
+    width={224}
+    height={224}
+    format="webp"
+    quality={90}
+    loading="eager"
+  />
 </a>
 
 <style>
   .wordmark {
     display: inline-flex;
-    flex-direction: column;
-    align-items: flex-start;
-    color: inherit;
-    text-decoration: none;
-    line-height: 1;
-    gap: 0.45rem;
-    padding-block: 0.5rem;
+    flex: 0 0 auto;
+    background: #fff;
   }
-  .wordmark-name {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: -0.06em;
+  .wordmark img {
+    width: 7rem;
+    height: 7rem;
+    object-fit: contain;
   }
-  .wordmark-name span {
-    color: var(--color-accent-bright);
-  }
-  .wordmark-descriptor {
-    font-size: 0.625rem;
-    font-weight: 600;
-    letter-spacing: 0.38em;
+  @media (max-width: 56rem) {
+    .wordmark img {
+      width: 6rem;
+      height: 6rem;
+    }
   }
 </style>
