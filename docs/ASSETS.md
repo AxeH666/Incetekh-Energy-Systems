@@ -27,9 +27,11 @@ source filenames, crop rules and replacement boundaries are recorded in
 GPS/address overlays. Originals are unchanged, and pictured people are not verified
 authors. Some photographs are alternate views of the same installation.
 
-The numbered `project photos/2.png`, `3.png` and `4.png` now appear in the
+The numbered `project photos/2.png` and `3.png` now appear in the
 homepage gallery as generic supporting images with illustrative alt text, alongside
 the real installation photograph. They are excluded from the project archive.
+The founder removed `4.png` from display in the final hero touch-ups; the original
+source remains in the repository.
 
 ## Published facts
 

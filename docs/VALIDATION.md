@@ -1,5 +1,19 @@
 # Final polish validation
 
+## Final hero touch-ups
+
+Validated on 2026-09-30 with Node 22.23.3 and installed Chrome. All **64 default
+browser/output checks passed**. The production build and Astro/strict TypeScript
+passed. New assertions verify matching action/statistic alignment, a 20-60px gap,
+inset photographs and exactly three slides at 390/768/1440/1920px. Existing checks
+cover motion, keyboard controls, reduced motion, swipe/pinch zoom, image layout
+reservation, accessibility, links and review loop continuity.
+
+Visually inspected the hero at those four widths and all three photo crops.
+Pause/play SVG icons are removed; accessible text controls appear only on keyboard
+focus. Image 4 is excluded from display while its source remains intact. Output
+is 2,061,564 bytes. No deployment or account change was performed.
+
 ## Single-photo slideshow and quieter controls
 
 Validated on 2026-09-30 with Node 22.23.3 and installed Chrome:

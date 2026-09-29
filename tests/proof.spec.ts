@@ -163,14 +163,16 @@ test('automatic scrolling continues on hover and pauses for focus, button and re
   const focusPosition = await track.evaluate((el) => el.scrollLeft);
   await page.waitForTimeout(250);
   expect(await track.evaluate((el) => el.scrollLeft)).toBe(focusPosition);
-  await toggle.click();
+  await toggle.focus();
+  await toggle.press('Enter');
   await expect(toggle).toHaveAttribute('aria-label', 'Resume scrolling');
   await page.mouse.move(1439, 999);
   await toggle.evaluate((el) => el.blur());
   const pausedPosition = await track.evaluate((el) => el.scrollLeft);
   await page.waitForTimeout(250);
   expect(await track.evaluate((el) => el.scrollLeft)).toBe(pausedPosition);
-  await toggle.click();
+  await toggle.focus();
+  await toggle.press('Enter');
   await page.mouse.move(1439, 999);
   await toggle.evaluate((el) => el.blur());
   await expect
@@ -190,7 +192,8 @@ test('floating reviews cross the loop boundary and expose each entry once to ass
   const track = page.locator('.review-track');
   const toggle = page.locator('.review-toggle');
   await track.scrollIntoViewIfNeeded();
-  await toggle.click();
+  await toggle.focus();
+  await toggle.press('Enter');
   await expect(toggle).toHaveAttribute('aria-label', 'Resume scrolling');
   await expect(track.getByRole('listitem')).toHaveCount(10);
   await expect(
@@ -204,7 +207,8 @@ test('floating reviews cross the loop boundary and expose each entry once to ass
       parseFloat(getComputedStyle(el).columnGap),
   );
   await track.evaluate((el, x) => (el.scrollLeft = x), cycle - 4);
-  await toggle.click();
+  await toggle.focus();
+  await toggle.press('Enter');
   await expect
     .poll(() => track.evaluate((el) => el.scrollLeft))
     .toBeLessThan(50);
@@ -240,7 +244,8 @@ test('touch interaction stops automatic movement until Resume is chosen', async 
   const paused = await track.evaluate((el) => el.scrollLeft);
   await page.waitForTimeout(250);
   expect(await track.evaluate((el) => el.scrollLeft)).toBe(paused);
-  await toggle.tap();
+  await toggle.focus();
+  await toggle.press('Enter');
   await expect
     .poll(() => track.evaluate((el) => el.scrollLeft))
     .toBeGreaterThan(paused + 8);
@@ -256,7 +261,8 @@ for (const width of [390, 1440, 3840]) {
     await page.evaluate(() => document.fonts.ready);
     const track = page.locator('.review-track');
     await track.scrollIntoViewIfNeeded();
-    await page.locator('.review-toggle').click();
+    await page.locator('.review-toggle').focus();
+    await page.locator('.review-toggle').press('Enter');
     for (const img of await track.locator('img').all()) {
       await img.evaluate((el: HTMLImageElement) => {
         el.loading = 'eager';
