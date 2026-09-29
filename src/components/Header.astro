@@ -1,5 +1,6 @@
 ---
 import Wordmark from './Wordmark.astro';
+import WhatsAppLink from './WhatsAppLink.astro';
 import { navigation } from '../data/site';
 ---
 
@@ -16,13 +17,7 @@ import { navigation } from '../data/site';
         </a>
       ))}
     </nav>
-    <a
-      class="button button-dark"
-      href="/contact/"
-      aria-current={Astro.url.pathname === '/contact/' ? 'page' : undefined}
-    >
-      Contact Us <span aria-hidden="true">↗</span>
-    </a>
+    <WhatsAppLink label="WhatsApp" />
   </div>
 </header>
 

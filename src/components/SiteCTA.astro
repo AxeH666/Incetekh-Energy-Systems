@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site';
+import WhatsAppLink from './WhatsAppLink.astro';
 ---
 
 <section class="container section site-cta" aria-labelledby="cta-heading">
@@ -13,11 +14,12 @@ import { site } from '../data/site';
   </div>
   <div class="cta-action">
     <p>
-      Tell us about your roof and what you have in mind. Call Incetekh to
-      arrange a visit.
+      Tell us about your roof or your existing system. Message us to arrange a
+      free site visit, performance check or annual yield audit.
     </p>
-    <a class="button button-dark" href={`tel:${site.phone}`}>
-      Call {site.phoneDisplay} <span aria-hidden="true">↗</span>
+    <WhatsAppLink />
+    <a class="text-link call-alternative" href={`tel:${site.phone}`}>
+      Call {site.phoneDisplay}
     </a>
   </div>
 </section>
@@ -35,6 +37,11 @@ import { site } from '../data/site';
   }
   .cta-action {
     max-width: 26rem;
+  }
+  .call-alternative {
+    display: flex;
+    width: fit-content;
+    margin-top: 0.75rem;
   }
   .cta-action p {
     color: var(--color-muted);

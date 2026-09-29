@@ -8,6 +8,7 @@ export const site = {
     'Solar engineering, procurement and construction, with more than 13 years of experience and 500+ projects completed.',
   phone: '+919441259786',
   phoneDisplay: '+91 94412 59786',
+  whatsapp: 'https://wa.me/919441259786',
 };
 
 export const foundationImage = {
@@ -24,4 +25,5 @@ export const navigation = [
   { href: '/about/', label: 'About' },
   { href: '/services/', label: 'Services' },
   { href: '/projects/', label: 'Projects' },
+  { href: '/contact/', label: 'Contact' },
 ];

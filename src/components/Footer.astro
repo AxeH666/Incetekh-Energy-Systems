@@ -1,5 +1,6 @@
 ---
 import Wordmark from './Wordmark.astro';
+import WhatsAppLink from './WhatsAppLink.astro';
 import { site, navigation } from '../data/site';
 ---
 
@@ -15,10 +16,10 @@ import { site, navigation } from '../data/site';
         {navigation.map((link) => (
           <a href={link.href}>{link.label}</a>
         ))}
-        <a href="/contact/">Contact</a>
       </nav>
       <div class="footer-contact">
         <h2 class="eyebrow">Arrange a free site visit</h2>
+        <WhatsAppLink />
         <a class="phone-link" href={`tel:${site.phone}`}>
           <span>{site.phoneDisplay}</span>
           <span aria-hidden="true">↗</span>
@@ -80,6 +81,7 @@ import { site, navigation } from '../data/site';
     margin-bottom: var(--space-4);
   }
   .phone-link {
+    margin-top: 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;

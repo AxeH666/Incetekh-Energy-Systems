@@ -69,7 +69,7 @@ test('service warranty is qualified and supported services are findable', async 
   });
   await expect(warranty).toContainText('subject to your written proposal');
   await expect(
-    page.getByRole('heading', { name: 'Annual yield audits' }),
+    page.getByRole('heading', { name: 'Free annual yield audits' }),
   ).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'A free site visit.', exact: true }),
