@@ -66,7 +66,7 @@ test('every visible action resolves, including service fragments and branded res
     }
     await expect(
       page.locator(
-        'button, a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
+        'button:not(.review-toggle), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
       ),
     ).toHaveCount(0);
     const links = await page
@@ -121,6 +121,7 @@ for (const width of [390, 768, 1440, 1920]) {
       if (route.request().resourceType() === 'image') await imagesReady;
       await route.continue();
     });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => document.fonts.ready);
@@ -141,6 +142,9 @@ for (const width of [390, 768, 1440, 1920]) {
       await image.scrollIntoViewIfNeeded();
       await image.evaluate((el: HTMLImageElement) => el.decode());
     }
+    await page.locator('.review-track').evaluate((el) => {
+      el.scrollLeft = 0;
+    });
     await page.evaluate(() => window.scrollTo(0, 0));
     expect(await positions()).toEqual(before);
   });

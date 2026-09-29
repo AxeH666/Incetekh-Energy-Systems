@@ -1,5 +1,9 @@
 # Final pre-deployment polish
 
+Follow-up: the founder subsequently requested 12 photo reviews with automatic
+scrolling on Home. [TESTIMONIALS.md](TESTIMONIALS.md) describes the current
+implementation; it supersedes the text-only, no-runtime review details below.
+
 This focused component starts from fresh main `9ba5466` after PR #8. It preserves
 the static Astro architecture, supplied artwork, real project proof and confirmed
 business claims. No deployment, DNS, email, analytics activation or later scope.

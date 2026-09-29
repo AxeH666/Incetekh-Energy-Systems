@@ -1,5 +1,35 @@
 # Final polish validation
 
+## Homepage photo-review follow-up
+
+The founder's follow-up replaces the earlier text-only review strip with 12
+photo/text entries and gentle automatic scrolling. Checked locally on 2026-09-29
+using Node 22.23.3 and installed Chrome. The earlier PR #9 record below is historical.
+
+- Default production build passed. All 49 browser/output tests passed across the
+  full run and focused rerun: the initial run passed 48/49, then all nine review
+  tests passed after fixing a test locator that depended on the changing button
+  label. Earlier test assumptions were updated for the new inline script and motion.
+- Formatting lint passed; Astro/strict TypeScript returned zero errors, warnings
+  or hints.
+- Four launch-mode SEO checks passed with analytics intercepted locally; the
+  default non-indexable, analytics-disabled build was restored afterward.
+- Reviewed section screenshots at 390/768/1440/1920px and the downloadable crops.
+  Twelve 320/640px WebP photo pairs exclude GPS/address overlays; originals remain
+  unchanged. One awkward source crop was replaced during visual review.
+- Checks cover photo loading, keyboard scrolling at 320/390/768/1440/1920px,
+  touch/manual use without JavaScript, hover/focus pause, Pause/Resume, reduced
+  motion, image layout reservation, accessibility and unchanged navigation.
+- Scrolling uses a small CSP-hashed inline script, with no new dependency, external
+  script file or relaxed CSP. Static output is 1,156,149 bytes, within the existing
+  1.5 MB budget.
+
+Temporary positive copy is the requested prelaunch design content, not verified
+testimonials. Text and photo authorship need verified replacement/permission or
+removal before public deployment. No deployment or account settings were changed.
+
+## Earlier PR #9 validation
+
 Validated locally on 2026-09-29 with pinned Node 22.23.3 and installed Google
 Chrome through Playwright (`PLAYWRIGHT_CHANNEL=chrome`, isolated port 4323).
 No deployment, DNS, mailbox or analytics account was changed.

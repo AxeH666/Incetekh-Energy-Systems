@@ -34,7 +34,7 @@ Do not enable automatic analytics injection alongside the manual token option.
 
 1. Confirm hosting account ownership, registrar/DNS access and deployment approval.
 2. Confirm use of the public phone number and permission to publish the selected
-   project/customer photographs. Replace all 13 temporary comments using the verified review sheet, or remove
+   project/customer photographs. Replace all 12 temporary comments using the verified review sheet, or remove
    the feedback text. The final polish has no visible sample labels and is not
    approved to publish invented endorsements. See TESTIMONIALS.md.
 3. Inspect existing DNS records and save their values before proposing changes.

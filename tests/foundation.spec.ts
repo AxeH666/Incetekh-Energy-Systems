@@ -28,7 +28,9 @@ test('semantic shell, metadata, and main navigation', async ({ page }) => {
   await expect(
     page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link'),
   ).toHaveText(['About', 'Services', 'Projects']);
-  await expect(page.locator('form, script[src]')).toHaveCount(0);
+  await expect(page.locator('form')).toHaveCount(0);
+  await expect(page.locator('script[src]')).toHaveCount(0);
+  await expect(page.locator('script[type="module"]')).toHaveCount(1);
 });
 
 test('keyboard skip link and contact navigation work', async ({ page }) => {
@@ -56,6 +58,7 @@ for (const width of [320, 390, 768, 1440, 1920]) {
   test(`responsive shell and accessibility at ${width}px`, async ({
     page,
   }, testInfo) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
@@ -100,6 +103,9 @@ for (const width of [320, 390, 768, 1440, 1920]) {
         )
         .toBe(true);
     }
+    await page.locator('.review-track').evaluate((el) => {
+      el.scrollLeft = 0;
+    });
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({
       path: testInfo.outputPath(`home-${width}.png`),
@@ -209,7 +215,7 @@ test('missing page uses the shared accessible error shell', async ({
   await expect(page).toHaveURL('/');
 });
 
-test('static output stays small and excludes source evidence and client scripts', async () => {
+test('static output stays small and limits client code to review scrolling', async () => {
   const files: string[] = [];
   async function walk(path: string) {
     for (const entry of await readdir(path, { withFileTypes: true })) {
@@ -219,7 +225,8 @@ test('static output stays small and excludes source evidence and client scripts'
     }
   }
   await walk('dist');
-  expect(files.some((file) => file.endsWith('.js'))).toBe(false);
+  const scripts = files.filter((file) => file.endsWith('.js'));
+  expect(scripts).toHaveLength(0);
   expect(
     files.some((file) => /review pictures|ChatGPT|hf_2026/.test(file)),
   ).toBe(false);

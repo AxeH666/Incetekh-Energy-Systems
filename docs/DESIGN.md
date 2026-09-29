@@ -25,7 +25,9 @@ and Organization schema. No recoloring, distortion or invented logo is used.
 - **Links:** real destinations, native anchors, visible focus, and 44px minimum
   navigation/call target heights. A skip link moves focus to main. The header
   contact link opens the dedicated enquiry page; phone links open the dialler.
-- **Motion:** a short button color transition only; disabled for reduced motion.
+- **Motion:** button color transition and gentle homepage review scrolling;
+  disabled for reduced motion. Scrolling pauses on interaction, with a visible
+  Pause/Resume control. No carousel dependency.
 - **Components:** extract only repeated structure. The layout owns the document;
   the page owns its composition. Add navigation entries only with working pages.
 
@@ -58,5 +60,5 @@ keyboard inspection; they do not establish full WCAG conformance.
 
 See [POLISH.md](POLISH.md) for current reference research, page hierarchy and
 review decisions. Feedback now lives on Home in a native horizontal scroll track;
-projects remain documentary proof. Archive photos are separate from feedback text.
+projects remain documentary proof. Twelve supplied photos accompany temporary feedback; authorship remains unverified.
 The old Reviews route redirects to the homepage section.
