@@ -1,0 +1,49 @@
+---
+import { site } from '../data/site';
+---
+
+<section class="container section site-cta" aria-labelledby="cta-heading">
+  <div>
+    <p class="eyebrow">Let’s talk solar</p>
+    <h2 id="cta-heading" class="section-title">
+      Start with a free
+      <br />
+      site visit.
+    </h2>
+  </div>
+  <div class="cta-action">
+    <p>
+      Tell us about your roof and what you have in mind. Call Incetekh to
+      arrange a visit.
+    </p>
+    <a class="button button-dark" href={`tel:${site.phone}`}>
+      Call {site.phoneDisplay} <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .site-cta {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-8);
+    align-items: end;
+  }
+  .eyebrow {
+    color: var(--color-accent);
+    margin-bottom: var(--space-6);
+  }
+  .cta-action {
+    max-width: 26rem;
+  }
+  .cta-action p {
+    color: var(--color-muted);
+    margin-bottom: var(--space-6);
+  }
+  @media (max-width: 44rem) {
+    .site-cta {
+      flex-direction: column;
+      align-items: start;
+    }
+  }
+</style>

@@ -1,8 +1,7 @@
 # Incetekh Energy
 
-PR1 establishes the public website foundation. Read [AGENTS.md](AGENTS.md) and
-[SCOPE.md](SCOPE.md) before making changes. This is a reviewable local shell,
-not the completed website or a production deployment.
+Phase 1 public website, delivered in sequential components. Read [AGENTS.md](AGENTS.md) and
+[SCOPE.md](SCOPE.md) before making changes. The current component is the homepage. External deployment is not authorized.
 
 ## Run locally
 
@@ -56,10 +55,9 @@ serves as the home link and the contact link remains visible; no menu is needed
 for this two-destination shell. The phone was confirmed by the founder. There is
 no invented mailbox, contact form, project data or customer testimonial.
 
-## PR1 boundaries
+## Delivery boundaries
 
-The build contains one short homepage introduction and photograph, not full
-homepage sections. Services, company pages, project/testimonial experiences,
+The build now contains the homepage, confirmed service summaries, and a call path. Services, company pages, project/testimonial experiences,
 lead forms, analytics, Search Console, sitemap/robots configuration, structured
 data, hosting/DNS and email setup belong to their later components.
 
@@ -71,4 +69,4 @@ deploy the domain. There is no deployment workflow or hosting dependency.
 
 Raw supplied assets remain intact and are not served wholesale. See the
 [asset register](docs/ASSETS.md) before selecting further imagery or claims.
-Do not start PR2 until this PR is independently reviewed and merged.
+See docs/PLAN.md for the current sequence. Each PR must be reviewed and merged before the next component.

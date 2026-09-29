@@ -51,10 +51,10 @@ test('keyboard skip link and contact navigation work', async ({ page }) => {
   ).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(
-    page.getByRole('link', { name: '+91 94412 59786' }),
+    page.getByRole('link', { name: '+91 94412 59786', exact: true }),
   ).toBeFocused();
   await expect(
-    page.getByRole('link', { name: '+91 94412 59786' }),
+    page.getByRole('link', { name: '+91 94412 59786', exact: true }),
   ).toHaveAttribute('href', 'tel:+919441259786');
 });
 
@@ -152,7 +152,7 @@ test('works without JavaScript and with reduced motion', async ({
   );
   await page.getByRole('link', { name: 'Get in touch' }).click();
   await expect(
-    page.getByRole('link', { name: '+91 94412 59786' }),
+    page.getByRole('link', { name: '+91 94412 59786', exact: true }),
   ).toBeInViewport();
   await context.close();
 });

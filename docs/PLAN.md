@@ -1,32 +1,22 @@
-# PR1: website foundation
+# Phase 1 local website delivery
 
-Boundary: component 1 in SCOPE.md, on the existing `feat/pr1-foundation` branch.
-The later user request supersedes the earlier complete-website task. Do not modify
-main, deploy, configure external services, or start PR2.
+Current authorization: deliver the complete local website through sequential,
+reviewed and merged PRs. No external deployment, purchases, DNS or mailbox changes.
 
-1. Complete: trim the starter setup and implement shared design foundations.
-2. Complete: add metadata and focused browser/accessibility coverage.
-3. Complete: local validation and self-review. See VALIDATION.md for results.
+1. Complete: PR1 foundation, reviewed after push and merged.
+2. In progress: homepage, confirmed offerings and free-site-visit call path.
+3. Pending: company and services pages.
+4. Pending: project proof and clearly labelled temporary review examples.
+5. Pending: contact experience.
+6. Pending: technical SEO, optional analytics, production hardening.
+7. Pending: deployment and email preparation documentation; final handoff.
 
-Delivery handoff: commit the verified work, push this branch, open a PR against
-main, then stop. Independent review and merge are required before PR2.
+One branch and PR per component. Validate and self-review before push; separately
+inspect the pushed PR and fix findings before merging. Sync clean main before the
+next branch. The implementing agent performs the separate post-push review; this
+must not be described as an external human approval.
 
-## Approach
-
-- Astro static output; plain CSS; self-hosted Manrope; no browser framework.
-- Warm off-white, charcoal, rust accent, strong type, generous spacing.
-- Shared header, footer, wordmark, and document layout. Navigation only points
-  to existing destinations. A single real photo and short introduction prove
-  the homepage direction without implementing the complete homepage.
-- Preserve supplied originals. Import only selected evidence into Astro's image
-  pipeline; don't copy the entire source asset collection into public output.
-- Use only confirmed name, solar EPC, approximate operating history, and phone.
-- No service pages, project gallery, testimonials, forms, analytics, sitemap,
-  business email, deployment integration, or Phase 2 features.
-
-## Validation
-
-Formatting lint, Astro/TypeScript checks, production build, browser checks at
-320–1920px, keyboard navigation, automated axe checks, no-JavaScript operation,
-metadata and link/asset checks. Inspect screenshots and the full diff against
-main before committing and pushing. Production deployment remains unapproved.
+Each component runs formatting lint, strict type checks, build, focused browser
+checks and visual inspection. Preserve source assets and avoid unsupported claims.
+Temporary review copy must be visibly labelled and readily replaceable. Do not
+publish invented names, ratings or attributed statements. Stop after local delivery.

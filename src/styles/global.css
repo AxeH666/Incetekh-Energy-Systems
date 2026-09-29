@@ -93,6 +93,45 @@ img {
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
+.section {
+  padding-block: clamp(3.5rem, 7vw, 7rem);
+}
+.section-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-8);
+}
+.section-title {
+  font-size: clamp(2rem, 3.8vw, 3.8rem);
+  letter-spacing: -0.05em;
+  line-height: 1.15;
+}
+.prose {
+  max-width: 48rem;
+}
+.prose > * + * {
+  margin-top: var(--space-6);
+}
+.prose p {
+  color: var(--color-muted);
+}
+.lead {
+  font-size: clamp(1.125rem, 1.5vw, 1.375rem);
+}
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 2.75rem;
+  font-size: var(--text-small);
+  font-weight: 700;
+  text-underline-offset: 0.35em;
+}
+@media (max-width: 44rem) {
+  .section-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .button {
   display: inline-flex;
   align-items: center;
