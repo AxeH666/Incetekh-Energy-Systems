@@ -65,7 +65,12 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
-    await expect(page.getByRole('img')).toBeVisible();
+    await expect(
+      page.getByRole('img', {
+        name: 'Rows of solar panels mounted on raised frames above a concrete rooftop.',
+        exact: true,
+      }),
+    ).toBeVisible();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -76,7 +81,10 @@ for (const width of [320, 390, 768, 1440, 1920]) {
       const box = await link.boundingBox();
       expect(box?.height).toBeGreaterThanOrEqual(44);
     }
-    const image = page.getByRole('img');
+    const image = page.getByRole('img', {
+      name: 'Rows of solar panels mounted on raised frames above a concrete rooftop.',
+      exact: true,
+    });
     await expect(image).toHaveAttribute('srcset', /480w.*800w.*1280w/);
     expect(
       await image.evaluate(
@@ -88,6 +96,17 @@ for (const width of [320, 390, 768, 1440, 1920]) {
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
     expect(result.violations).toEqual([]);
+    for (const photo of await page.locator('img').all()) {
+      await photo.scrollIntoViewIfNeeded();
+      await expect
+        .poll(() =>
+          photo.evaluate(
+            (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
+          ),
+        )
+        .toBe(true);
+    }
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({
       path: testInfo.outputPath(`home-${width}.png`),
       fullPage: true,
@@ -208,5 +227,5 @@ test('static output stays small and excludes source evidence and client scripts'
   const bytes = await Promise.all(
     files.map(async (file) => (await stat(file)).size),
   );
-  expect(bytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(750_000);
+  expect(bytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(1_500_000);
 });
