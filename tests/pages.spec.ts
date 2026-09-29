@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-for (const path of ['/about/', '/services/', '/projects/']) {
+for (const path of ['/about/', '/services/', '/projects/', '/contact/']) {
   for (const width of [320, 768, 1440]) {
     test(`${path} is accessible and navigable at ${width}px`, async ({
       page,
@@ -12,10 +12,9 @@ for (const path of ['/about/', '/services/', '/projects/']) {
       expect(response?.status()).toBe(200);
       await page.evaluate(() => document.fonts.ready);
       await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
-      await expect(page.locator('nav [aria-current="page"]')).toHaveAttribute(
-        'href',
-        path,
-      );
+      await expect(
+        page.locator('.site-header [aria-current="page"]'),
+      ).toHaveAttribute('href', path);
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,

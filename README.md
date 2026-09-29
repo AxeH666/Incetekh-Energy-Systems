@@ -1,7 +1,7 @@
 # Incetekh Energy
 
 Phase 1 public website, delivered in sequential components. Read [AGENTS.md](AGENTS.md) and
-[SCOPE.md](SCOPE.md) before making changes. The current component adds the company and services pages. External deployment is not authorized.
+[SCOPE.md](SCOPE.md) before making changes. The current component adds the phone-first contact page and enquiry guidance. External deployment is not authorized.
 
 ## Run locally
 
@@ -36,9 +36,9 @@ The tests use port 4321; stop your manual preview before running them.
 - `src/styles/global.css`: color, typography, spacing and layout tokens; shared
   button and accessibility styles.
 - `src/layouts/SiteLayout.astro`: document metadata and shared semantic shell.
-- `src/components/`: wordmark, header and footer only.
+- `src/components/`: shared navigation, footer, page introduction, call to action and labelled review preview.
 - `src/data/site.ts`: confirmed identity/contact data and the selected photograph.
-- `src/pages/`: homepage design proof and a shared-layout 404 page.
+- `src/pages/`: home, company, services, projects, contact and a shared-layout 404 page.
 - `public/`: directly served favicon and font redistribution license.
 - `tests/`: focused checks against the production build.
 - `docs/`: design decisions, asset evidence and PR1 boundaries.
@@ -57,9 +57,7 @@ reviews; see [replacement instructions](docs/TESTIMONIALS.md).
 
 ## Delivery boundaries
 
-The build now contains the homepage, confirmed service summaries, and a call path. Services, company pages, project/testimonial experiences,
-lead forms, analytics, Search Console, sitemap/robots configuration, structured
-data, hosting/DNS and email setup belong to their later components.
+The complete content and phone-first contact experience are implemented. Contact FAQs use native HTML disclosure controls and work without JavaScript. No form, email address, response-time promise or service area is invented. Technical SEO, optional analytics configuration and deployment/email preparation are the remaining components.
 
 All pages currently have `noindex, follow` metadata because this is an incomplete
 foundation. Remove that restriction only during the approved launch-readiness
