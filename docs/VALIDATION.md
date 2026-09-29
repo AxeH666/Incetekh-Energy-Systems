@@ -1,5 +1,24 @@
 # Final polish validation
 
+## Single-photo slideshow and quieter controls
+
+Validated on 2026-09-30 with Node 22.23.3 and installed Chrome:
+
+- All 59 default browser/output checks passed on the first run. A new real touch
+  gesture regression was then added; all six focused gallery/polish checks passed,
+  including a swipe followed by more than one autoplay interval without movement.
+- Astro/strict TypeScript and the production build passed. The same four photos
+  now fade in a single fixed frame, with dot navigation and compact icon controls.
+- Tests cover automatic advancement and wraparound, one accessible active photo,
+  dot selection, keyboard navigation, touch pause, reduced motion, no-JS fallback,
+  hidden scrollbars, absence of caption strips/visible pause text, review hover
+  and the existing mobile/accessibility/link/image-reservation regressions.
+- Visually inspected the hero and reviews at 390/768/1440px and each of the four
+  displayed photos. Captures are in ignored `playwright-report/slideshow/`.
+- No external dependency, new CSP permission, deployment or account change.
+  Supporting images retain illustrative alt text and are not in the Projects
+  archive. The public-launch review-content boundary remains unchanged.
+
 ## Gallery, hover and footer pass
 
 Validated on 2026-09-30 with Node 22.23.3 and installed Chrome. The records below

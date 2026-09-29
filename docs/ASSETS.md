@@ -28,7 +28,7 @@ GPS/address overlays. Originals are unchanged, and pictured people are not verif
 authors. Some photographs are alternate views of the same installation.
 
 The numbered `project photos/2.png`, `3.png` and `4.png` now appear in the
-homepage gallery as explicitly captioned illustrative supporting images, alongside
+homepage gallery as generic supporting images with illustrative alt text, alongside
 the real installation photograph. They are excluded from the project archive.
 
 ## Published facts

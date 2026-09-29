@@ -61,7 +61,7 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     await expect
       .poll(() => track.evaluate((el) => el.scrollLeft))
       .toBeGreaterThan(0);
-    // Native horizontal scrollbars support touch/trackpad and direct end positioning too.
+    // Hidden scrollbars retain native touch/trackpad and direct end positioning.
     await track.evaluate((el) =>
       el.scrollTo({ left: el.scrollWidth, behavior: 'instant' }),
     );
@@ -164,7 +164,7 @@ test('automatic scrolling continues on hover and pauses for focus, button and re
   await page.waitForTimeout(250);
   expect(await track.evaluate((el) => el.scrollLeft)).toBe(focusPosition);
   await toggle.click();
-  await expect(toggle).toHaveText('Resume scrolling');
+  await expect(toggle).toHaveAttribute('aria-label', 'Resume scrolling');
   await page.mouse.move(1439, 999);
   await toggle.evaluate((el) => el.blur());
   const pausedPosition = await track.evaluate((el) => el.scrollLeft);
@@ -191,7 +191,7 @@ test('floating reviews cross the loop boundary and expose each entry once to ass
   const toggle = page.locator('.review-toggle');
   await track.scrollIntoViewIfNeeded();
   await toggle.click();
-  await expect(toggle).toHaveText('Resume scrolling');
+  await expect(toggle).toHaveAttribute('aria-label', 'Resume scrolling');
   await expect(track.getByRole('listitem')).toHaveCount(10);
   await expect(
     track.locator(
@@ -212,7 +212,7 @@ test('floating reviews cross the loop boundary and expose each entry once to ass
   await expect
     .poll(() => track.evaluate((el) => el.scrollLeft))
     .toBeGreaterThan(afterWrap + 8);
-  await expect(toggle).toHaveText('Pause scrolling');
+  await expect(toggle).toHaveAttribute('aria-label', 'Pause scrolling');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(track.locator('.review-list')).toHaveCount(1);
 });
@@ -236,7 +236,7 @@ test('touch interaction stops automatic movement until Resume is chosen', async 
     .poll(() => track.evaluate((el) => el.scrollLeft))
     .toBeGreaterThan(8);
   await track.tap();
-  await expect(toggle).toHaveText('Resume scrolling');
+  await expect(toggle).toHaveAttribute('aria-label', 'Resume scrolling');
   const paused = await track.evaluate((el) => el.scrollLeft);
   await page.waitForTimeout(250);
   expect(await track.evaluate((el) => el.scrollLeft)).toBe(paused);

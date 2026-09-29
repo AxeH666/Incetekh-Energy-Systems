@@ -66,7 +66,7 @@ test('every visible action resolves, including service fragments and branded res
     }
     await expect(
       page.locator(
-        'button:not([data-strip-toggle]), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
+        'button:not([data-strip-toggle]):not(.gallery-dot):not(.gallery-toggle), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
       ),
     ).toHaveCount(0);
     const links = await page

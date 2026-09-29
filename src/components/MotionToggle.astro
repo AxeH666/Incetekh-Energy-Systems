@@ -1,0 +1,59 @@
+---
+interface Props {
+  label: string;
+  controls: string;
+  class: string;
+  strip?: boolean;
+}
+const { label, controls, class: className, strip } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['motion-toggle', className]}
+  aria-label={label}
+  aria-controls={controls}
+  data-paused="false"
+  data-strip-toggle={strip || undefined}
+  hidden
+>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <g class="pause-icon">
+      <rect x="4" y="3" width="3" height="10" rx="0.5" />
+      <rect x="9" y="3" width="3" height="10" rx="0.5" />
+    </g>
+    <path class="play-icon" d="M5 3L13 8L5 13Z" />
+  </svg>
+</button>
+
+<style>
+  .motion-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    flex: none;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+  .motion-toggle[hidden],
+  .play-icon {
+    display: none;
+  }
+  [data-paused='true'] .pause-icon {
+    display: none;
+  }
+  [data-paused='true'] .play-icon {
+    display: block;
+  }
+</style>
