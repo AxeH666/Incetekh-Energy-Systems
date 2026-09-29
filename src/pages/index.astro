@@ -1,7 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import SiteLayout from '../layouts/SiteLayout.astro';
-import { foundationImage } from '../data/site';
+import SiteCTA from '../components/SiteCTA.astro';
+import { foundationImage, site } from '../data/site';
 ---
 
 <SiteLayout title="Incetekh Energy | Solar Engineering & EPC">
@@ -15,10 +16,15 @@ import { foundationImage } from '../data/site';
         <br />
         <span>Built on experience.</span>
       </h1>
-      <p class="intro-copy">
-        Approximately 15 years of operating experience in solar engineering,
-        procurement and construction.
-      </p>
+      <div class="intro-copy">
+        <p>
+          Approximately 15 years of operating experience in solar engineering,
+          procurement and construction.
+        </p>
+        <a class="text-link" href={`tel:${site.phone}`}>
+          Arrange a free site visit <span aria-hidden="true">↗</span>
+        </a>
+      </div>
     </div>
   </section>
   <figure class="project-image container">
@@ -37,6 +43,75 @@ import { foundationImage } from '../data/site';
       <span>From the Incetekh Energy project archive</span>
     </figcaption>
   </figure>
+  <section
+    class="section container section-grid"
+    aria-labelledby="experience-heading"
+  >
+    <p class="eyebrow">Experience, on the ground</p>
+    <div class="prose">
+      <h2 id="experience-heading" class="section-title">
+        Every roof is different.
+        <br />
+        Start with yours.
+      </h2>
+      <p class="lead">
+        Good solar decisions begin with the site, the way you use electricity,
+        and the questions that matter to you.
+      </p>
+      <p>
+        Incetekh Energy is an established solar EPC business, built over
+        approximately 15 years and grown through word of mouth. We bring that
+        experience to the conversation about your next installation.
+      </p>
+    </div>
+  </section>
+  <section class="care-band" aria-labelledby="care-heading">
+    <div class="container section">
+      <div class="section-grid">
+        <p class="eyebrow">Solar, with ongoing care</p>
+        <h2 class="section-title" id="care-heading">
+          From the first visit.
+          <br />
+          Beyond installation.
+        </h2>
+      </div>
+      <dl class="service-list">
+        <div>
+          <dt>
+            <span>01</span> Solar EPC
+          </dt>
+          <dd>
+            Engineering, procurement and construction for your solar
+            installation.
+          </dd>
+        </div>
+        <div>
+          <dt>
+            <span>02</span> System performance checks
+          </dt>
+          <dd>
+            A service for checking how your existing solar system is performing.
+          </dd>
+        </div>
+        <div>
+          <dt>
+            <span>03</span> Annual yield audits
+          </dt>
+          <dd>An annual review of your system’s energy generation.</dd>
+        </div>
+        <div>
+          <dt>
+            <span>04</span> 5-year warranty
+          </dt>
+          <dd>
+            Available under the written proposal and applicable warranty terms.
+            Confirm coverage for your installation before proceeding.
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+  <SiteCTA />
 </SiteLayout>
 
 <style>
@@ -74,6 +149,47 @@ import { foundationImage } from '../data/site';
     font-size: var(--text-lead);
     max-width: 28rem;
     padding-bottom: 0.4rem;
+  }
+  .intro-copy .text-link {
+    margin-top: var(--space-6);
+  }
+  .care-band {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .care-band .eyebrow {
+    color: var(--color-on-dark-muted);
+  }
+  .service-list {
+    margin: var(--space-12) 0 0;
+  }
+  .service-list > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    border-top: 1px solid #626961;
+    padding-block: var(--space-8);
+  }
+  dt {
+    font-size: clamp(1.2rem, 2vw, 1.65rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+  }
+  dt span {
+    color: var(--color-accent-bright);
+    font-size: var(--text-small);
+    margin-right: var(--space-6);
+  }
+  dd {
+    margin: 0;
+    color: var(--color-on-dark-muted);
+    max-width: 32rem;
+  }
+  @media (max-width: 44rem) {
+    .service-list > div {
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+    }
   }
   .project-image {
     margin-bottom: clamp(3rem, 5vw, 5rem);
