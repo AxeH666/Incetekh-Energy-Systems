@@ -1,6 +1,6 @@
 # Incetekh Energy
 
-Complete local Phase 1 public website: home, about, services, project photographs,
+Complete local Phase 1 public website: home, about, services, products, project photographs,
 homepage feedback, contact, privacy and a custom 404. Built with static
 Astro, TypeScript and plain CSS. Read [AGENTS.md](AGENTS.md) and [SCOPE.md](SCOPE.md)
 before changes. No public deployment, DNS changes or business-email setup has
@@ -39,13 +39,14 @@ and test environment values. [Configuration details](docs/VISIBILITY.md).
 
 ## Structure and maintenance
 
-- `src/pages/`: six content pages plus a legacy Reviews redirect, 404, sitemap and robots endpoints rendered at build time.
+- `src/pages/`: seven content pages plus a legacy Reviews redirect, 404, sitemap and robots endpoints rendered at build time.
 - `src/layouts/SiteLayout.astro`: semantic shell, metadata, schema and optional analytics.
 - `src/components/`: navigation, footer, page introduction, call to action and review preview.
 - `src/styles/global.css`: typography, color, spacing, layout and accessibility tokens.
 - `src/data/site.ts`: confirmed identity/contact and selected project images.
 - `src/data/review-samples.ts`: 10 temporary photo comments to replace before public deployment.
 - `src/data/visibility.ts`: validated public build settings.
+- `src/data/solar.ts` and `products.ts`: planning assumptions, central subsidy calculation and sourced equipment options.
 - `public/`: font license and compatible static-host response headers. Branding derivatives are generated from the supplied logo at build time.
 - `tests/`: production-output, responsive, accessibility, contact, evidence and SEO checks.
 - `docs/`: design, evidence, validation and owner handoff.
@@ -59,7 +60,7 @@ business facts, warranty qualifiers and feedback status aligned across pages.
 Warm paper, charcoal, restrained rust accents, large type and real installation
 photographs. Self-hosted Manrope, no remote fonts, no client app runtime. The
 navigation remains visible on narrow screens and FAQs use native HTML controls.
-A small inline script controls the homepage gallery and review scrolling. The optional Cloudflare
+Small inline scripts control the homepage gallery, review scrolling and local solar-size estimator. The optional Cloudflare
 analytics beacon is the only external script when enabled.
 
 The founder confirmed the phone, more than 13 years of experience and 500+ completed projects, solar EPC,
@@ -71,6 +72,8 @@ It must be replaced with verified feedback or removed before public deployment.
 Photos accompany the temporary comments for prelaunch design; authorship is unverified.
 
 ## Handoff
+
+Solar sizing, subsidy research and equipment options: [SOLAR-PLANNING.md](docs/SOLAR-PLANNING.md).
 
 Current gallery, hover and footer polish: [GALLERY-POLISH.md](docs/GALLERY-POLISH.md).
 Earlier homepage/WhatsApp design: [HOMEPAGE-REFRESH.md](docs/HOMEPAGE-REFRESH.md).

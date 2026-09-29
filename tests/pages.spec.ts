@@ -4,6 +4,7 @@ import AxeBuilder from '@axe-core/playwright';
 for (const path of [
   '/about/',
   '/services/',
+  '/products/',
   '/projects/',
   '/contact/',
   '/privacy/',

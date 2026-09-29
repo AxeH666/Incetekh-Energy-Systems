@@ -1,3 +1,4 @@
+import { isAllowedExternal } from './support/links';
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readdir, stat } from 'node:fs/promises';
@@ -27,10 +28,12 @@ test('semantic shell, metadata, and main navigation', async ({ page }) => {
   );
   await expect(
     page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link'),
-  ).toHaveText(['About', 'Services', 'Projects', 'Contact']);
-  await expect(page.locator('form')).toHaveCount(0);
+  ).toHaveText(['About', 'Services', 'Products', 'Projects', 'Contact']);
+  await expect(
+    page.getByRole('form', { name: 'Solar size estimator' }),
+  ).toHaveCount(1);
   await expect(page.locator('script[src]')).toHaveCount(0);
-  await expect(page.locator('script[type="module"]')).toHaveCount(1);
+  await expect(page.locator('script[type="module"]')).toHaveCount(2);
 });
 
 test('keyboard skip link and contact navigation work', async ({ page }) => {
@@ -140,10 +143,7 @@ test('all local links and assets resolve without external browser requests', asy
     if (href.startsWith('#')) await expect(page.locator(href)).toHaveCount(1);
     else if (href.startsWith('/'))
       expect((await request.get(href)).status()).toBe(200);
-    else
-      expect(['tel:+919441259786', 'https://wa.me/919441259786']).toContain(
-        href,
-      );
+    else expect(isAllowedExternal(href)).toBe(true);
   }
   for (const selector of ['link[rel="icon"]', 'meta[property="og:image"]']) {
     const element = page.locator(selector);
@@ -222,7 +222,7 @@ test('missing page uses the shared accessible error shell', async ({
   await expect(page).toHaveURL('/');
 });
 
-test('static output stays small and limits client code to homepage photo scrolling', async () => {
+test('static output keeps planning and motion scripts small and local', async () => {
   const files: string[] = [];
   async function walk(path: string) {
     for (const entry of await readdir(path, { withFileTypes: true })) {

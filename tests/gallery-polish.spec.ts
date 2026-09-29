@@ -1,3 +1,4 @@
+import { isAllowedExternal } from './support/links';
 import { test, expect } from '@playwright/test';
 
 for (const width of [390, 768, 1440, 1920]) {
@@ -217,7 +218,7 @@ test('linked headings lift on hover and focus; footer and WhatsApp are consisten
       'matrix(1, 0, 0, 1, 0, -3)',
     );
     for (const link of await page.locator('.whatsapp-link').all()) {
-      await expect(link).toHaveAttribute('href', 'https://wa.me/919441259786');
+      expect(isAllowedExternal((await link.getAttribute('href'))!)).toBe(true);
       const icon = (await link.locator('img').boundingBox())!;
       expect(icon.width).toBe(22);
       expect(icon.height).toBe(22);

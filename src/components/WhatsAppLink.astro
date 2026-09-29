@@ -2,11 +2,15 @@
 import { site } from '../data/site';
 interface Props {
   label?: string;
+  message?: string;
 }
-const { label = 'Chat on WhatsApp' } = Astro.props;
+const { label = 'Chat on WhatsApp', message } = Astro.props;
+const href = message
+  ? `${site.whatsapp}?text=${encodeURIComponent(message)}`
+  : site.whatsapp;
 ---
 
-<a class="button whatsapp-link" href={site.whatsapp}>
+<a class="button whatsapp-link" href={href}>
   <img
     src="/brand/whatsapp.svg"
     width="22"
