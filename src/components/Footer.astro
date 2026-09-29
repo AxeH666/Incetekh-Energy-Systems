@@ -1,0 +1,83 @@
+---
+import Wordmark from './Wordmark.astro';
+import { site } from '../data/site';
+---
+
+<footer class="site-footer" id="contact" tabindex="-1">
+  <div class="container">
+    <div class="footer-main">
+      <div class="footer-identity">
+        <Wordmark />
+        <p>Engineering. Procurement. Construction.</p>
+      </div>
+      <div class="footer-contact">
+        <h2 class="eyebrow">Talk to Incetekh</h2>
+        <a class="phone-link" href={`tel:${site.phone}`}>
+          <span>{site.phoneDisplay}</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>
+        © {new Date().getFullYear()} {site.name}
+      </p>
+      <p>Solar EPC</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding-top: var(--space-12);
+  }
+  .footer-main {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding-bottom: var(--space-12);
+  }
+  .footer-identity p {
+    color: var(--color-on-dark-muted);
+    font-size: var(--text-small);
+    margin-top: var(--space-4);
+  }
+  .footer-contact h2 {
+    color: var(--color-on-dark-muted);
+    margin-bottom: var(--space-4);
+  }
+  .phone-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    min-height: 2.75rem;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    letter-spacing: -0.035em;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+  }
+  .phone-link span:last-child {
+    color: var(--color-accent-bright);
+  }
+  .footer-bottom {
+    border-top: 1px solid #444844;
+    padding-block: var(--space-6);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-4);
+    color: var(--color-on-dark-muted);
+    font-size: var(--text-small);
+  }
+  @media (max-width: 44rem) {
+    .footer-main {
+      flex-direction: column;
+    }
+    .footer-contact {
+      max-width: 24rem;
+    }
+  }
+</style>

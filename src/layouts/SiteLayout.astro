@@ -1,0 +1,54 @@
+---
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, foundationImage } from '../data/site';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImage = await getImage({
+  src: foundationImage.src,
+  width: 1200,
+  format: 'jpg',
+});
+const socialImageUrl = new URL(socialImage.src, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f4ef" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <!-- PR1 is a foundation preview. Revisit indexing at the launch milestone. -->
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:alt" content={foundationImage.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,109 @@
+---
+import { Image } from 'astro:assets';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { foundationImage } from '../data/site';
+---
+
+<SiteLayout title="Incetekh Energy | Solar Engineering & EPC">
+  <section class="intro container" aria-labelledby="page-title">
+    <p class="eyebrow intro-label">
+      <span aria-hidden="true"></span> Solar EPC
+    </p>
+    <div class="intro-grid">
+      <h1 id="page-title">
+        Solar engineering.
+        <br />
+        <span>Built on experience.</span>
+      </h1>
+      <p class="intro-copy">
+        Approximately 15 years of operating experience in solar engineering,
+        procurement and construction.
+      </p>
+    </div>
+  </section>
+  <figure class="project-image container">
+    <Image
+      src={foundationImage.src}
+      alt={foundationImage.alt}
+      widths={[480, 800, 1280]}
+      sizes="(min-width: 1600px) 1440px, 91vw"
+      format="webp"
+      quality={85}
+      loading="eager"
+      fetchpriority="high"
+    />
+    <figcaption>
+      <span class="eyebrow">Rooftop solar</span>
+      <span>From the Incetekh Energy project archive</span>
+    </figcaption>
+  </figure>
+</SiteLayout>
+
+<style>
+  .intro {
+    padding-top: clamp(3rem, 6.5vw, 6.5rem);
+    padding-bottom: clamp(2.5rem, 4.5vw, 4.5rem);
+  }
+  .intro-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
+  }
+  .intro-label span {
+    width: 0.45rem;
+    height: 0.45rem;
+    background: var(--color-accent);
+  }
+  .intro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(14rem, 1fr);
+    gap: var(--space-8);
+    align-items: end;
+  }
+  h1 {
+    font-size: clamp(2.5rem, 5.4vw, 5.4rem);
+    line-height: 1.12;
+    letter-spacing: -0.06em;
+  }
+  h1 span {
+    color: var(--color-muted);
+  }
+  .intro-copy {
+    color: var(--color-muted);
+    font-size: var(--text-lead);
+    max-width: 28rem;
+    padding-bottom: 0.4rem;
+  }
+  .project-image {
+    margin-bottom: clamp(3rem, 5vw, 5rem);
+  }
+  .project-image img {
+    width: 100%;
+    aspect-ratio: 2.35 / 1;
+    object-fit: cover;
+    object-position: center 60%;
+    background: var(--color-line);
+  }
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2) var(--space-6);
+    padding-top: var(--space-4);
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+  @media (max-width: 56rem) {
+    .intro-grid {
+      grid-template-columns: 1fr;
+    }
+    h1 {
+      font-size: clamp(2.25rem, 6.4vw, 4rem);
+    }
+    .project-image img {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>
