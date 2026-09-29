@@ -1,5 +1,28 @@
 import { test, expect } from '@playwright/test';
 
+for (const width of [390, 768, 1440, 1920]) {
+  test(`hero photo is inset and statistics sit directly below the action at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    const action = (await page.locator('.hero-link').boundingBox())!;
+    const stat = (await page.locator('.project-proof').boundingBox())!;
+    const photo = (await page.locator('.project-gallery').boundingBox())!;
+    expect(Math.abs(stat.x - action.x)).toBeLessThan(1);
+    expect(stat.y - action.y - action.height).toBeGreaterThan(20);
+    expect(stat.y - action.y - action.height).toBeLessThan(60);
+    expect(photo.x).toBeGreaterThanOrEqual(20);
+    expect(photo.x + photo.width).toBeLessThanOrEqual(width - 20);
+    await expect(page.locator('.gallery-slide')).toHaveCount(3);
+    await expect(
+      page.locator('.gallery-slide img[alt*="workers"]'),
+    ).toHaveCount(0);
+    await expect(page.locator('.motion-toggle svg')).toHaveCount(0);
+  });
+}
+
 test('gallery shows one photo at a time with automatic fading and dot selection', async ({
   page,
 }) => {
@@ -10,28 +33,29 @@ test('gallery shows one photo at a time with automatic fading and dot selection'
   const toggle = gallery.locator('.gallery-toggle');
   const dots = gallery.locator('.gallery-dot');
   await expect(track.getByRole('img')).toHaveCount(1);
-  await expect(slides).toHaveCount(4);
+  await expect(slides).toHaveCount(3);
   expect(
     new Set(
       await slides
         .locator('img')
         .evaluateAll((imgs) => imgs.map((img) => img.getAttribute('src'))),
     ).size,
-  ).toBe(4);
+  ).toBe(3);
   await expect(slides.nth(1)).toHaveAttribute('data-active', '', {
     timeout: 7000,
   });
   await expect(slides.nth(1)).toHaveCSS('opacity', '1');
   await expect(slides.first()).toHaveCSS('opacity', '0');
   expect(await track.evaluate((el) => el.scrollLeft)).toBe(0);
-  await dots.nth(3).click();
-  await expect(dots.nth(3)).toHaveAttribute('aria-pressed', 'true');
+  await dots.nth(2).click();
+  await expect(dots.nth(2)).toHaveAttribute('aria-pressed', 'true');
   await expect(toggle).toHaveAttribute('aria-label', 'Resume gallery');
   await expect(track.getByRole('img')).toHaveAttribute(
     'alt',
-    /Illustrative scene of workers/,
+    /Illustrative view of a large rooftop/,
   );
-  await toggle.click();
+  await toggle.focus();
+  await toggle.press('Enter');
   await expect(slides.first()).toHaveAttribute('data-active', '', {
     timeout: 7000,
   });
@@ -53,7 +77,8 @@ test('photo captions, pause text and scrollbar chrome are absent', async ({
   ).toHaveCount(0);
   for (const selector of ['.gallery-toggle', '.review-toggle']) {
     const button = page.locator(selector);
-    await expect(button).toHaveText('');
+    await expect(button.locator('svg')).toHaveCount(0);
+    await expect(button).toHaveCSS('clip-path', 'inset(50%)');
     await expect(button).toHaveAccessibleName(/Pause/);
   }
   for (const selector of ['.gallery-track', '.review-track']) {
@@ -140,7 +165,8 @@ test('individual original and repeated review cards lift without vertical clippi
   await page.goto('/');
   const track = page.locator('.review-track');
   await track.scrollIntoViewIfNeeded();
-  await page.locator('.review-toggle').click();
+  await page.locator('.review-toggle').focus();
+  await page.locator('.review-toggle').press('Enter');
   for (const list of await track.locator('ul').all()) {
     const card = list.locator('.review').nth(1);
     await card.scrollIntoViewIfNeeded();
@@ -216,7 +242,7 @@ test('gallery remains manually browsable without JavaScript on mobile', async ({
   await page.goto('/');
   const track = page.getByRole('region', { name: 'Solar photo gallery' });
   await expect(page.locator('.gallery-toggle')).toBeHidden();
-  await expect(track.getByRole('img')).toHaveCount(4);
+  await expect(track.getByRole('img')).toHaveCount(3);
   await track.focus();
   await page.keyboard.press('ArrowRight');
   await expect

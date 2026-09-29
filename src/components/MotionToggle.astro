@@ -16,44 +16,39 @@ const { label, controls, class: className, strip } = Astro.props;
   data-paused="false"
   data-strip-toggle={strip || undefined}
   hidden
->
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="currentColor"
-    aria-hidden="true"
-  >
-    <g class="pause-icon">
-      <rect x="4" y="3" width="3" height="10" rx="0.5" />
-      <rect x="9" y="3" width="3" height="10" rx="0.5" />
-    </g>
-    <path class="play-icon" d="M5 3L13 8L5 13Z" />
-  </svg>
-</button>
+></button>
 
 <style>
+  /* No visible playback chrome; keyboard users retain a discoverable control. */
   .motion-toggle {
-    display: inline-grid;
-    place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    position: absolute;
+    width: 1px;
+    height: 1px;
     padding: 0;
-    flex: none;
-    border: 1px solid currentColor;
-    border-radius: 50%;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
-  .motion-toggle[hidden],
-  .play-icon {
+  .motion-toggle:focus-visible {
+    width: auto;
+    height: auto;
+    min-height: 44px;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    clip-path: none;
+    overflow: visible;
+    background: #fff;
+    color: #202622;
+    font: inherit;
+    font-size: 0.8125rem;
+    z-index: 2;
+  }
+  .motion-toggle::after {
+    content: attr(aria-label);
+  }
+  .motion-toggle[hidden] {
     display: none;
-  }
-  [data-paused='true'] .pause-icon {
-    display: none;
-  }
-  [data-paused='true'] .play-icon {
-    display: block;
   }
 </style>
