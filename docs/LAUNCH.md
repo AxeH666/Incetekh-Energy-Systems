@@ -34,8 +34,9 @@ Do not enable automatic analytics injection alongside the manual token option.
 
 1. Confirm hosting account ownership, registrar/DNS access and deployment approval.
 2. Confirm use of the public phone number and permission to publish the selected
-   project/customer photographs. Replace the three sample comments using the
-   verified review sheet when available; otherwise retain every sample label.
+   project/customer photographs. Replace all 13 temporary comments using the verified review sheet, or remove
+   the feedback text. The final polish has no visible sample labels and is not
+   approved to publish invented endorsements. See TESTIMONIALS.md.
 3. Inspect existing DNS records and save their values before proposing changes.
    Use the host's actual domain instructions and assigned targets. Do not guess
    an IP/CNAME or replace existing mail records. An apex-domain setup on Pages
@@ -55,7 +56,7 @@ Do not enable automatic analytics injection alongside the manual token option.
 - Load every route from the domain on desktop and a phone; check photos, font,
   header, footer, focus indicators and all call links. Arrange a real test call
   with the owner; automated tests did not place a call.
-- Verify HTTPS, canonical redirects, title/social tags, seven sitemap URLs,
+- Verify HTTPS, canonical redirects, title/social tags, six sitemap URLs and the legacy `/reviews/` redirect to `/#reviews`,
   robots sitemap declaration and `index, follow` on content pages.
 - Request a nonexistent path: it must return HTTP 404 with the custom error
   page and noindex, not HTTP 200 or the homepage. Disable any SPA fallback.

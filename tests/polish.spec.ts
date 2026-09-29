@@ -5,7 +5,6 @@ const routes = [
   '/about/',
   '/services/',
   '/projects/',
-  '/reviews/',
   '/contact/',
   '/privacy/',
   '/404.html',
@@ -39,12 +38,12 @@ test('confirmed proof and manufacturer relationships are visible and bounded', a
   await expect(manufacturers).not.toContainText(
     /exclusive|strategic partner|endorsed|authori[sz]ed|tier/i,
   );
-  await expect(page.locator('[data-review-status]')).toHaveCount(0);
-  await page.getByRole('link', { name: 'View Reviews', exact: true }).click();
-  await expect(page).toHaveURL('/reviews/');
+  await expect(page.locator('#reviews')).toBeVisible();
   await expect(
-    page.locator('[data-review-status="illustrative"]'),
-  ).toBeVisible();
+    page
+      .locator('.site-header, .site-footer')
+      .getByRole('link', { name: /reviews/i }),
+  ).toHaveCount(0);
 });
 
 test('every visible action resolves, including service fragments and branded resources', async ({
@@ -109,3 +108,40 @@ test('every visible action resolves, including service fragments and branded res
     .click();
   await expect(page.locator('#checks-heading')).toBeInViewport();
 });
+
+for (const width of [390, 768, 1440, 1920]) {
+  test(`compact header and image space remain stable at ${width}px`, async ({
+    page,
+  }) => {
+    let releaseImages!: () => void;
+    const imagesReady = new Promise<void>((resolve) => {
+      releaseImages = resolve;
+    });
+    await page.route('**/*', async (route) => {
+      if (route.request().resourceType() === 'image') await imagesReady;
+      await route.continue();
+    });
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => document.fonts.ready);
+    const logo = page.locator('.site-header .wordmark img');
+    const header = (await page.locator('.site-header').boundingBox())!;
+    expect(header.height).toBeLessThan(width < 704 ? 142 : 90);
+    expect((await logo.boundingBox())!.width).toBeLessThanOrEqual(88);
+    const positions = () =>
+      page.locator('img, #reviews, .site-footer').evaluateAll((els) =>
+        els.map((el) => {
+          const box = el.getBoundingClientRect();
+          return [box.x, box.y + scrollY, box.width, box.height];
+        }),
+      );
+    const before = await positions();
+    releaseImages();
+    for (const image of await page.locator('img').all()) {
+      await image.scrollIntoViewIfNeeded();
+      await image.evaluate((el: HTMLImageElement) => el.decode());
+    }
+    await page.evaluate(() => window.scrollTo(0, 0));
+    expect(await positions()).toEqual(before);
+  });
+}

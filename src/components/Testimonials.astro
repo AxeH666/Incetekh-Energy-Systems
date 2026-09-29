@@ -10,42 +10,63 @@ import { reviewSamples } from '../data/review-samples';
   data-review-status="illustrative"
 >
   <div class="container section">
-    <div class="section-grid review-intro">
-      <p class="eyebrow">Testimonials / preview</p>
-      <div class="prose">
+    <div class="review-intro">
+      <div>
+        <p class="eyebrow">Customer perspectives</p>
         <h2 class="section-title" id="reviews-heading">
-          Customer perspectives.
+          A conversation that counts.
         </h2>
-        <p>
-          The comments below are illustrative sample copy, not verified customer
-          reviews. The installation photographs do not identify the author of
-          any comment.
-        </p>
       </div>
+      <p class="scroll-hint" id="review-instructions">
+        Scroll to explore <span aria-hidden="true">&#8596;</span>
+        <span class="keyboard-hint">
+          {' '}
+          Use left and right arrow keys when focused.
+        </span>
+      </p>
     </div>
-    <div class="review-grid">
-      {reviewSamples.map((sample) => (
-        <article class="review" aria-labelledby={sample.id}>
-          <Image
-            src={sample.image}
-            alt={sample.alt}
-            width={800}
-            height={800}
-            widths={[400, 800]}
-            sizes="(max-width: 704px) 90vw, 30vw"
-            fit="cover"
-            position="top"
-            format="webp"
-            quality={80}
-            loading="lazy"
-          />
-          <h3 id={sample.id}>Sample copy — not a verified review</h3>
-          <p class="sample-text">{sample.text}</p>
-          <p class="photo-note">
-            Installation photograph. No review attribution.
-          </p>
-        </article>
-      ))}
+    <div
+      class="review-track"
+      role="region"
+      aria-label="Customer feedback"
+      aria-describedby="review-instructions"
+      tabindex="0"
+    >
+      <ul class="review-list">
+        {reviewSamples.map((review, index) => (
+          <li class="review">
+            <span class="review-number" aria-hidden="true">
+              {String(index + 1).padStart(2, '0')} /
+            </span>
+            <p class="review-text">{review.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="review-archive">
+      <div
+        class="archive-images"
+        aria-label="Installation photographs from the Incetekh archive"
+      >
+        {reviewSamples
+          .filter((review) => review.image)
+          .map((review) => (
+            <Image
+              src={review.image!}
+              alt={review.alt!}
+              width={800}
+              height={800}
+              widths={[160, 320, 800]}
+              sizes="(max-width: 704px) 26vw, 112px"
+              fit="cover"
+              position="top"
+              format="webp"
+              quality={80}
+              loading="lazy"
+            />
+          ))}
+      </div>
+      <p>From the Incetekh installation archive.</p>
     </div>
   </div>
 </section>
@@ -55,38 +76,126 @@ import { reviewSamples } from '../data/review-samples';
     background: #e9ece5;
   }
   .review-intro {
-    margin-bottom: var(--space-12);
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
   }
-  .review-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-8);
+  .eyebrow {
+    color: var(--color-accent);
+    margin-bottom: 1rem;
   }
-  .review img {
-    width: 100%;
+  .section-title {
+    max-width: 24rem;
+  }
+  .scroll-hint {
+    color: var(--color-muted);
+    font-size: var(--text-small);
+    flex-shrink: 0;
+  }
+  .scroll-hint span[aria-hidden] {
+    margin-left: 0.75rem;
+    font-size: 1.5rem;
+  }
+  .keyboard-hint {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .review-track {
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    scrollbar-color: var(--color-muted) transparent;
+    padding-bottom: 1.25rem;
+  }
+  .review-list {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+  .review {
+    flex: 0 0 clamp(17rem, 31vw, 25rem);
+    padding: 1.25rem clamp(1.5rem, 3vw, 3rem) 1.5rem 0;
+    border-top: 1px solid var(--color-muted);
+    scroll-snap-align: start;
+  }
+  .review + .review {
+    padding-left: clamp(1.5rem, 3vw, 3rem);
+    border-left: 1px solid var(--color-line);
+  }
+  .review-number {
+    display: block;
+    color: var(--color-accent);
+    font-size: var(--text-small);
+    margin-bottom: 1.5rem;
+  }
+  .review-text {
+    font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+    line-height: 1.55;
+    letter-spacing: -0.02em;
+  }
+  .review-archive {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .archive-images {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .archive-images img {
+    width: 7rem;
     height: auto;
     aspect-ratio: 1;
   }
-  h3 {
-    color: var(--color-accent);
-    font-size: var(--text-small);
-    font-weight: 700;
-    margin: var(--space-6) 0 var(--space-4);
-  }
-  .sample-text {
-    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
-    line-height: 1.5;
-    letter-spacing: -0.02em;
-  }
-  .photo-note {
+  .review-archive p {
+    max-width: 15rem;
     font-size: var(--text-small);
     color: var(--color-muted);
-    margin-top: var(--space-6);
   }
   @media (max-width: 44rem) {
-    .review-grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-12);
+    .review-intro {
+      flex-direction: column;
+      align-items: start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .review {
+      flex-basis: 85%;
+    }
+    .review-archive {
+      flex-direction: column;
+      align-items: start;
+      gap: 0.75rem;
+    }
+    .archive-images img {
+      width: min(7rem, 26vw);
+    }
+    .review-archive p {
+      max-width: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .review-track {
+      scroll-behavior: auto;
+      scroll-snap-type: none;
+    }
+  }
+  @media print {
+    .review-track {
+      overflow: visible;
+    }
+    .review-list {
+      display: block;
+    }
+    .review {
+      break-inside: avoid;
     }
   }
 </style>

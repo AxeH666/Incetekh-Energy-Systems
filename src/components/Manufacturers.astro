@@ -6,14 +6,17 @@ import tata from '../../tata power solar logo.jpeg';
 ---
 
 <section class="manufacturers" aria-labelledby="manufacturers-heading">
-  <div class="container section">
-    <div class="section-grid">
-      <p class="eyebrow">Manufacturers / sales channels</p>
-      <div class="prose">
+  <div class="container manufacturer-inner">
+    <div class="manufacturer-intro">
+      <div>
+        <p class="eyebrow">Manufacturers / sales channels</p>
         <h2 class="section-title" id="manufacturers-heading">
-          Products from familiar names.
-          <br />A direct conversation with us.
+          Established names.
+          <br />
+          One point of contact.
         </h2>
+      </div>
+      <div class="prose">
         <p>
           Incetekh sells relevant products from Waaree, Adani Solar and Tata
           Power Solar through dealership and sales-channel relationships.
@@ -43,6 +46,9 @@ import tata from '../../tata power solar logo.jpeg';
           src={adani}
           alt="Adani Solar"
           width={320}
+          height={200}
+          fit="cover"
+          position="center"
           format="webp"
           quality={90}
         />
@@ -52,6 +58,9 @@ import tata from '../../tata power solar logo.jpeg';
           src={tata}
           alt="Tata Power Solar"
           width={320}
+          height={210}
+          fit="cover"
+          position="center"
           format="webp"
           quality={90}
         />
@@ -63,50 +72,57 @@ import tata from '../../tata power solar logo.jpeg';
 <style>
   .manufacturers {
     background: #fff;
-    border-bottom: 1px solid var(--color-line);
+  }
+  .manufacturer-inner {
+    padding-block: clamp(3rem, 5vw, 5rem);
+  }
+  .manufacturer-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+  .eyebrow {
+    color: var(--color-accent);
+    margin-bottom: 1.25rem;
+  }
+  .section-title {
+    font-size: clamp(1.875rem, 2.8vw, 2.5rem);
   }
   .manufacturer-logos {
     list-style: none;
     padding: 0;
-    margin: 3rem 0 0;
+    margin: 2.5rem 0 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     border-top: 1px solid var(--color-line);
   }
   li {
-    min-height: 13rem;
+    min-width: 0;
+    min-height: 8rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 1.5rem;
-  }
-  li + li {
-    border-left: 1px solid var(--color-line);
+    padding: 1.5rem 0.75rem 0;
   }
   img {
+    width: 9rem;
+    height: auto;
     object-fit: contain;
   }
   .waaree img {
-    width: 12rem;
-  }
-  .adani img {
-    width: 13rem;
-  }
-  .tata img {
     width: 11rem;
   }
-  @media (max-width: 40rem) {
-    .manufacturer-logos {
+  .tata img {
+    width: 9.5rem;
+  }
+  @media (max-width: 44rem) {
+    .manufacturer-intro {
       grid-template-columns: 1fr;
-      margin-top: 2rem;
+      gap: 1.5rem;
     }
     li {
-      min-height: 10rem;
-      padding: 1rem;
-    }
-    li + li {
-      border-left: 0;
-      border-top: 1px solid var(--color-line);
+      min-height: 6rem;
+      padding-inline: 0.5rem;
     }
   }
 </style>

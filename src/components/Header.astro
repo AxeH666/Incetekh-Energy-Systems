@@ -32,11 +32,11 @@ import { navigation } from '../data/site';
     background: #fff;
   }
   .header-inner {
-    min-height: 7.5rem;
+    min-height: 5.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-4);
+    gap: clamp(1.25rem, 3vw, 3rem);
     padding-block: var(--space-2);
   }
   nav {
@@ -52,24 +52,30 @@ import { navigation } from '../data/site';
     text-decoration-thickness: 1px;
     text-underline-offset: 0.4em;
     font-size: var(--text-small);
+    font-weight: 600;
   }
   nav a:not([aria-current]) {
     text-decoration: none;
   }
-  @media (max-width: 56rem) {
+  nav a:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 44rem) {
     .button {
       gap: var(--space-3);
       padding-inline: var(--space-3);
     }
     .header-inner {
-      min-height: 5.5rem;
+      min-height: 0;
+      gap: 0.25rem 1rem;
       flex-wrap: wrap;
     }
     nav {
       order: 3;
       width: 100%;
       margin-left: 0;
-      justify-content: space-between;
+      justify-content: flex-start;
+      gap: clamp(1.5rem, 8vw, 3rem);
       border-top: 1px solid var(--color-line);
       padding-top: var(--space-2);
       flex-wrap: wrap;

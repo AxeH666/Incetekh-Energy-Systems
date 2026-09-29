@@ -1,4 +1,61 @@
-# Pre-deployment polish
+# Final pre-deployment polish
+
+This focused component starts from fresh main `9ba5466` after PR #8. It preserves
+the static Astro architecture, supplied artwork, real project proof and confirmed
+business claims. No deployment, DNS, email, analytics activation or later scope.
+
+## Audit and design plan
+
+Before editing, rendered Home at 390, 768 and 1440px and inspected the shared
+components and inner pages. Findings: 112px square header logo; overly dominant
+manufacturer headline; 480px-plus stacked logo band on mobile; mismatched logo
+internal whitespace; cramped tablet service columns; oversized inner-page titles;
+and a review teaser pointing away from the homepage.
+
+Briefly rechecked [GE Vernova](https://www.gevernova.com/) and
+[Siemens Energy](https://www.siemens-energy.com/global/en/home.html) in Chrome.
+Compact brand placement, restrained navigation, differentiated headline scales
+and coherent image/text groupings informed the refinement. Both sites' hero media
+was incomplete in capture; no claim of a full external visual audit. Their pages
+emphasize editorial stories rather than providing a review-carousel pattern to copy.
+Reviewed [native overflow accessibility](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/overflow)
+and [Astro redirects](https://docs.astro.build/en/guides/routing/#redirects) for
+focusable scrolling and static-route compatibility.
+
+Plan: audit (complete), refine shared scale and Home composition, validate actual
+rendered pages and interactions, then self-review, push one PR, independently
+review its pushed diff, address findings, merge and sync main. No deployment.
+
+## Final composition
+
+- Header: 88px desktop height; 88 by 70px logo (80px wide on small screens).
+  A centered build-time crop removes only outer white space, retaining the
+  complete supplied artwork and its proportions. Navigation aligns vertically
+  with the Contact Us action; tablets keep a single row.
+- Type: 76px maximum homepage heading, 72px inner-page heading, 48px section
+  heading, smaller 40px manufacturer heading. Fluid mobile sizes, bounded copy
+  width and an 84rem content limit reduce visual competition on wide screens.
+- Rhythm: stronger left alignment in services, roomy stacked tablet service
+  content, shorter manufacturer section, no repeated intervening CTA banners.
+- Imagery: real rooftop hero remains dominant; secondary installation images
+  use 4:3 crops. Source material and evidence are unchanged.
+- Manufacturers: compact three-logo row at all widths; Adani/Tata whitespace
+  cropped at build time and widths tuned optically, without stretched artwork.
+  Existing qualified sales-channel and warranty wording remains adjacent.
+- Feedback: 13 centralized temporary entries (ten additional), native horizontal
+  scroll with a visible continuation and focus outline, no autoplay or runtime.
+  Archive photos are separate from comments. See [TESTIMONIALS.md](TESTIMONIALS.md)
+  for the required verified-content replacement before deployment.
+- Navigation: About, Services, Projects and Contact Us; footer mirrors the useful
+  destinations. Reviews teaser/destination removed; old route redirects to Home.
+  Sitemap has six content URLs when indexing is enabled.
+
+See [VALIDATION.md](VALIDATION.md) for checks and limitations. Historical PR #8
+notes follow for context; the final decisions above supersede conflicting details.
+
+---
+
+# Earlier pre-deployment polish (PR #8)
 
 One focused refinement from fresh `main` at `29a6daf`, after PR #7. No deployment,
 DNS, mailbox, purchase, analytics activation or later-phase system is included.
