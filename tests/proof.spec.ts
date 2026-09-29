@@ -1,32 +1,30 @@
 import { test, expect } from '@playwright/test';
 
 // Temporary copy is a private prelaunch design fixture, not verified evidence.
-test('homepage feedback is centralized, unattributed and separate from archive photographs', async ({
+test('homepage contains twelve photo reviews without invented attribution', async ({
   page,
   request,
 }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   const section = page.locator('[data-review-status="illustrative"]');
-  await expect(section.locator('.review')).toHaveCount(13);
+  await expect(section.locator('.review')).toHaveCount(12);
   await expect(
-    section.locator('.review img, blockquote, cite, [itemtype*="Review"]'),
+    section.locator('blockquote, cite, [itemtype*="Review"]'),
   ).toHaveCount(0);
   await expect(section).not.toContainText(
     /sample review|sample copy|testimonial to be added|lorem ipsum|five.star|verified customer/i,
   );
-  await expect(section.locator('.review-archive')).toContainText(
-    'Incetekh installation archive',
-  );
+  await expect(section.locator('.review img')).toHaveCount(12);
   for (const img of await section.locator('img').all()) {
     await img.scrollIntoViewIfNeeded();
-    await expect(img).toHaveAttribute('width', '800');
-    await expect(img).toHaveAttribute('height', '800');
-    await expect(img).toHaveAttribute('srcset', /160w.*320w.*800w/);
+    await expect(img).toHaveAttribute('width', '640');
+    await expect(img).toHaveAttribute('height', /^(320|640)$/);
+    await expect(img).toHaveAttribute('srcset', /320w.*640w/);
     await expect
       .poll(() =>
         img.evaluate(
-          (el: HTMLImageElement) =>
-            el.complete && el.naturalWidth === el.naturalHeight,
+          (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
         ),
       )
       .toBe(true);
@@ -130,4 +128,46 @@ test('old reviews destination redirects to the homepage section and leaves sitem
   expect(await (await request.get('/sitemap.xml')).text()).not.toContain(
     '/reviews/',
   );
+});
+
+test('automatic scrolling pauses for hover, focus, button and reduced motion', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const track = page.locator('.review-track');
+  const toggle = page.getByRole('button', {
+    name: /^(Pause|Resume) scrolling$/,
+  });
+  await track.scrollIntoViewIfNeeded();
+  await page.mouse.move(1439, 999);
+  await expect
+    .poll(() => track.evaluate((el) => el.scrollLeft))
+    .toBeGreaterThan(8);
+  await track.hover();
+  const hoverPosition = await track.evaluate((el) => el.scrollLeft);
+  await page.waitForTimeout(250);
+  expect(await track.evaluate((el) => el.scrollLeft)).toBe(hoverPosition);
+  await page.mouse.move(1439, 999);
+  await track.focus();
+  const focusPosition = await track.evaluate((el) => el.scrollLeft);
+  await page.waitForTimeout(250);
+  expect(await track.evaluate((el) => el.scrollLeft)).toBe(focusPosition);
+  await toggle.click();
+  await expect(toggle).toHaveText('Resume scrolling');
+  await page.mouse.move(1439, 999);
+  await toggle.evaluate((el) => el.blur());
+  const pausedPosition = await track.evaluate((el) => el.scrollLeft);
+  await page.waitForTimeout(250);
+  expect(await track.evaluate((el) => el.scrollLeft)).toBe(pausedPosition);
+  await toggle.click();
+  await page.mouse.move(1439, 999);
+  await toggle.evaluate((el) => el.blur());
+  await expect
+    .poll(() => track.evaluate((el) => el.scrollLeft))
+    .toBeGreaterThan(pausedPosition + 5);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(toggle).toBeHidden();
+  const reducedPosition = await track.evaluate((el) => el.scrollLeft);
+  await page.waitForTimeout(250);
+  expect(await track.evaluate((el) => el.scrollLeft)).toBe(reducedPosition);
 });

@@ -44,7 +44,7 @@ and test environment values. [Configuration details](docs/VISIBILITY.md).
 - `src/components/`: navigation, footer, page introduction, call to action and review preview.
 - `src/styles/global.css`: typography, color, spacing, layout and accessibility tokens.
 - `src/data/site.ts`: confirmed identity/contact and selected project images.
-- `src/data/review-samples.ts`: 13 temporary comments to replace before public deployment.
+- `src/data/review-samples.ts`: 12 temporary photo comments to replace before public deployment.
 - `src/data/visibility.ts`: validated public build settings.
 - `public/`: font license and compatible static-host response headers. Branding derivatives are generated from the supplied logo at build time.
 - `tests/`: production-output, responsive, accessibility, contact, evidence and SEO checks.
@@ -59,7 +59,8 @@ business facts, warranty qualifiers and feedback status aligned across pages.
 Warm paper, charcoal, restrained rust accents, large type and real installation
 photographs. Self-hosted Manrope, no remote fonts, no client app runtime. The
 navigation remains visible on narrow screens and FAQs use native HTML controls.
-The optional Cloudflare analytics beacon is the only external script when enabled.
+A small inline script controls homepage review scrolling. The optional Cloudflare
+analytics beacon is the only external script when enabled.
 
 The founder confirmed the phone, more than 13 years of experience and 500+ completed projects, solar EPC,
 free site visits, system performance checks, annual yield audits and a five-year
@@ -67,7 +68,7 @@ warranty subject to written proposal terms. No unverified mailbox, office, addit
 statistics or customer identities are published. Waaree, Adani Solar and Tata Power Solar are presented as manufacturer sales
 channels through confirmed dealership relationships. Temporary feedback is founder-authorized design copy, not verified testimonials.
 It must be replaced with verified feedback or removed before public deployment.
-Archive photos are separate from comments and imply no authorship.
+Photos accompany the temporary comments for prelaunch design; authorship is unverified.
 
 ## Handoff
 

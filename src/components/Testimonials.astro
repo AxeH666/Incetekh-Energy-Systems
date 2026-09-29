@@ -17,16 +17,27 @@ import { reviewSamples } from '../data/review-samples';
           A conversation that counts.
         </h2>
       </div>
-      <p class="scroll-hint" id="review-instructions">
-        Scroll to explore <span aria-hidden="true">&#8596;</span>
-        <span class="keyboard-hint">
-          {' '}
-          Use left and right arrow keys when focused.
-        </span>
-      </p>
+      <div class="review-controls">
+        <p class="scroll-hint" id="review-instructions">
+          Scroll to explore <span aria-hidden="true">&#8596;</span>
+          <span class="keyboard-hint">
+            {' '}
+            Use left and right arrow keys when focused.
+          </span>
+        </p>
+        <button
+          class="review-toggle"
+          type="button"
+          aria-controls="feedback-track"
+          hidden
+        >
+          Pause scrolling
+        </button>
+      </div>
     </div>
     <div
       class="review-track"
+      id="feedback-track"
       role="region"
       aria-label="Customer feedback"
       aria-describedby="review-instructions"
@@ -35,6 +46,19 @@ import { reviewSamples } from '../data/review-samples';
       <ul class="review-list">
         {reviewSamples.map((review, index) => (
           <li class="review">
+            <Image
+              src={review.image}
+              alt={review.alt}
+              width={640}
+              height={review.cropHeight}
+              widths={[320, 640]}
+              sizes="(max-width: 704px) 75vw, 320px"
+              fit="cover"
+              position="top"
+              format="webp"
+              quality={75}
+              loading="lazy"
+            />
             <span class="review-number" aria-hidden="true">
               {String(index + 1).padStart(2, '0')} /
             </span>
@@ -42,31 +66,6 @@ import { reviewSamples } from '../data/review-samples';
           </li>
         ))}
       </ul>
-    </div>
-    <div class="review-archive">
-      <div
-        class="archive-images"
-        aria-label="Installation photographs from the Incetekh archive"
-      >
-        {reviewSamples
-          .filter((review) => review.image)
-          .map((review) => (
-            <Image
-              src={review.image!}
-              alt={review.alt!}
-              width={800}
-              height={800}
-              widths={[160, 320, 800]}
-              sizes="(max-width: 704px) 26vw, 112px"
-              fit="cover"
-              position="top"
-              format="webp"
-              quality={80}
-              loading="lazy"
-            />
-          ))}
-      </div>
-      <p>From the Incetekh installation archive.</p>
     </div>
   </div>
 </section>
@@ -107,7 +106,7 @@ import { reviewSamples } from '../data/review-samples';
   }
   .review-track {
     overflow-x: auto;
-    scroll-snap-type: x proximity;
+    scroll-snap-type: none;
     overscroll-behavior-x: contain;
     scrollbar-color: var(--color-muted) transparent;
     padding-bottom: 1.25rem;
@@ -115,49 +114,52 @@ import { reviewSamples } from '../data/review-samples';
   .review-list {
     list-style: none;
     display: flex;
+    gap: 1.5rem;
     margin: 0;
     padding: 0;
   }
   .review {
-    flex: 0 0 clamp(17rem, 31vw, 25rem);
-    padding: 1.25rem clamp(1.5rem, 3vw, 3rem) 1.5rem 0;
-    border-top: 1px solid var(--color-muted);
-    scroll-snap-align: start;
+    flex: 0 0 clamp(17rem, 27vw, 20rem);
+    padding-bottom: 1.5rem;
   }
-  .review + .review {
-    padding-left: clamp(1.5rem, 3vw, 3rem);
-    border-left: 1px solid var(--color-line);
+  .review img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 65% center;
+    margin-bottom: 1.25rem;
+  }
+  .review-controls {
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .review-toggle {
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--color-muted);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+  }
+  .review-toggle:hover {
+    background: var(--color-paper);
   }
   .review-number {
     display: block;
     color: var(--color-accent);
     font-size: var(--text-small);
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
   }
   .review-text {
     font-size: clamp(1.125rem, 1.6vw, 1.375rem);
     line-height: 1.55;
     letter-spacing: -0.02em;
-  }
-  .review-archive {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-top: 2rem;
-  }
-  .archive-images {
-    display: flex;
-    gap: 0.5rem;
-  }
-  .archive-images img {
-    width: 7rem;
-    height: auto;
-    aspect-ratio: 1;
-  }
-  .review-archive p {
-    max-width: 15rem;
-    font-size: var(--text-small);
-    color: var(--color-muted);
   }
   @media (max-width: 44rem) {
     .review-intro {
@@ -169,17 +171,6 @@ import { reviewSamples } from '../data/review-samples';
     .review {
       flex-basis: 85%;
     }
-    .review-archive {
-      flex-direction: column;
-      align-items: start;
-      gap: 0.75rem;
-    }
-    .archive-images img {
-      width: min(7rem, 26vw);
-    }
-    .review-archive p {
-      max-width: none;
-    }
   }
   @media (prefers-reduced-motion: reduce) {
     .review-track {
@@ -188,6 +179,9 @@ import { reviewSamples } from '../data/review-samples';
     }
   }
   @media print {
+    .review-controls {
+      display: none;
+    }
     .review-track {
       overflow: visible;
     }
@@ -199,3 +193,99 @@ import { reviewSamples } from '../data/review-samples';
     }
   }
 </style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('#reviews');
+  const track = section?.querySelector<HTMLElement>('.review-track');
+  const toggle = section?.querySelector<HTMLButtonElement>('.review-toggle');
+  if (section && track && toggle) {
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let paused = false;
+    let hovering = false;
+    let visible = false;
+    let frame: number | null = null;
+    let previousTime = 0;
+    let position = track.scrollLeft;
+    const canMove = () =>
+      !paused &&
+      !hovering &&
+      visible &&
+      !document.hidden &&
+      !reducedMotion.matches &&
+      !section.contains(document.activeElement);
+    const updateLabel = () => {
+      toggle.textContent = paused ? 'Resume scrolling' : 'Pause scrolling';
+    };
+    const stop = () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = null;
+      previousTime = 0;
+    };
+    const tick = (time: number) => {
+      frame = null;
+      if (!canMove()) return;
+      if (previousTime) {
+        position += Math.min(time - previousTime, 64) * 0.025;
+        const end = track.scrollWidth - track.clientWidth;
+        track.scrollLeft = Math.min(position, end);
+        if (position >= end) {
+          paused = true;
+          updateLabel();
+          stop();
+          return;
+        }
+      }
+      previousTime = time;
+      frame = requestAnimationFrame(tick);
+    };
+    const sync = () => {
+      stop();
+      toggle.hidden = reducedMotion.matches;
+      if (canMove()) {
+        position = track.scrollLeft;
+        frame = requestAnimationFrame(tick);
+      }
+    };
+    toggle.addEventListener('click', () => {
+      paused = !paused;
+      if (
+        !paused &&
+        track.scrollLeft >= track.scrollWidth - track.clientWidth - 1
+      )
+        track.scrollLeft = 0;
+      updateLabel();
+      sync();
+    });
+    section.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse') {
+        hovering = true;
+        sync();
+      }
+    });
+    section.addEventListener('pointerleave', () => {
+      hovering = false;
+      sync();
+    });
+    section.addEventListener('focusin', sync);
+    section.addEventListener('focusout', () => requestAnimationFrame(sync));
+    // Manual scrolling stays under the visitor's control until they choose Resume.
+    const pauseForInteraction = () => {
+      paused = true;
+      updateLabel();
+      sync();
+    };
+    track.addEventListener('pointerdown', pauseForInteraction);
+    track.addEventListener('wheel', pauseForInteraction, { passive: true });
+    track.addEventListener('keydown', pauseForInteraction);
+    reducedMotion.addEventListener('change', sync);
+    document.addEventListener('visibilitychange', sync);
+    new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        sync();
+      },
+      { threshold: 0.2 },
+    ).observe(track);
+    sync();
+  }
+</script>
