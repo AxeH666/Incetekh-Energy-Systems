@@ -1,5 +1,40 @@
 # Final polish validation
 
+## Gallery, hover and footer pass
+
+Validated on 2026-09-30 with Node 22.23.3 and installed Chrome. The records below
+this section describe earlier PRs.
+
+- Formatting lint and Astro/strict TypeScript passed with zero errors, warnings
+  or hints; the production build passed.
+- The 58-check full run passed 56 checks and exposed a gallery-control overflow
+  at 200% text size plus an output-budget overrun. The control now wraps and the
+  three new image sets use quality 78 WebP. All 22 affected foundation, gallery
+  and polish checks then passed; every default check has a passing result.
+- All four launch-mode SEO checks passed with intercepted analytics. The default
+  non-indexable, analytics-disabled build was restored afterward.
+- Output is 2,433,143 bytes across all pages and image variants, below the
+  documented 2.5 MB budget for the enlarged gallery. No external JavaScript
+  bundle or dependency was added. The homepage has one CSP-hashed inline module.
+- Browser coverage includes 320/390/768/1440/1920px, selected axe A/AA checks,
+  keyboard and touch scrolling, no-JS operation, 200% text scaling, forced colors,
+  reserved image space, ten accessible reviews, automatic advancement, loop
+  continuity, Pause/Resume and dynamic reduced motion. Review seam comparisons
+  at 390/1440/3840px still pass.
+- New checks verify all four gallery photos and illustrative alt text,
+  gallery wraparound and keyboard control, original and repeated review hover
+  enlargement without vertical clipping, reduced-motion suppression, sitewide
+  removal of diagonal arrows, linked-service hover/focus, and consistent 22px
+  WhatsApp artwork with the confirmed click-to-chat destination.
+- Visually inspected Home at 390/768/1440px, all five inner pages at 390/1440px,
+  footer composition, numbered gallery image crops and hovered reviews at readable
+  scale. Captures are local ignored artifacts in `playwright-report/gallery-polish/`.
+
+The user-renamed 2/3/4 PNG files retain their exact original bytes. Generated or
+unconfirmed supporting scenes are visibly illustrative and excluded from the
+Projects archive. The temporary review content still needs verified permissioned
+replacement or removal before public deployment. No deployment was performed.
+
 ## Continuous reviews, free services and WhatsApp
 
 Current homepage refresh validated on 2026-09-29 with Node 22.23.3 and installed

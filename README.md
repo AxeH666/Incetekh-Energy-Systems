@@ -59,7 +59,7 @@ business facts, warranty qualifiers and feedback status aligned across pages.
 Warm paper, charcoal, restrained rust accents, large type and real installation
 photographs. Self-hosted Manrope, no remote fonts, no client app runtime. The
 navigation remains visible on narrow screens and FAQs use native HTML controls.
-A small inline script controls homepage review scrolling. The optional Cloudflare
+A small inline script controls the homepage gallery and review scrolling. The optional Cloudflare
 analytics beacon is the only external script when enabled.
 
 The founder confirmed the phone, more than 13 years of experience and 500+ completed projects, solar EPC,
@@ -72,7 +72,8 @@ Photos accompany the temporary comments for prelaunch design; authorship is unve
 
 ## Handoff
 
-Current homepage/WhatsApp design: [HOMEPAGE-REFRESH.md](docs/HOMEPAGE-REFRESH.md).
+Current gallery, hover and footer polish: [GALLERY-POLISH.md](docs/GALLERY-POLISH.md).
+Earlier homepage/WhatsApp design: [HOMEPAGE-REFRESH.md](docs/HOMEPAGE-REFRESH.md).
 
 - [Pre-deployment polish and research](docs/POLISH.md)
 - [Design rules](docs/DESIGN.md)

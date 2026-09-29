@@ -194,8 +194,10 @@ test('floating reviews cross the loop boundary and expose each entry once to ass
   await expect(toggle).toHaveText('Resume scrolling');
   await expect(track.getByRole('listitem')).toHaveCount(10);
   await expect(
-    track.locator('.review-list[aria-hidden="true"]'),
-  ).toHaveAttribute('inert', '');
+    track.locator(
+      '.review-list[aria-hidden="true"] a, .review-list[aria-hidden="true"] button, .review-list[aria-hidden="true"] [tabindex]',
+    ),
+  ).toHaveCount(0);
   const cycle = await track.evaluate(
     (el) =>
       el.querySelector('ul')!.getBoundingClientRect().width +

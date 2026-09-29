@@ -82,9 +82,6 @@ img {
 .site-footer:focus-visible {
   outline-color: var(--color-accent-bright);
 }
-.care-band :focus-visible {
-  outline-color: var(--color-accent-bright);
-}
 .container {
   width: min(100% - var(--gutter) * 2, var(--content-width));
   margin-inline: auto;
@@ -140,14 +137,18 @@ img {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-6);
-  min-height: 2.875rem;
+  min-height: 3rem;
   padding: 0.75rem 1.125rem;
   font-size: var(--text-small);
   font-weight: 600;
   line-height: 1.35;
   text-decoration: none;
   border: 1px solid transparent;
-  transition: background-color 160ms ease;
+  border-radius: 3px;
+  transition:
+    transform 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease;
 }
 .button-dark {
   color: var(--color-paper);
@@ -179,8 +180,57 @@ img {
 .skip-link:focus {
   transform: translateY(0);
 }
+.text-link,
+.site-header nav a,
+.site-footer nav a,
+.phone-link,
+.contact-number,
+.free-service-list > a {
+  transition:
+    transform 220ms ease,
+    color 220ms ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :is(
+    .text-link,
+    .button,
+    .site-header nav a,
+    .site-footer nav a,
+    .phone-link,
+    .contact-number
+  ):focus-visible {
+    transform: translateY(-3px);
+  }
+  .free-service-list > a:focus-visible {
+    transform: translateY(-5px);
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :is(
+    .text-link,
+    .button,
+    .site-header nav a,
+    .site-footer nav a,
+    .phone-link,
+    .contact-number
+  ):hover {
+    transform: translateY(-3px);
+  }
+  .button:hover {
+    box-shadow: 0 8px 18px -12px #0009;
+  }
+  .free-service-list > a:hover {
+    transform: translateY(-5px);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .button {
+  .button,
+  .text-link,
+  .site-header nav a,
+  .site-footer nav a,
+  .phone-link,
+  .contact-number,
+  .free-service-list > a {
     transition: none;
   }
 }

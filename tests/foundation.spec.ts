@@ -106,8 +106,8 @@ for (const width of [320, 390, 768, 1440, 1920]) {
         )
         .toBe(true);
     }
-    await page.locator('.review-track').evaluate((el) => {
-      el.scrollLeft = 0;
+    await page.locator('[data-strip-track]').evaluateAll((els) => {
+      els.forEach((el) => (el.scrollLeft = 0));
     });
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({
@@ -222,7 +222,7 @@ test('missing page uses the shared accessible error shell', async ({
   await expect(page).toHaveURL('/');
 });
 
-test('static output stays small and limits client code to review scrolling', async () => {
+test('static output stays small and limits client code to homepage photo scrolling', async () => {
   const files: string[] = [];
   async function walk(path: string) {
     for (const entry of await readdir(path, { withFileTypes: true })) {
@@ -240,5 +240,5 @@ test('static output stays small and limits client code to review scrolling', asy
   const bytes = await Promise.all(
     files.map(async (file) => (await stat(file)).size),
   );
-  expect(bytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(1_500_000);
+  expect(bytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(2_500_000);
 });

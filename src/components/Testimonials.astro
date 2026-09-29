@@ -8,6 +8,7 @@ import { reviewSamples } from '../data/review-samples';
   id="reviews"
   aria-labelledby="reviews-heading"
   data-review-status="illustrative"
+  data-floating-strip
 >
   <div class="container review-intro">
     <div>
@@ -18,6 +19,7 @@ import { reviewSamples } from '../data/review-samples';
     </div>
     <button
       class="review-toggle"
+      data-strip-toggle
       type="button"
       aria-controls="feedback-track"
       hidden
@@ -31,13 +33,14 @@ import { reviewSamples } from '../data/review-samples';
   </p>
   <div
     class="review-track"
+    data-strip-track
     id="feedback-track"
     role="region"
     aria-label="Customer feedback"
     aria-describedby="review-instructions"
     tabindex="0"
   >
-    <ul class="review-list">
+    <ul class="review-list" data-strip-list>
       {reviewSamples.map((review) => (
         <li class="review" data-review-id={review.id}>
           <Image
@@ -104,7 +107,7 @@ import { reviewSamples } from '../data/review-samples';
     gap: 1.5rem;
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    padding-bottom: 1rem;
+    padding-block: 1.25rem 2.5rem;
     scrollbar-width: thin;
     scrollbar-color: var(--color-muted) transparent;
   }
@@ -121,6 +124,10 @@ import { reviewSamples } from '../data/review-samples';
     flex: none;
     align-self: start;
     background: #fff;
+    position: relative;
+    transition:
+      transform 240ms ease,
+      box-shadow 240ms ease;
   }
   .review:nth-child(even) {
     margin-top: 2rem;
@@ -144,6 +151,19 @@ import { reviewSamples } from '../data/review-samples';
     font-size: 1rem;
     line-height: 1.65;
   }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .review:hover {
+      transform: translateY(-8px) scale(1.035);
+      box-shadow: 0 16px 28px -14px #20262255;
+      z-index: 1;
+    }
+    .review:first-child {
+      transform-origin: left center;
+    }
+    .review:last-child {
+      transform-origin: right center;
+    }
+  }
   @media (max-width: 44rem) {
     .review-intro {
       align-items: start;
@@ -156,6 +176,9 @@ import { reviewSamples } from '../data/review-samples';
     }
   }
   @media (prefers-reduced-motion: reduce) {
+    .review {
+      transition: none;
+    }
     .review-track {
       scroll-behavior: auto;
       scroll-snap-type: none;
@@ -178,95 +201,3 @@ import { reviewSamples } from '../data/review-samples';
     }
   }
 </style>
-
-<script>
-  const section = document.querySelector<HTMLElement>('#reviews');
-  const track = section?.querySelector<HTMLElement>('.review-track');
-  const list = track?.querySelector<HTMLUListElement>('.review-list');
-  const toggle = section?.querySelector<HTMLButtonElement>('.review-toggle');
-  if (section && track && list && toggle) {
-    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-    let motionReduced = reducedMotion.matches;
-    // One visual copy makes the boundary seamless. Assistive technology reads
-    // the original list once; no links or focusable controls live in the copy.
-    const copy = list.cloneNode(true) as HTMLUListElement;
-    copy.setAttribute('aria-hidden', 'true');
-    copy.inert = true;
-    copy.querySelectorAll('img').forEach((img) => (img.alt = ''));
-    let paused = false;
-    let visible = false;
-    let frame: number | null = null;
-    let previousTime = 0;
-    let position = 0;
-    const cycleWidth = () =>
-      list.getBoundingClientRect().width +
-      parseFloat(getComputedStyle(track).columnGap);
-    const canMove = () =>
-      !paused &&
-      visible &&
-      !document.hidden &&
-      !motionReduced &&
-      document.activeElement !== track;
-    const stop = () => {
-      if (frame !== null) cancelAnimationFrame(frame);
-      frame = null;
-      previousTime = 0;
-    };
-    const tick = (time: number) => {
-      frame = null;
-      if (!canMove()) return;
-      if (previousTime) {
-        position =
-          (position + Math.min(time - previousTime, 64) * 0.045) % cycleWidth();
-        track.scrollLeft = position;
-      }
-      previousTime = time;
-      frame = requestAnimationFrame(tick);
-    };
-    const sync = () => {
-      stop();
-      toggle.hidden = motionReduced;
-      if (motionReduced) {
-        copy.remove();
-      } else if (!copy.isConnected) track.append(copy);
-      if (canMove()) {
-        position = track.scrollLeft % cycleWidth();
-        frame = requestAnimationFrame(tick);
-      }
-    };
-    const updateLabel = () =>
-      (toggle.textContent = paused ? 'Resume scrolling' : 'Pause scrolling');
-    toggle.addEventListener('click', () => {
-      paused = !paused;
-      updateLabel();
-      sync();
-    });
-    const pauseForInteraction = () => {
-      paused = true;
-      updateLabel();
-      sync();
-    };
-    track.addEventListener('pointerdown', pauseForInteraction);
-    // Vertical page scrolling must not silently turn off the floating strip.
-    track.addEventListener(
-      'wheel',
-      (event) => {
-        if (Math.abs(event.deltaX) > 0 || event.shiftKey) pauseForInteraction();
-      },
-      { passive: true },
-    );
-    track.addEventListener('keydown', pauseForInteraction);
-    track.addEventListener('focus', sync);
-    track.addEventListener('blur', sync);
-    reducedMotion.addEventListener('change', (event) => {
-      motionReduced = event.matches;
-      sync();
-    });
-    document.addEventListener('visibilitychange', sync);
-    new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      sync();
-    }).observe(track);
-    sync();
-  }
-</script>
