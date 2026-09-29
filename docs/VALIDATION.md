@@ -7,7 +7,10 @@ Validated on 2026-09-30 with Node 22.23.3 and installed Chrome:
 - All 59 default browser/output checks passed on the first run. A new real touch
   gesture regression was then added; all six focused gallery/polish checks passed,
   including a swipe followed by more than one autoplay interval without movement.
-- Astro/strict TypeScript and the production build passed. The same four photos
+- Independent review caught that `touch-action: pan-y` blocked native pinch zoom.
+  It now permits `pan-y pinch-zoom`. All six focused tests passed again, including
+  an actual two-finger gesture that increases the browser visual viewport scale.
+- Formatting lint, Astro/strict TypeScript and the production build passed. The same four photos
   now fade in a single fixed frame, with dot navigation and compact icon controls.
 - Tests cover automatic advancement and wraparound, one accessible active photo,
   dot selection, keyboard navigation, touch pause, reduced motion, no-JS fallback,

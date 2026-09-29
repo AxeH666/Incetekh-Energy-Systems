@@ -75,6 +75,7 @@ test('mobile swipes change one photo and keep playback paused', async ({
   await page.goto('/');
   const track = page.locator('.gallery-track');
   await track.scrollIntoViewIfNeeded();
+  await expect(track).toHaveCSS('touch-action', 'pan-y pinch-zoom');
   const box = (await track.boundingBox())!;
   const session = await context.newCDPSession(page);
   const y = box.y + box.height / 2;
@@ -106,6 +107,30 @@ test('mobile swipes change one photo and keep playback paused', async ({
     'true',
   );
   expect(await track.evaluate((el) => el.scrollLeft)).toBe(0);
+  const center = box.x + box.width / 2;
+  await session.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [
+      { x: center - 30, y },
+      { x: center + 30, y },
+    ],
+  });
+  for (let i = 1; i <= 8; i++) {
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [
+        { x: center - 30 - i * 10, y },
+        { x: center + 30 + i * 10, y },
+      ],
+    });
+  }
+  await session.send('Input.dispatchTouchEvent', {
+    type: 'touchEnd',
+    touchPoints: [],
+  });
+  await expect
+    .poll(() => page.evaluate(() => visualViewport!.scale))
+    .toBeGreaterThan(1.2);
   await context.close();
 });
 
