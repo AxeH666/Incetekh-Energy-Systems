@@ -5,7 +5,9 @@
 An editorial, engineering-led composition: strong left alignment, large type,
 quiet borders and a real installation photograph. Warm paper and charcoal form
 the surfaces; rust is an accent for focus and interaction. No gradients, cards,
-decorative motion or generated imagery are needed for the foundation.
+decorative effects are needed for the foundation. The founder subsequently
+requested floating photos and review hover lift; the numbered supporting scenes
+are explicitly illustrative. See [GALLERY-POLISH.md](GALLERY-POLISH.md).
 
 The supplied Incetekh logo is displayed intact on white in the shared header and
 footer. Optimized versions also identify the social preview, favicon, touch icon
@@ -26,7 +28,7 @@ and Organization schema. No recoloring, distortion or invented logo is used.
   navigation/call target heights. A skip link moves focus to main. The header
   Contact navigation opens the enquiry page; the primary button opens WhatsApp.
   Phone links remain available.
-- **Motion:** button color transition and gentle homepage review scrolling;
+- **Motion:** subtle link/button lift, review hover enlargement and gentle homepage photo scrolling;
   disabled for reduced motion. Continuous looping stops on intentional interaction, with a visible
   Pause/Resume control. No carousel dependency.
 - **Components:** extract only repeated structure. The layout owns the document;

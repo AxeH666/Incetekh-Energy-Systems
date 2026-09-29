@@ -2,15 +2,16 @@
 
 All 43 supplied images were visually inspected for the polish pass: 39 photographs/
 supporting images and four newly supplied logos. No PDFs, brochures, certificates
-or written review spreadsheet were supplied. Original artwork and both source
-photo folders remain unchanged.
+or written review spreadsheet were supplied. Original artwork bytes remain unchanged. The founder renamed three project-folder
+images to `2.png`, `3.png` and `4.png`; the gallery polish preserves those exact
+renames, documented in [GALLERY-POLISH.md](GALLERY-POLISH.md).
 
 | Material                                                                  | Observation                                                               | Final treatment                                                          |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `project photos/WhatsApp Image 2026-09-26 at 1.41.35 PM.jpeg` (1280×720)  | Raised solar array on a concrete rooftop                                  | Home/project gallery                                                     |
 | `project photos/WhatsApp Image 2026-09-26 at 1.41.36 PM.jpeg` (1080×1143) | Panels on a corrugated metal roof                                         | Home/company/project gallery                                             |
-| Four `project photos/ChatGPT Image…png` files                             | Supporting scenes with generated provenance indicated by filename         | Excluded                                                                 |
-| Three `project photos/hf_…png` files                                      | Rooftop scenes with unconfirmed original/generated/enhanced provenance    | Excluded                                                                 |
+| Two remaining `project photos/ChatGPT Image…png` files                    | Supporting scenes with generated provenance indicated by filename         | Excluded                                                                 |
+| Two remaining `project photos/hf_…png` files                              | Rooftop scenes with unconfirmed original/generated/enhanced provenance    | Excluded                                                                 |
 | Thirty `review pictures/WhatsApp Image…jpeg` files                        | People/installations, repeated views, water heaters, GPS/address overlays | Eight cropped review photos; two project photos also appear in the strip |
 
 The four supplied root-level logos are now committed as original source assets:
@@ -25,6 +26,10 @@ source filenames, crop rules and replacement boundaries are recorded in
 [TESTIMONIALS.md](TESTIMONIALS.md). Downloadable 320/640px WebP derivatives exclude
 GPS/address overlays. Originals are unchanged, and pictured people are not verified
 authors. Some photographs are alternate views of the same installation.
+
+The numbered `project photos/2.png`, `3.png` and `4.png` now appear in the
+homepage gallery as explicitly captioned illustrative supporting images, alongside
+the real installation photograph. They are excluded from the project archive.
 
 ## Published facts
 

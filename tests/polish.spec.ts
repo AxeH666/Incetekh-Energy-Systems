@@ -66,7 +66,7 @@ test('every visible action resolves, including service fragments and branded res
     }
     await expect(
       page.locator(
-        'button:not(.review-toggle), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
+        'button:not([data-strip-toggle]), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
       ),
     ).toHaveCount(0);
     const links = await page
@@ -150,8 +150,8 @@ for (const width of [390, 768, 1440, 1920]) {
       await image.scrollIntoViewIfNeeded();
       await image.evaluate((el: HTMLImageElement) => el.decode());
     }
-    await page.locator('.review-track').evaluate((el) => {
-      el.scrollLeft = 0;
+    await page.locator('[data-strip-track]').evaluateAll((els) => {
+      els.forEach((el) => (el.scrollLeft = 0));
     });
     await page.evaluate(() => window.scrollTo(0, 0));
     expect(await positions()).toEqual(before);

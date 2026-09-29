@@ -1,0 +1,201 @@
+---
+import { Image } from 'astro:assets';
+import { foundationImage } from '../data/site';
+import equipment from '../../project photos/2.png';
+import rooftop from '../../project photos/3.png';
+import installation from '../../project photos/4.png';
+
+const photos = [
+  { ...foundationImage, caption: 'From the Incetekh project archive' },
+  {
+    src: equipment,
+    alt: 'Illustrative solar equipment and rooftop scene.',
+    caption: 'Solar equipment · Illustrative image',
+  },
+  {
+    src: rooftop,
+    alt: 'Illustrative view of a large rooftop solar array.',
+    caption: 'Rooftop solar · Illustrative image',
+  },
+  {
+    src: installation,
+    alt: 'Illustrative scene of workers fitting rooftop solar panels.',
+    caption: 'Installation detail · Illustrative image',
+  },
+];
+---
+
+<div
+  class="project-gallery"
+  data-floating-strip
+  data-speed="30"
+  data-action="gallery"
+>
+  <div class="gallery-heading">
+    <p class="eyebrow">Solar, in perspective</p>
+    <button
+      type="button"
+      class="gallery-toggle"
+      data-strip-toggle
+      aria-controls="solar-gallery"
+      hidden
+    >
+      Pause gallery
+    </button>
+  </div>
+  <p class="sr-only" id="gallery-instructions">
+    Photos move automatically. Pause the gallery or focus this region and use
+    the left and right arrow keys to browse.
+  </p>
+  <div
+    class="gallery-track"
+    id="solar-gallery"
+    data-strip-track
+    role="region"
+    aria-label="Solar photo gallery"
+    aria-describedby="gallery-instructions"
+    tabindex="0"
+  >
+    <ul class="gallery-list" data-strip-list>
+      {photos.map((photo, index) => (
+        <li>
+          <figure>
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              widths={[480, 800, 1280]}
+              width={1280}
+              sizes="(max-width: 896px) 80vw, (max-width: 1760px) 39vw, 688px"
+              format="webp"
+              quality={index === 0 ? 80 : 78}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
+            />
+            <figcaption>
+              <span class="photo-number" aria-hidden="true">
+                0{index + 1}
+              </span>
+              {photo.caption}
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .project-gallery {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 2rem;
+  }
+  .gallery-heading {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-right: 2rem;
+  }
+  .eyebrow {
+    color: #c9d6c8;
+  }
+  .gallery-toggle {
+    min-height: 2.75rem;
+    padding: 0.5rem 0;
+    border: 0;
+    background: none;
+    color: #fff;
+    font: inherit;
+    font-size: 0.75rem;
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .gallery-track {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding-block: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: #8b9e90 transparent;
+    overscroll-behavior-x: contain;
+  }
+  .gallery-list {
+    display: flex;
+    flex: none;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    width: clamp(18rem, 39vw, 43rem);
+    flex: none;
+  }
+  li:nth-child(even) {
+    padding-top: 1.5rem;
+  }
+  figure {
+    background: #f5f4ef;
+    color: #202622;
+  }
+  img {
+    width: 100%;
+    aspect-ratio: 1.25;
+    object-fit: cover;
+  }
+  figcaption {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    min-height: 4.25rem;
+  }
+  .photo-number {
+    color: #5b625c;
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+  :focus-visible {
+    outline-color: #f7b097;
+    outline-offset: -3px;
+  }
+  @media (max-width: 56rem) {
+    .project-gallery {
+      padding-top: 0;
+    }
+    .gallery-heading {
+      padding-inline: var(--gutter);
+    }
+    .gallery-track {
+      margin-left: var(--gutter);
+    }
+    li {
+      width: 80vw;
+    }
+    img {
+      aspect-ratio: 1.6;
+    }
+  }
+  @media print {
+    .gallery-toggle,
+    .gallery-list[aria-hidden] {
+      display: none;
+    }
+    .gallery-track,
+    .gallery-list {
+      display: block;
+      overflow: visible;
+    }
+    li {
+      break-inside: avoid;
+    }
+  }
+</style>

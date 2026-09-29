@@ -1,5 +1,9 @@
 # Homepage, continuous reviews and WhatsApp
 
+This records the preceding homepage refresh. The subsequent gallery, shared
+scrolling behavior, hover effects and footer changes are in
+[GALLERY-POLISH.md](GALLERY-POLISH.md).
+
 The founder requested automatic floating reviews, clearer photographs without
 repeated people, WhatsApp links/logo, and a stronger homepage with the free
 services visible before the detailed Services page. In this session the founder
