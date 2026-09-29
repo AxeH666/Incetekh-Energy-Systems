@@ -42,20 +42,14 @@ test('keyboard skip link and contact navigation work', async ({ page }) => {
   await expect(page.getByRole('main')).toBeFocused();
   await page.getByRole('link', { name: 'Get in touch' }).focus();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('contentinfo')).toBeFocused();
-  await page.keyboard.press('Tab');
-  await expect(
-    page
-      .getByRole('contentinfo')
-      .getByRole('link', { name: 'Incetekh Energy — home' }),
-  ).toBeFocused();
-  await page.keyboard.press('Tab');
-  await expect(
-    page.getByRole('link', { name: '+91 94412 59786', exact: true }),
-  ).toBeFocused();
-  await expect(
-    page.getByRole('link', { name: '+91 94412 59786', exact: true }),
-  ).toHaveAttribute('href', 'tel:+919441259786');
+  await expect(page).toHaveURL('/contact/');
+  const call = page.getByRole('link', {
+    name: 'Call +91 94412 59786',
+    exact: true,
+  });
+  await call.focus();
+  await expect(call).toBeFocused();
+  await expect(call).toHaveAttribute('href', 'tel:+919441259786');
 });
 
 for (const width of [320, 390, 768, 1440, 1920]) {
@@ -171,7 +165,7 @@ test('works without JavaScript and with reduced motion', async ({
   );
   await page.getByRole('link', { name: 'Get in touch' }).click();
   await expect(
-    page.getByRole('link', { name: '+91 94412 59786', exact: true }),
+    page.getByRole('link', { name: 'Call +91 94412 59786', exact: true }),
   ).toBeInViewport();
   await context.close();
 });

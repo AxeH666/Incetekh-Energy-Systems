@@ -21,7 +21,11 @@ const links = [
         </a>
       ))}
     </nav>
-    <a class="button button-dark" href="#contact">
+    <a
+      class="button button-dark"
+      href="/contact/"
+      aria-current={Astro.url.pathname === '/contact/' ? 'page' : undefined}
+    >
       Get in touch <span aria-hidden="true">↗</span>
     </a>
   </div>

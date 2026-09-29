@@ -1,0 +1,163 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import { site } from '../data/site';
+---
+
+<SiteLayout
+  title="Contact & Free Site Visits | Incetekh Energy"
+  description="Call Incetekh Energy on +91 94412 59786 to discuss rooftop solar, arrange a free site visit, or ask about system performance checks and annual yield audits."
+>
+  <PageIntro
+    eyebrow="Start a conversation"
+    title="Let’s talk about your site."
+    description="Planning rooftop solar or looking at an existing system? Call us to discuss what you need and arrange a free site visit."
+  />
+  <section class="container contact-grid" aria-labelledby="call-heading">
+    <div class="call-panel">
+      <h2 class="eyebrow" id="call-heading">
+        Call Incetekh Energy
+      </h2>
+      <a
+        class="contact-number"
+        href={`tel:${site.phone}`}
+        aria-label={`Call ${site.phoneDisplay}`}
+      >
+        94412 59786 <span aria-hidden="true">↗</span>
+      </a>
+      <p>Calling from outside India? Use {site.phoneDisplay}.</p>
+      <p>
+        Tell us your site location and the support you are looking for. We’ll
+        discuss suitability and visit arrangements with you.
+      </p>
+    </div>
+    <div class="prose preparation">
+      <h2 class="section-title">A useful first conversation.</h2>
+      <p>If available, have these details to hand:</p>
+      <ul>
+        <li>Your site location and building type.</li>
+        <li>A recent electricity bill or a sense of your energy use.</li>
+        <li>Whether this is a new installation or an existing solar system.</li>
+        <li>
+          Any questions about your roof, system performance or next steps.
+        </li>
+      </ul>
+      <p>You don’t need all the answers before calling.</p>
+    </div>
+  </section>
+  <section
+    class="container section section-grid questions"
+    aria-labelledby="questions-heading"
+  >
+    <h2 class="section-title" id="questions-heading">
+      Before we speak.
+    </h2>
+    <div>
+      <details>
+        <summary>Is the site visit free?</summary>
+        <p>
+          Yes. Call to arrange a free site visit. We’ll confirm the location and
+          visit arrangements with you.
+        </p>
+      </details>
+      <details>
+        <summary>Can I ask about an existing system?</summary>
+        <p>
+          Yes. Incetekh offers system performance checks and annual yield
+          audits. Tell us about your installation and what you would like
+          checked.
+        </p>
+      </details>
+      <details>
+        <summary>What does the 5-year warranty cover?</summary>
+        <p>
+          The 5-year warranty is subject to your written proposal and applicable
+          terms. Ask us to explain the coverage, exclusions and responsibilities
+          for your system before proceeding.
+        </p>
+      </details>
+      <a class="text-link" href="/services/">
+        Explore our services <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    padding-bottom: clamp(3rem, 6vw, 6rem);
+  }
+  .call-panel {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding: clamp(1.5rem, 3vw, 3rem);
+    align-self: start;
+  }
+  .call-panel p {
+    color: var(--color-on-dark-muted);
+    margin-top: var(--space-6);
+  }
+  .call-panel :focus-visible {
+    outline-color: var(--color-accent-bright);
+  }
+  .contact-number {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: clamp(1.75rem, 3.5vw, 3.5rem);
+    letter-spacing: -0.05em;
+    line-height: 1.4;
+    margin-top: var(--space-8);
+    min-height: 2.75rem;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+  .contact-number span {
+    color: var(--color-accent-bright);
+  }
+  .preparation .section-title {
+    font-size: clamp(1.75rem, 3vw, 3rem);
+  }
+  ul {
+    padding-left: 1.25rem;
+    color: var(--color-muted);
+  }
+  li + li {
+    margin-top: var(--space-3);
+  }
+  .questions {
+    border-top: 1px solid var(--color-line);
+  }
+  details {
+    border-bottom: 1px solid var(--color-line);
+    padding-block: var(--space-6);
+  }
+  details:first-child {
+    padding-top: 0;
+  }
+  summary {
+    min-height: 2.75rem;
+    cursor: pointer;
+    font-size: var(--text-lead);
+    font-weight: 600;
+    padding-block: var(--space-2);
+  }
+  details p {
+    margin-top: var(--space-4);
+    color: var(--color-muted);
+    max-width: 44rem;
+  }
+  .questions .text-link {
+    margin-top: var(--space-6);
+  }
+  @media (max-width: 44rem) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
