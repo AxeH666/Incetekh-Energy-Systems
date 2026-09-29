@@ -1,4 +1,4 @@
-﻿# Local validation
+# Local validation
 
 Validated on 2026-09-29 using Node 22.23.3 and installed Google Chrome through
 Playwright. Managed Chromium downloads timed out; the documented
@@ -7,7 +7,7 @@ handsets have not been tested.
 
 ## Results
 
-- Formatting lint passed.
+- Formatting lint passed, including an isolated fresh Git checkout with LF rules.
 - Astro/strict TypeScript: zero errors, warnings or hints.
 - Production build passed: six public content pages, custom 404, sitemap and robots.
 - All **36 default-mode browser/output tests passed**.

@@ -1,4 +1,4 @@
-﻿# Evidence and asset register
+# Evidence and asset register
 
 All 39 supplied images were visually inspected before implementation. No PDFs,
 brochures, certificates, written review spreadsheet or original brand logo files

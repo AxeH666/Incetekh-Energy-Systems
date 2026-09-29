@@ -1,4 +1,4 @@
-﻿# Incetekh Energy
+# Incetekh Energy
 
 Complete local Phase 1 public website: home, company, services, project photographs,
 labelled review previews, contact, privacy and a custom 404. Built with static

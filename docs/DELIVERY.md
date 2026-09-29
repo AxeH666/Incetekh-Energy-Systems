@@ -14,7 +14,7 @@ actions. This is not a claim that the full live Phase 1 milestone is complete.
 | [4](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/4) | Real project gallery and explicitly labelled temporary review preview                    |
 | [5](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/5) | Phone-first contact page, preparation guidance and accessible FAQs                       |
 | [6](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/6) | SEO, privacy, optional analytics, CSP and static-host configuration                      |
-| Final handoff PR                                               | Deployment/email preparation, evidence register and consolidated validation              |
+| [7](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/7) | Deployment/email preparation, evidence register and consolidated validation              |
 
 Each component started from synced main after the previous PR merged. The
 implementing agent performed self-review and a separate review of each pushed
