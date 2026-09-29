@@ -1,5 +1,8 @@
 # Final pre-deployment polish
 
+Current follow-up: [HOMEPAGE-REFRESH.md](HOMEPAGE-REFRESH.md) supersedes the
+review motion, homepage composition and phone-only lead paths below.
+
 Follow-up: the founder subsequently requested 12 photo reviews with automatic
 scrolling on Home. [TESTIMONIALS.md](TESTIMONIALS.md) describes the current
 implementation; it supersedes the text-only, no-runtime review details below.

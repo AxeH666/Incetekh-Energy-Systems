@@ -1,64 +1,52 @@
 # Homepage feedback and replacement
 
-The final polish brief explicitly requests ten additional temporary comments and
-natural presentation without visible sample labels. That instruction supersedes
-the earlier labelled preview. The follow-up request pairs 12 supplied photos with 12 founder-authorized illustrative
-entries in `src/data/review-samples.ts`, rendered once on Home by
-`Testimonials.astro`. They are not source testimonials or verified endorsements.
-The section retains `data-review-status="illustrative"` for maintenance/tests.
-There are no names, stars, dates, locations, quantified outcomes or review schema.
+Ten founder-authorized temporary entries live in `src/data/review-samples.ts` and
+appear on Home. The user requested natural positive prelaunch copy without sample
+labels. These are not verified endorsements or statements attributed to the people
+photographed. `data-review-status="illustrative"` records this internally. No names,
+ratings, locations, quantified outcomes or review schema are added.
 
-## Before public deployment
+Before public deployment, replace the copy with verified, permissioned statements
+from the review spreadsheet or remove it. Check photo permission and attribution
+separately. Noindex is not access control or authorization to publish draft reviews.
 
-Replace the temporary entries with permissioned, verified spreadsheet statements,
-or remove the feedback text from the public build. Unlabelled invented comments
-must not be launched as actual customer endorsements. No deployment is authorized
-by this PR. Noindex is not a substitute for private preview access control.
+## Motion
 
-Check the source row, exact wording, permitted attribution and photo permission.
-Do not infer authorship from filenames, visual similarity or GPS labels. Update
-the data, status marker, regression expectations and evidence register together.
+The native horizontal region moves at 45 CSS pixels/second and repeats seamlessly.
+One runtime visual copy is hidden from assistive technology and inert. There are
+ten source entries, not twenty reviews. The loop does not stop at its boundary.
+Normal hover and vertical page scrolling continue the movement. Pause/Resume,
+keyboard focus, touch and horizontal wheel interaction give explicit control.
+The script stops offscreen and in hidden tabs. Reduced motion disables automatic
+movement and removes the copy. No-JS readers retain the native original list.
 
-## Interaction and photographs
+The tiny Astro script is CSP-hashed and adds no library or external requests.
+See [HOMEPAGE-REFRESH.md](HOMEPAGE-REFRESH.md) for the design rationale and sources.
 
-The homepage now presents 12 photo/text entries in one horizontally scrolling
-strip. Copy is short, positive and temporary; the pictured people are not verified
-authors. Pairing is for the requested prelaunch design only, not source attribution.
-No customer names, stars, locations, capacities or performance outcomes are added.
+## Selected photographs
 
-A small Astro-processed, CSP-hashed inline script gently advances the native
-scroll region at 25 CSS pixels/second only while visible. Hover and keyboard focus
-pause it; touch, wheel and keyboard interactions keep it paused until Resume is
-chosen. The visible Pause/Resume control is hidden without JS and with reduced
-motion. Reduced-motion users retain manual scrolling. The track stops at the end;
-Resume restarts it. No clones, library, autoplay timer or live-region announcements.
+Six portrait scenes are mixed with four installation details. Repeated portrait
+views and the former final pair were removed; selection does not establish the
+identity or review authorship of any person. All sources are dated 2026-09-26.
 
-Photos are imported directly from `review pictures/`, preserving originals. The
-single data file lists all 12 sources and alt text. Portraits use top-square crops;
-the two landscape originals use top 2:1 crops, excluding overlays. Astro generates
-320/640px WebP derivatives at quality 75. CSS frames them consistently without
-stretching; privacy is enforced in downloadable derivatives, not merely CSS.
-Inspect all derivatives after changing crop settings. Some photos show different
-views of the same installation; no count of distinct customers is implied.
+| Entry | Folder          | Filename suffix       | Downloadable crop                    |
+| ----- | --------------- | --------------------- | ------------------------------------ |
+| 1     | review pictures | `1.41.32 PM (1).jpeg` | Top square                           |
+| 2     | review pictures | `1.41.27 PM (1).jpeg` | Top 2:1                              |
+| 3     | review pictures | `1.41.23 PM.jpeg`     | Top square                           |
+| 4     | review pictures | `1.41.34 PM (2).jpeg` | Top 2:1                              |
+| 5     | review pictures | `1.41.33 PM.jpeg`     | Top 2:1, excludes the distant person |
+| 6     | project photos  | `1.41.35 PM.jpeg`     | Top square                           |
+| 7     | review pictures | `1.41.24 PM.jpeg`     | Top square                           |
+| 8     | review pictures | `1.41.28 PM (1).jpeg` | Top 2:1                              |
+| 9     | review pictures | `1.41.29 PM (2).jpeg` | Top square                           |
+| 10    | project photos  | `1.41.36 PM.jpeg`     | Top square                           |
 
-Photo source suffixes in display order (all dated 2026-09-26):
+Astro generates 320/640px WebP derivatives at quality 80. Landscape crops request
+the larger rendition because the square CSS frame uses half their width. GPS and
+address overlays must be absent from the downloadable files, not merely hidden
+by CSS. Check these derivatives after any source/crop change. Originals remain
+unchanged outside the published directory.
 
-1. `1.41.24 PM.jpeg`
-2. `1.41.25 PM.jpeg`
-3. `1.41.31 PM.jpeg`
-4. `1.41.26 PM (1).jpeg`
-5. `1.41.29 PM (2).jpeg`
-6. `1.41.32 PM (1).jpeg`
-7. `1.41.32 PM (2).jpeg`
-8. `1.41.28 PM.jpeg`
-9. `1.41.24 PM (1).jpeg`
-10. `1.41.33 PM.jpeg`
-11. `1.41.26 PM.jpeg` (landscape)
-12. `1.41.33 PM (1).jpeg` (landscape)
-
-Animation timing uses elapsed timestamps, following
-[MDN requestAnimationFrame guidance](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame).
-
-`/reviews/` is a static Astro redirect to `/#reviews`, with a fallback link and
-noindex. No main/footer Reviews destination or sitemap entry remains. Verify the
-chosen host's behavior at launch; local static preview uses a meta refresh.
+The old `/reviews/` route redirects to `/#reviews`, remains noindex and stays out
+of the sitemap. Main navigation includes About, Services, Projects and Contact.

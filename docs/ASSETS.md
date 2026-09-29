@@ -5,13 +5,13 @@ supporting images and four newly supplied logos. No PDFs, brochures, certificate
 or written review spreadsheet were supplied. Original artwork and both source
 photo folders remain unchanged.
 
-| Material                                                                  | Observation                                                               | Final treatment                                             |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `project photos/WhatsApp Image 2026-09-26 at 1.41.35 PM.jpeg` (1280×720)  | Raised solar array on a concrete rooftop                                  | Home/project gallery                                        |
-| `project photos/WhatsApp Image 2026-09-26 at 1.41.36 PM.jpeg` (1080×1143) | Panels on a corrugated metal roof                                         | Home/company/project gallery                                |
-| Four `project photos/ChatGPT Image…png` files                             | Supporting scenes with generated provenance indicated by filename         | Excluded                                                    |
-| Three `project photos/hf_…png` files                                      | Rooftop scenes with unconfirmed original/generated/enhanced provenance    | Excluded                                                    |
-| Thirty `review pictures/WhatsApp Image…jpeg` files                        | People/installations, repeated views, water heaters, GPS/address overlays | Twelve cropped photos in homepage reviews; remainder unused |
+| Material                                                                  | Observation                                                               | Final treatment                                                          |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `project photos/WhatsApp Image 2026-09-26 at 1.41.35 PM.jpeg` (1280×720)  | Raised solar array on a concrete rooftop                                  | Home/project gallery                                                     |
+| `project photos/WhatsApp Image 2026-09-26 at 1.41.36 PM.jpeg` (1080×1143) | Panels on a corrugated metal roof                                         | Home/company/project gallery                                             |
+| Four `project photos/ChatGPT Image…png` files                             | Supporting scenes with generated provenance indicated by filename         | Excluded                                                                 |
+| Three `project photos/hf_…png` files                                      | Rooftop scenes with unconfirmed original/generated/enhanced provenance    | Excluded                                                                 |
+| Thirty `review pictures/WhatsApp Image…jpeg` files                        | People/installations, repeated views, water heaters, GPS/address overlays | Eight cropped review photos; two project photos also appear in the strip |
 
 The four supplied root-level logos are now committed as original source assets:
 `incetekh_logo.png`, `waree-logo - final.jpg`, `adani_logo.png`, and
@@ -20,7 +20,7 @@ complete artwork appears in the header/footer, square social preview, favicon,
 touch icon and Organization logo. Manufacturer artwork retains its proportions,
 colors and wording, with individual display widths to balance the marks.
 
-Twelve review photographs now accompany the temporary homepage comments. All
+Ten review photographs now accompany the temporary homepage comments. All
 source filenames, crop rules and replacement boundaries are recorded in
 [TESTIMONIALS.md](TESTIMONIALS.md). Downloadable 320/640px WebP derivatives exclude
 GPS/address overlays. Originals are unchanged, and pictured people are not verified
@@ -28,14 +28,14 @@ authors. Some photographs are alternate views of the same installation.
 
 ## Published facts
 
-| Fact                                                             | Evidence                                                                                          |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Incetekh Energy; solar EPC                                       | Founder brief, AGENTS.md and SCOPE.md                                                             |
-| More than 13 years of experience; word-of-mouth roots            | Latest founder confirmation supersedes approximate history in SCOPE.md; no founding year inferred |
-| Phone +91 94412 59786                                            | Explicit founder confirmation in this session                                                     |
-| Free site visits; system performance checks; annual yield audits | Explicit founder confirmation                                                                     |
-| Five-year warranty                                               | Explicit confirmation, with terms agreed per proposal; qualified everywhere                       |
-| Installation photographs                                         | Supplied real project material; captions describe visible features only                           |
+| Fact                                                                       | Evidence                                                                                          |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Incetekh Energy; solar EPC                                                 | Founder brief, AGENTS.md and SCOPE.md                                                             |
+| More than 13 years of experience; word-of-mouth roots                      | Latest founder confirmation supersedes approximate history in SCOPE.md; no founding year inferred |
+| Phone +91 94412 59786                                                      | Explicit founder confirmation in this session                                                     |
+| Free site visits; free system performance checks; free annual yield audits | Explicit founder confirmation                                                                     |
+| Five-year warranty                                                         | Explicit confirmation, with terms agreed per proposal; qualified everywhere                       |
+| Installation photographs                                                   | Supplied real project material; captions describe visible features only                           |
 
 Also explicitly confirmed for this polish pass: **500+ projects completed** and
 sales through **dealership and sales-channel relationships** for relevant Waaree,
@@ -46,7 +46,7 @@ strategic partnership, dealer tier or territory is claimed.
 ## Temporary content and exclusions
 
 The founder explicitly authorized temporary short positive review copy while the
-verified spreadsheet is missing. The final brief requests natural presentation without sample labels. Twelve
+verified spreadsheet is missing. The final brief requests natural presentation without sample labels. Ten
 illustrative comments are centralized and internally marked unverified, with no
 names/ratings or structured review data. Photographs accompany the requested temporary copy, without verified authorship. Replace the text with verified records or
 remove it before public deployment; see [TESTIMONIALS.md](TESTIMONIALS.md).
@@ -61,3 +61,7 @@ addresses visible in originals are not used to infer those business details.
 The supplied Incetekh artwork replaces the earlier provisional wordmark/favicon.
 Publication permission for photos should be confirmed by the owner before external
 launch. Temporary review copy is a deployment blocker until replaced or removed.
+
+The founder confirmed all three services are free in the homepage-refresh session.
+WhatsApp uses the confirmed public phone via an ordinary click-to-chat link.
+The official white WhatsApp glyph source is recorded in [HOMEPAGE-REFRESH.md](HOMEPAGE-REFRESH.md).

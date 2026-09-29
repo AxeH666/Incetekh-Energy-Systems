@@ -77,11 +77,19 @@ test('every visible action resolves, including service fragments and branded res
         expect(href).toBe('tel:+919441259786');
         continue;
       }
+      if (href.startsWith('https://wa.me/')) {
+        expect(href).toBe('https://wa.me/919441259786');
+        continue;
+      }
       const url = new URL(href, `${baseURL}${path}`);
       expect(url.origin).toBe(baseURL);
       if (url.hash) {
-        expect(url.pathname).toBe(path);
-        await expect(page.locator(url.hash)).toHaveCount(1);
+        if (url.pathname === path)
+          await expect(page.locator(url.hash)).toHaveCount(1);
+        else
+          expect(await (await request.get(url.pathname)).text()).toContain(
+            `id="${url.hash.slice(1)}"`,
+          );
       } else expect((await request.get(url.pathname)).status()).toBe(200);
     }
     for (const selector of [

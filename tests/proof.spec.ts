@@ -1,21 +1,28 @@
 import { test, expect } from '@playwright/test';
 
 // Temporary copy is a private prelaunch design fixture, not verified evidence.
-test('homepage contains twelve photo reviews without invented attribution', async ({
+test('homepage contains ten distinct photo reviews without invented attribution', async ({
   page,
   request,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   const section = page.locator('[data-review-status="illustrative"]');
-  await expect(section.locator('.review')).toHaveCount(12);
+  await expect(section.locator('.review')).toHaveCount(10);
   await expect(
     section.locator('blockquote, cite, [itemtype*="Review"]'),
   ).toHaveCount(0);
   await expect(section).not.toContainText(
     /sample review|sample copy|testimonial to be added|lorem ipsum|five.star|verified customer/i,
   );
-  await expect(section.locator('.review img')).toHaveCount(12);
+  await expect(section.locator('.review img')).toHaveCount(10);
+  expect(
+    new Set(
+      await section
+        .locator('.review img')
+        .evaluateAll((imgs) => imgs.map((img) => img.getAttribute('src'))),
+    ).size,
+  ).toBe(10);
   for (const img of await section.locator('img').all()) {
     await img.scrollIntoViewIfNeeded();
     await expect(img).toHaveAttribute('width', '640');
@@ -66,7 +73,9 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     ).toBe(true);
     await page.keyboard.press('Tab');
     await expect(
-      page.getByRole('link', { name: 'Call +91 94412 59786', exact: true }),
+      page
+        .locator('.site-cta')
+        .getByRole('link', { name: 'Chat on WhatsApp', exact: true }),
     ).toBeFocused();
   });
 }
@@ -130,7 +139,7 @@ test('old reviews destination redirects to the homepage section and leaves sitem
   );
 });
 
-test('automatic scrolling pauses for hover, focus, button and reduced motion', async ({
+test('automatic scrolling continues on hover and pauses for focus, button and reduced motion', async ({
   page,
 }) => {
   await page.goto('/');
@@ -146,7 +155,9 @@ test('automatic scrolling pauses for hover, focus, button and reduced motion', a
   await track.hover();
   const hoverPosition = await track.evaluate((el) => el.scrollLeft);
   await page.waitForTimeout(250);
-  expect(await track.evaluate((el) => el.scrollLeft)).toBe(hoverPosition);
+  expect(await track.evaluate((el) => el.scrollLeft)).toBeGreaterThan(
+    hoverPosition + 5,
+  );
   await page.mouse.move(1439, 999);
   await track.focus();
   const focusPosition = await track.evaluate((el) => el.scrollLeft);
@@ -171,3 +182,104 @@ test('automatic scrolling pauses for hover, focus, button and reduced motion', a
   await page.waitForTimeout(250);
   expect(await track.evaluate((el) => el.scrollLeft)).toBe(reducedPosition);
 });
+
+test('floating reviews cross the loop boundary and expose each entry once to assistive technology', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const track = page.locator('.review-track');
+  const toggle = page.locator('.review-toggle');
+  await track.scrollIntoViewIfNeeded();
+  await toggle.click();
+  await expect(toggle).toHaveText('Resume scrolling');
+  await expect(track.getByRole('listitem')).toHaveCount(10);
+  await expect(
+    track.locator('.review-list[aria-hidden="true"]'),
+  ).toHaveAttribute('inert', '');
+  const cycle = await track.evaluate(
+    (el) =>
+      el.querySelector('ul')!.getBoundingClientRect().width +
+      parseFloat(getComputedStyle(el).columnGap),
+  );
+  await track.evaluate((el, x) => (el.scrollLeft = x), cycle - 4);
+  await toggle.click();
+  await expect
+    .poll(() => track.evaluate((el) => el.scrollLeft))
+    .toBeLessThan(50);
+  const afterWrap = await track.evaluate((el) => el.scrollLeft);
+  await expect
+    .poll(() => track.evaluate((el) => el.scrollLeft))
+    .toBeGreaterThan(afterWrap + 8);
+  await expect(toggle).toHaveText('Pause scrolling');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(track.locator('.review-list')).toHaveCount(1);
+});
+
+test('touch interaction stops automatic movement until Resume is chosen', async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({
+    baseURL,
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await context.newPage();
+  await page.goto('/');
+  const track = page.locator('.review-track');
+  const toggle = page.locator('.review-toggle');
+  await track.scrollIntoViewIfNeeded();
+  await expect
+    .poll(() => track.evaluate((el) => el.scrollLeft))
+    .toBeGreaterThan(8);
+  await track.tap();
+  await expect(toggle).toHaveText('Resume scrolling');
+  const paused = await track.evaluate((el) => el.scrollLeft);
+  await page.waitForTimeout(250);
+  expect(await track.evaluate((el) => el.scrollLeft)).toBe(paused);
+  await toggle.tap();
+  await expect
+    .poll(() => track.evaluate((el) => el.scrollLeft))
+    .toBeGreaterThan(paused + 8);
+  await context.close();
+});
+
+for (const width of [390, 1440, 3840]) {
+  test(`loop seam is visually identical and has enough content at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    const track = page.locator('.review-track');
+    await track.scrollIntoViewIfNeeded();
+    await page.locator('.review-toggle').click();
+    for (const img of await track.locator('img').all()) {
+      await img.evaluate((el: HTMLImageElement) => {
+        el.loading = 'eager';
+        return el.decode();
+      });
+    }
+    const cycle = await track.evaluate(
+      (el) =>
+        el.querySelector('ul')!.getBoundingClientRect().width +
+        parseFloat(getComputedStyle(el).columnGap),
+    );
+    expect(
+      await track.evaluate((el) => el.scrollWidth - el.clientWidth),
+    ).toBeGreaterThanOrEqual(cycle);
+    await track.evaluate((el) => (el.scrollLeft = 0));
+    const box = (await track.boundingBox())!;
+    const clip = {
+      x: box.x,
+      y: box.y,
+      width: box.width,
+      height: box.height - 32,
+    };
+    const start = await page.screenshot({ clip });
+    await track.evaluate((el, x) => (el.scrollLeft = x), cycle);
+    const loop = await page.screenshot({ clip });
+    expect(start.equals(loop)).toBe(true);
+  });
+}

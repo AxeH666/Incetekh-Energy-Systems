@@ -4,172 +4,155 @@ import { reviewSamples } from '../data/review-samples';
 ---
 
 <section
-  class="reviews"
+  class="reviews section"
   id="reviews"
   aria-labelledby="reviews-heading"
   data-review-status="illustrative"
 >
-  <div class="container section">
-    <div class="review-intro">
-      <div>
-        <p class="eyebrow">Customer perspectives</p>
-        <h2 class="section-title" id="reviews-heading">
-          A conversation that counts.
-        </h2>
-      </div>
-      <div class="review-controls">
-        <p class="scroll-hint" id="review-instructions">
-          Scroll to explore <span aria-hidden="true">&#8596;</span>
-          <span class="keyboard-hint">
-            {' '}
-            Use left and right arrow keys when focused.
-          </span>
-        </p>
-        <button
-          class="review-toggle"
-          type="button"
-          aria-controls="feedback-track"
-          hidden
-        >
-          Pause scrolling
-        </button>
-      </div>
+  <div class="container review-intro">
+    <div>
+      <p class="eyebrow">People & perspectives</p>
+      <h2 class="section-title" id="reviews-heading">
+        Good work. Word of mouth.
+      </h2>
     </div>
-    <div
-      class="review-track"
-      id="feedback-track"
-      role="region"
-      aria-label="Customer feedback"
-      aria-describedby="review-instructions"
-      tabindex="0"
+    <button
+      class="review-toggle"
+      type="button"
+      aria-controls="feedback-track"
+      hidden
     >
-      <ul class="review-list">
-        {reviewSamples.map((review, index) => (
-          <li class="review">
-            <Image
-              src={review.image}
-              alt={review.alt}
-              width={640}
-              height={review.cropHeight}
-              widths={[320, 640]}
-              sizes="(max-width: 704px) 75vw, 320px"
-              fit="cover"
-              position="top"
-              format="webp"
-              quality={75}
-              loading="lazy"
-            />
-            <span class="review-number" aria-hidden="true">
-              {String(index + 1).padStart(2, '0')} /
+      Pause scrolling
+    </button>
+  </div>
+  <p class="sr-only" id="review-instructions">
+    Reviews move automatically. Use Pause scrolling to stop them, or focus this
+    region and use the left and right arrow keys.
+  </p>
+  <div
+    class="review-track"
+    id="feedback-track"
+    role="region"
+    aria-label="Customer feedback"
+    aria-describedby="review-instructions"
+    tabindex="0"
+  >
+    <ul class="review-list">
+      {reviewSamples.map((review) => (
+        <li class="review" data-review-id={review.id}>
+          <Image
+            src={review.image}
+            alt={review.alt}
+            width={640}
+            height={review.cropHeight}
+            widths={[320, 640]}
+            sizes={
+              review.cropHeight < 640
+                ? `${(288 * 640) / review.cropHeight}px`
+                : '(max-width: 704px) 78vw, 288px'
+            }
+            fit="cover"
+            position="top"
+            format="webp"
+            quality={80}
+            loading="lazy"
+          />
+          <div class="review-copy">
+            <span class="quote-mark" aria-hidden="true">
+              &#8220;
             </span>
-            <p class="review-text">{review.text}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+            <p>{review.text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
 <style>
   .reviews {
-    background: #e9ece5;
+    background: #eeeee8;
+    overflow: clip;
   }
   .review-intro {
     display: flex;
     align-items: end;
     justify-content: space-between;
     gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2.75rem;
   }
   .eyebrow {
     color: var(--color-accent);
     margin-bottom: 1rem;
   }
-  .section-title {
-    max-width: 24rem;
-  }
-  .scroll-hint {
-    color: var(--color-muted);
-    font-size: var(--text-small);
-    flex-shrink: 0;
-  }
-  .scroll-hint span[aria-hidden] {
-    margin-left: 0.75rem;
-    font-size: 1.5rem;
-  }
-  .keyboard-hint {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-  .review-track {
-    overflow-x: auto;
-    scroll-snap-type: none;
-    overscroll-behavior-x: contain;
-    scrollbar-color: var(--color-muted) transparent;
-    padding-bottom: 1.25rem;
-  }
-  .review-list {
-    list-style: none;
-    display: flex;
-    gap: 1.5rem;
-    margin: 0;
-    padding: 0;
-  }
-  .review {
-    flex: 0 0 clamp(17rem, 27vw, 20rem);
-    padding-bottom: 1.5rem;
-  }
-  .review img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
-    object-fit: cover;
-    object-position: 65% center;
-    margin-bottom: 1.25rem;
-  }
-  .review-controls {
-    min-height: 2.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-  }
   .review-toggle {
+    flex-shrink: 0;
     min-height: 2.75rem;
-    padding: 0.5rem 0.875rem;
-    border: 1px solid var(--color-muted);
-    background: transparent;
+    padding: 0.5rem 0;
+    border: 0;
+    border-bottom: 1px solid currentColor;
     color: var(--color-ink);
+    background: transparent;
     font: inherit;
     font-size: var(--text-small);
     cursor: pointer;
   }
-  .review-toggle:hover {
-    background: var(--color-paper);
+  .review-track {
+    width: min(100% - var(--gutter) * 2, var(--content-width));
+    margin-inline: auto;
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted) transparent;
   }
-  .review-number {
-    display: block;
+  .review-list {
+    display: flex;
+    gap: 1.5rem;
+    flex: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .review {
+    width: 18rem;
+    flex: none;
+    align-self: start;
+    background: #fff;
+  }
+  .review:nth-child(even) {
+    margin-top: 2rem;
+  }
+  .review img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: center;
+  }
+  .review-copy {
+    padding: 1rem 1.5rem 1.75rem;
+  }
+  .quote-mark {
     color: var(--color-accent);
-    font-size: var(--text-small);
-    margin-bottom: 0.75rem;
+    font-size: 2.5rem;
+    line-height: 1;
+    display: block;
   }
-  .review-text {
-    font-size: clamp(1.125rem, 1.6vw, 1.375rem);
-    line-height: 1.55;
-    letter-spacing: -0.02em;
+  .review-copy p {
+    font-size: 1rem;
+    line-height: 1.65;
   }
   @media (max-width: 44rem) {
     .review-intro {
-      flex-direction: column;
       align-items: start;
+      flex-direction: column;
       gap: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
     }
     .review {
-      flex-basis: 85%;
+      width: min(18rem, 78vw);
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -179,14 +162,16 @@ import { reviewSamples } from '../data/review-samples';
     }
   }
   @media print {
-    .review-controls {
+    .review-toggle {
       display: none;
     }
-    .review-track {
-      overflow: visible;
-    }
+    .review-track,
     .review-list {
       display: block;
+      overflow: visible;
+    }
+    .review-list[aria-hidden] {
+      display: none;
     }
     .review {
       break-inside: avoid;
@@ -197,25 +182,31 @@ import { reviewSamples } from '../data/review-samples';
 <script>
   const section = document.querySelector<HTMLElement>('#reviews');
   const track = section?.querySelector<HTMLElement>('.review-track');
+  const list = track?.querySelector<HTMLUListElement>('.review-list');
   const toggle = section?.querySelector<HTMLButtonElement>('.review-toggle');
-  if (section && track && toggle) {
+  if (section && track && list && toggle) {
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let motionReduced = reducedMotion.matches;
+    // One visual copy makes the boundary seamless. Assistive technology reads
+    // the original list once; no links or focusable controls live in the copy.
+    const copy = list.cloneNode(true) as HTMLUListElement;
+    copy.setAttribute('aria-hidden', 'true');
+    copy.inert = true;
+    copy.querySelectorAll('img').forEach((img) => (img.alt = ''));
     let paused = false;
-    let hovering = false;
     let visible = false;
     let frame: number | null = null;
     let previousTime = 0;
-    let position = track.scrollLeft;
+    let position = 0;
+    const cycleWidth = () =>
+      list.getBoundingClientRect().width +
+      parseFloat(getComputedStyle(track).columnGap);
     const canMove = () =>
       !paused &&
-      !hovering &&
       visible &&
       !document.hidden &&
-      !reducedMotion.matches &&
-      !section.contains(document.activeElement);
-    const updateLabel = () => {
-      toggle.textContent = paused ? 'Resume scrolling' : 'Pause scrolling';
-    };
+      !motionReduced &&
+      document.activeElement !== track;
     const stop = () => {
       if (frame !== null) cancelAnimationFrame(frame);
       frame = null;
@@ -225,67 +216,57 @@ import { reviewSamples } from '../data/review-samples';
       frame = null;
       if (!canMove()) return;
       if (previousTime) {
-        position += Math.min(time - previousTime, 64) * 0.025;
-        const end = track.scrollWidth - track.clientWidth;
-        track.scrollLeft = Math.min(position, end);
-        if (position >= end) {
-          paused = true;
-          updateLabel();
-          stop();
-          return;
-        }
+        position =
+          (position + Math.min(time - previousTime, 64) * 0.045) % cycleWidth();
+        track.scrollLeft = position;
       }
       previousTime = time;
       frame = requestAnimationFrame(tick);
     };
     const sync = () => {
       stop();
-      toggle.hidden = reducedMotion.matches;
+      toggle.hidden = motionReduced;
+      if (motionReduced) {
+        copy.remove();
+      } else if (!copy.isConnected) track.append(copy);
       if (canMove()) {
-        position = track.scrollLeft;
+        position = track.scrollLeft % cycleWidth();
         frame = requestAnimationFrame(tick);
       }
     };
+    const updateLabel = () =>
+      (toggle.textContent = paused ? 'Resume scrolling' : 'Pause scrolling');
     toggle.addEventListener('click', () => {
       paused = !paused;
-      if (
-        !paused &&
-        track.scrollLeft >= track.scrollWidth - track.clientWidth - 1
-      )
-        track.scrollLeft = 0;
       updateLabel();
       sync();
     });
-    section.addEventListener('pointerenter', (event) => {
-      if (event.pointerType === 'mouse') {
-        hovering = true;
-        sync();
-      }
-    });
-    section.addEventListener('pointerleave', () => {
-      hovering = false;
-      sync();
-    });
-    section.addEventListener('focusin', sync);
-    section.addEventListener('focusout', () => requestAnimationFrame(sync));
-    // Manual scrolling stays under the visitor's control until they choose Resume.
     const pauseForInteraction = () => {
       paused = true;
       updateLabel();
       sync();
     };
     track.addEventListener('pointerdown', pauseForInteraction);
-    track.addEventListener('wheel', pauseForInteraction, { passive: true });
-    track.addEventListener('keydown', pauseForInteraction);
-    reducedMotion.addEventListener('change', sync);
-    document.addEventListener('visibilitychange', sync);
-    new IntersectionObserver(
-      ([entry]) => {
-        visible = entry.isIntersecting;
-        sync();
+    // Vertical page scrolling must not silently turn off the floating strip.
+    track.addEventListener(
+      'wheel',
+      (event) => {
+        if (Math.abs(event.deltaX) > 0 || event.shiftKey) pauseForInteraction();
       },
-      { threshold: 0.2 },
-    ).observe(track);
+      { passive: true },
+    );
+    track.addEventListener('keydown', pauseForInteraction);
+    track.addEventListener('focus', sync);
+    track.addEventListener('blur', sync);
+    reducedMotion.addEventListener('change', (event) => {
+      motionReduced = event.matches;
+      sync();
+    });
+    document.addEventListener('visibilitychange', sync);
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      sync();
+    }).observe(track);
     sync();
   }
 </script>

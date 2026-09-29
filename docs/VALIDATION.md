@@ -1,5 +1,53 @@
 # Final polish validation
 
+## Continuous reviews, free services and WhatsApp
+
+Current homepage refresh validated on 2026-09-29 with Node 22.23.3 and installed
+Chrome through Playwright. The earlier records below are historical.
+
+- All **51 default tests passed**; all **four
+  launch-mode SEO checks passed**. Default non-indexable/analytics-disabled output
+  was restored. Production build and formatting passed. Astro/strict TypeScript
+  is clean.
+- A final photo-only crop adjustment was rebuilt, visually checked and passed
+  the focused photo test. Its first rerun was blocked by our manual preview's
+  server lock; stopping that preview resolved the local test setup. Current
+  default output is approximately 1.22 MB, within the 1.5 MB budget.
+- Full-page desktop, tablet and mobile renders were inspected, with reviews and
+  controls inspected separately at readable scale. Automated checks additionally
+  cover 320/390/768/1440/1920px, no page overflow, selected axe rules, keyboard
+  navigation, text scaling, image layout reservation and no-JS use.
+- Motion tests confirm automatic advancement, continued movement on hover,
+  crossing the seamless loop boundary, Pause/Resume, keyboard focus, touch pause,
+  and dynamic reduced motion. There are ten accessible entries; the visual copy
+  is inert and hidden from assistive technology.
+- The first full run caught a reduced-motion change that stopped motion but did
+  not remove the visual copy while the control retained focus. Media-query state
+  now updates centrally from its change event. The focused 11-test review suite
+  and final 51-test run passed after this fix.
+- Inspected all ten largest downloadable photo crops for GPS/address overlays,
+  clarity and repeated views. Landscape rendering now requests enough pixels for
+  its square frame. A tighter installation-detail crop excludes a distant person.
+  This PR does not edit or remove source photographs.
+- Every WhatsApp link targets `https://wa.me/919441259786`; a navigation test
+  intercepts the destination without sending a message. The local SVG matches
+  the official downloaded white glyph byte-for-byte. Loading the site makes no
+  WhatsApp requests. Real WhatsApp account reachability/handset handoff is not
+  claimed by these local checks.
+
+Independent review identified two motion issues: the internal gutter produced a
+visible seam, and an unbounded ultra-wide viewport could exhaust the repeated
+content before the cycle ended. The gutter now sits outside a bounded track.
+All **14 focused review tests passed**, including byte-identical rendered seam
+comparisons at 390/1440/3840px and enough-content checks for each width.
+On 2026-09-30, all **18 foundation/polish checks** also passed after these fixes,
+including responsive accessibility and image layout reservation. Formatting and
+Astro/strict TypeScript were rerun clean.
+
+No deployment was performed. The requested temporary reviews still need verified
+replacement or removal before public launch. Separate source-file renames made
+in the workspace during this task are excluded from the PR.
+
 ## Homepage photo-review follow-up
 
 The founder's follow-up replaces the earlier text-only review strip with 12

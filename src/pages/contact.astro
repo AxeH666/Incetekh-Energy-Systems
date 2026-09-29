@@ -2,6 +2,7 @@
 import SiteLayout from '../layouts/SiteLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import { site } from '../data/site';
+import WhatsAppLink from '../components/WhatsAppLink.astro';
 ---
 
 <SiteLayout
@@ -11,13 +12,16 @@ import { site } from '../data/site';
   <PageIntro
     eyebrow="Start a conversation"
     title="Let’s talk about your site."
-    description="Planning rooftop solar or looking at an existing system? Call us to discuss what you need and arrange a free site visit."
+    description="Planning rooftop solar or looking at an existing system? Message us on WhatsApp or call to arrange a free site visit, performance check or annual yield audit."
   />
   <section class="container contact-grid" aria-labelledby="call-heading">
     <div class="call-panel">
       <h2 class="eyebrow" id="call-heading">
-        Call Incetekh Energy
+        Speak with Incetekh Energy
       </h2>
+      <div class="whatsapp-action">
+        <WhatsAppLink />
+      </div>
       <a
         class="contact-number"
         href={`tel:${site.phone}`}
@@ -63,8 +67,8 @@ import { site } from '../data/site';
       <details>
         <summary>Can I ask about an existing system?</summary>
         <p>
-          Yes. Incetekh offers system performance checks and annual yield
-          audits. Tell us about your installation and what you would like
+          Yes. Incetekh offers free system performance checks and free annual
+          yield audits. Tell us about your installation and what you would like
           checked.
         </p>
       </details>
@@ -84,6 +88,9 @@ import { site } from '../data/site';
 </SiteLayout>
 
 <style>
+  .whatsapp-action {
+    margin-top: 1.5rem;
+  }
   .contact-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

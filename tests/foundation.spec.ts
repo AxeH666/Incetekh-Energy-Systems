@@ -27,7 +27,7 @@ test('semantic shell, metadata, and main navigation', async ({ page }) => {
   );
   await expect(
     page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link'),
-  ).toHaveText(['About', 'Services', 'Projects']);
+  ).toHaveText(['About', 'Services', 'Projects', 'Contact']);
   await expect(page.locator('form')).toHaveCount(0);
   await expect(page.locator('script[src]')).toHaveCount(0);
   await expect(page.locator('script[type="module"]')).toHaveCount(1);
@@ -42,7 +42,10 @@ test('keyboard skip link and contact navigation work', async ({ page }) => {
   await expect(skip).toHaveCSS('outline-style', 'solid');
   await page.keyboard.press('Enter');
   await expect(page.getByRole('main')).toBeFocused();
-  await page.getByRole('link', { name: 'Contact Us' }).focus();
+  await page
+    .getByRole('navigation', { name: 'Main navigation' })
+    .getByRole('link', { name: 'Contact', exact: true })
+    .focus();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL('/contact/');
   const call = page.getByRole('link', {
@@ -137,7 +140,10 @@ test('all local links and assets resolve without external browser requests', asy
     if (href.startsWith('#')) await expect(page.locator(href)).toHaveCount(1);
     else if (href.startsWith('/'))
       expect((await request.get(href)).status()).toBe(200);
-    else expect(href).toBe('tel:+919441259786');
+    else
+      expect(['tel:+919441259786', 'https://wa.me/919441259786']).toContain(
+        href,
+      );
   }
   for (const selector of ['link[rel="icon"]', 'meta[property="og:image"]']) {
     const element = page.locator(selector);
@@ -167,11 +173,13 @@ test('works without JavaScript and with reduced motion', async ({
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Contact Us' })).toHaveCSS(
-    'transition-duration',
-    '0s',
-  );
-  await page.getByRole('link', { name: 'Contact Us' }).click();
+  await expect(
+    page.getByRole('link', { name: 'WhatsApp', exact: true }),
+  ).toHaveCSS('transition-duration', '0s');
+  await page
+    .getByRole('navigation', { name: 'Main navigation' })
+    .getByRole('link', { name: 'Contact', exact: true })
+    .click();
   await expect(
     page.getByRole('link', { name: 'Call +91 94412 59786', exact: true }),
   ).toBeInViewport();
@@ -193,10 +201,9 @@ test('text scaling and forced-colors retain usable controls', async ({
     ),
   ).toBe(true);
   await page.emulateMedia({ forcedColors: 'active' });
-  await expect(page.getByRole('link', { name: 'Contact Us' })).toHaveCSS(
-    'border-top-style',
-    'solid',
-  );
+  await expect(
+    page.getByRole('link', { name: 'WhatsApp', exact: true }),
+  ).toHaveCSS('border-top-style', 'solid');
 });
 
 test('missing page uses the shared accessible error shell', async ({
