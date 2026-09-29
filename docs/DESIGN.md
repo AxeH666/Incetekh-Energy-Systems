@@ -22,8 +22,8 @@ claim that an official logo was provided. The favicon follows that treatment.
 - **Color:** text uses ink/muted on paper and paper/muted-light on ink. The
   brighter orange is decorative on paper and a focus/accent color on dark.
 - **Links:** real destinations, native anchors, visible focus, and 44px minimum
-  navigation/call target heights. A skip link moves focus to main. The contact
-  anchor moves focus to the footer, preserving a predictable keyboard sequence.
+  navigation/call target heights. A skip link moves focus to main. The header
+  contact link opens the dedicated enquiry page; phone links open the dialler.
 - **Motion:** a short button color transition only; disabled for reduced motion.
 - **Components:** extract only repeated structure. The layout owns the document;
   the page owns its composition. Add navigation entries only with working pages.
@@ -35,8 +35,10 @@ and sizes. The foundation uses one imported original, generates 480/800/1280px
 WebP variants, and reserves the image's display space to avoid layout movement.
 The source is not upscaled during image generation. CSS crops its display for
 the wide desktop and narrower mobile composition; it does not retouch content.
-The above-the-fold photograph loads eagerly. Later offscreen imagery should be
-lazy-loaded. A separate JPEG derivative supports social metadata.
+The homepage photograph loads eagerly. Offscreen imagery is lazy-loaded. A
+separate JPEG derivative supports social metadata. Company/projects also use
+the second real rooftop image. Review-preview photos use actual top-cropped
+WebP derivatives to exclude GPS/address overlays; see TESTIMONIALS.md.
 
 Keep originals outside `public/`. Import selected files explicitly; never publish
 the full review-photo folder or infer project identities from file names.
