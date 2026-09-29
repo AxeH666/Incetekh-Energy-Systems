@@ -4,13 +4,19 @@ import { getImage } from 'astro:assets';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site, foundationImage } from '../data/site';
+import {
+  indexable,
+  analyticsToken,
+  googleVerification,
+} from '../data/visibility';
 
 interface Props {
   title: string;
   description?: string;
+  noindex?: boolean;
 }
 
-const { title, description = site.description } = Astro.props;
+const { title, description = site.description, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const socialImage = await getImage({
   src: foundationImage.src,
@@ -18,6 +24,26 @@ const socialImage = await getImage({
   format: 'jpg',
 });
 const socialImageUrl = new URL(socialImage.src, Astro.site);
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': new URL('/#organization', Astro.site).href,
+      name: site.name,
+      url: Astro.site?.href,
+      telephone: site.phone,
+      description: site.description,
+    },
+    {
+      '@type': 'WebSite',
+      '@id': new URL('/#website', Astro.site).href,
+      name: site.name,
+      url: Astro.site?.href,
+      publisher: { '@id': new URL('/#organization', Astro.site).href },
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -28,9 +54,14 @@ const socialImageUrl = new URL(socialImage.src, Astro.site);
     <meta name="theme-color" content="#f5f4ef" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <!-- PR1 is a foundation preview. Revisit indexing at the launch milestone. -->
-    <meta name="robots" content="noindex, follow" />
-    <link rel="canonical" href={canonical} />
+    <meta
+      name="robots"
+      content={indexable && !noindex ? 'index, follow' : 'noindex, follow'}
+    />
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {googleVerification && (
+      <meta name="google-site-verification" content={googleVerification} />
+    )}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
@@ -38,8 +69,16 @@ const socialImageUrl = new URL(socialImage.src, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:width" content={socialImage.attributes.width} />
+    <meta property="og:image:height" content={socialImage.attributes.height} />
     <meta property="og:image:alt" content={foundationImage.alt} />
     <meta name="twitter:card" content="summary_large_image" />
+    {Astro.url.pathname === '/' && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(schema).replace(/</g, '\\u003c')}
+      />
+    )}
   </head>
   <body>
     <a class="skip-link" href="#main">
@@ -50,5 +89,13 @@ const socialImageUrl = new URL(socialImage.src, Astro.site);
       <slot />
     </main>
     <Footer />
+    {analyticsToken && !noindex && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: analyticsToken })}
+      ></script>
+    )}
   </body>
 </html>

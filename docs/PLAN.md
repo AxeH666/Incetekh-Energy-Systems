@@ -7,8 +7,8 @@ reviewed and merged PRs. No external deployment, purchases, DNS or mailbox chang
 2. Complete: homepage, confirmed offerings and free-site-visit call path.
 3. Complete: company and services pages.
 4. Complete: project proof and clearly labelled temporary review examples.
-5. In progress: contact experience; phone-first page, preparation and native FAQs.
-6. Pending: technical SEO, optional analytics, production hardening.
+5. Complete: contact experience; phone-first page, preparation and native FAQs.
+6. In progress: technical SEO, optional analytics, production hardening.
 7. Pending: deployment and email preparation documentation; final handoff.
 
 One branch and PR per component. Validate and self-review before push; separately

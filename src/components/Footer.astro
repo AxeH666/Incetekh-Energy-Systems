@@ -22,7 +22,13 @@ import { site } from '../data/site';
       <p>
         © {new Date().getFullYear()} {site.name}
       </p>
-      <p>Solar EPC</p>
+      <a
+        class="text-link"
+        href="/privacy/"
+        aria-current={Astro.url.pathname === '/privacy/' ? 'page' : undefined}
+      >
+        Privacy
+      </a>
     </div>
   </div>
 </footer>

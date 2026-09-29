@@ -1,7 +1,7 @@
 # Incetekh Energy
 
 Phase 1 public website, delivered in sequential components. Read [AGENTS.md](AGENTS.md) and
-[SCOPE.md](SCOPE.md) before making changes. The current component adds the phone-first contact page and enquiry guidance. External deployment is not authorized.
+[SCOPE.md](SCOPE.md) before making changes. The public website includes search readiness and optional analytics configuration. External deployment is not authorized.
 
 ## Run locally
 
@@ -12,7 +12,7 @@ npm ci
 npm run dev
 ```
 
-Open the local address printed by Astro. No environment variables, credentials,
+Open the local address printed by Astro. No environment variables or credentials are required; optional public build settings are in `.env.example`. No
 external APIs, or server-side services are needed.
 
 ```sh
@@ -57,13 +57,9 @@ reviews; see [replacement instructions](docs/TESTIMONIALS.md).
 
 ## Delivery boundaries
 
-The complete content and phone-first contact experience are implemented. Contact FAQs use native HTML disclosure controls and work without JavaScript. No form, email address, response-time promise or service area is invented. Technical SEO, optional analytics configuration and deployment/email preparation are the remaining components.
+The complete content and phone-first contact experience are implemented. Contact FAQs use native HTML disclosure controls and work without JavaScript. No form, email address, response-time promise or service area is invented. Technical SEO, privacy information, optional analytics and security configuration are included. Deployment/email preparation is the final handoff component.
 
-All pages currently have `noindex, follow` metadata because this is an incomplete
-foundation. Remove that restriction only during the approved launch-readiness
-work (keep error pages non-indexable). Canonical and social URLs already use the
-scope's intended domain, `https://incetekhenergy.com`; that does not connect or
-deploy the domain. There is no deployment workflow or hosting dependency.
+Preview builds default to noindex with analytics disabled. See [visibility configuration](docs/VISIBILITY.md) for launch indexing, Search Console and the optional public analytics token. The intended canonical domain is https://incetekhenergy.com; configuration does not connect or deploy it. No account credentials are needed to build the site.
 
 Raw supplied assets remain intact and are not served wholesale. See the
 [asset register](docs/ASSETS.md) before selecting further imagery or claims.

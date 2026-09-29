@@ -1,0 +1,82 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import { analyticsToken } from '../data/visibility';
+import { site } from '../data/site';
+---
+
+<SiteLayout
+  title="Website Privacy | Incetekh Energy"
+  description="How the Incetekh Energy website handles browsing, optional site analytics and telephone enquiries."
+>
+  <PageIntro
+    eyebrow="Website information"
+    title="Privacy, plainly."
+    description="What happens when you browse this website or get in touch."
+  />
+  <div class="container privacy-copy section">
+    <section class="prose" aria-labelledby="browsing-heading">
+      <h2 id="browsing-heading">Browsing this website</h2>
+      <p>
+        This website has no account registration, enquiry form, advertising
+        pixels or embedded social-media feeds. Fonts and project photographs are
+        served with the site.
+      </p>
+      <p>
+        The hosting provider may process technical request information, such as
+        IP addresses, to deliver and protect the website.
+      </p>
+    </section>
+    <section class="prose" aria-labelledby="analytics-heading">
+      <h2 id="analytics-heading">Website analytics</h2>
+      {analyticsToken ? (
+        <>
+          <p>
+            Cloudflare Web Analytics is enabled to help us understand page
+            visits and website performance. It does not use cookies or local
+            storage to track visitors. Your browser sends visit and performance
+            information to Cloudflare.
+          </p>
+          <a
+            class="text-link"
+            href="https://developers.cloudflare.com/web-analytics/about/"
+          >
+            About Cloudflare Web Analytics
+          </a>
+        </>
+      ) : (
+        <p>
+          Website analytics is currently disabled. This site does not set
+          analytics or advertising cookies.
+        </p>
+      )}
+    </section>
+    <section class="prose" aria-labelledby="enquiries-heading">
+      <h2 id="enquiries-heading">Telephone enquiries</h2>
+      <p>
+        Call links open your device’s calling app. They do not submit an online
+        enquiry. Share only the details needed to discuss your site and
+        requirements.
+      </p>
+      <p>
+        For questions about information you have shared with Incetekh Energy,
+        contact us by phone.
+      </p>
+      <a class="text-link" href={`tel:${site.phone}`}>
+        Call {site.phoneDisplay}
+      </a>
+    </section>
+  </div>
+</SiteLayout>
+<style>
+  .privacy-copy {
+    padding-top: 0;
+  }
+  section + section {
+    margin-top: var(--space-12);
+  }
+  h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    letter-spacing: -0.04em;
+  }
+</style>
