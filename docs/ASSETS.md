@@ -41,3 +41,12 @@ content. The founder confirmed there is no business mailbox yet; none is shown.
 - GPS labels are not used to infer customers, service coverage or office location.
 - No generated image is represented as a historic Incetekh installation.
 - Photos with personal addresses/coordinates remain outside public output.
+
+## PR4 publication update
+
+The second clean rooftop photograph is now used on company/projects pages. Three
+customer/project photographs are used as top-cropped derivatives in the labelled
+testimonial preview; see TESTIMONIALS.md for exact sources and crop boundaries.
+The temporary copy is explicitly founder-authorized and is not verified evidence.
+Source GPS/address overlays remain outside public output. Confirmed service
+offerings are now presented on home/services pages with qualified warranty terms.

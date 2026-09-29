@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-for (const path of ['/about/', '/services/']) {
+for (const path of ['/about/', '/services/', '/projects/']) {
   for (const width of [320, 768, 1440]) {
     test(`${path} is accessible and navigable at ${width}px`, async ({
       page,
@@ -35,6 +35,17 @@ for (const path of ['/about/', '/services/']) {
             .analyze()
         ).violations,
       ).toEqual([]);
+      for (const photo of await page.locator('img').all()) {
+        await photo.scrollIntoViewIfNeeded();
+        await expect
+          .poll(() =>
+            photo.evaluate(
+              (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
+            ),
+          )
+          .toBe(true);
+      }
+      await page.evaluate(() => window.scrollTo(0, 0));
       await page.screenshot({
         path: testInfo.outputPath('page.png'),
         fullPage: true,

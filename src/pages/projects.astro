@@ -1,0 +1,100 @@
+---
+import { Image } from 'astro:assets';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import SiteCTA from '../components/SiteCTA.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { foundationImage, metalRoofImage } from '../data/site';
+---
+
+<SiteLayout
+  title="Solar Installation Photographs | Incetekh Energy"
+  description="Explore real rooftop installation photographs from the Incetekh Energy project archive, with descriptive captions and no unverified project claims."
+>
+  <PageIntro
+    eyebrow="Selected installation photographs"
+    title="Solar, out in the world."
+    description="A closer look at rooftop installations from the Incetekh Energy project archive."
+  />
+  <section class="container gallery" aria-label="Installation gallery">
+    <figure>
+      <Image
+        src={foundationImage.src}
+        alt={foundationImage.alt}
+        widths={[480, 800, 1280]}
+        sizes="(max-width: 704px) 90vw, 55vw"
+        format="webp"
+        quality={85}
+        loading="eager"
+      />
+      <figcaption>
+        <p class="eyebrow">Concrete rooftop</p>
+        <h2>Elevated rooftop array</h2>
+        <p>Solar modules supported on raised frames above a concrete roof.</p>
+      </figcaption>
+    </figure>
+    <figure>
+      <Image
+        src={metalRoofImage.src}
+        alt={metalRoofImage.alt}
+        widths={[480, 800, 1080]}
+        sizes="(max-width: 704px) 90vw, 35vw"
+        format="webp"
+        quality={80}
+      />
+      <figcaption>
+        <p class="eyebrow">Metal rooftop</p>
+        <h2>Following the roofline</h2>
+        <p>
+          Solar panels arranged along the slopes of a corrugated metal roof.
+        </p>
+      </figcaption>
+    </figure>
+  </section>
+  <p class="container evidence-note">
+    Photographs show the installations as supplied. Project capacities, client
+    identities, dates and performance figures are not published without verified
+    records.
+  </p>
+  <Testimonials />
+  <SiteCTA />
+</SiteLayout>
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .gallery figure:nth-child(2) {
+    margin-top: clamp(2rem, 7vw, 7rem);
+  }
+  .gallery img {
+    width: 100%;
+  }
+  figcaption {
+    padding-top: var(--space-6);
+  }
+  figcaption h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2.4rem);
+    letter-spacing: -0.04em;
+    margin-block: var(--space-3);
+  }
+  figcaption > p:last-child,
+  .evidence-note {
+    color: var(--color-muted);
+  }
+  .evidence-note {
+    font-size: var(--text-small);
+    padding-block: var(--space-12);
+  }
+  @media (max-width: 44rem) {
+    .gallery {
+      grid-template-columns: 1fr;
+    }
+    .gallery figure:nth-child(2) {
+      margin-top: 0;
+    }
+  }
+</style>

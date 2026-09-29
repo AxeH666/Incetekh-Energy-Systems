@@ -51,7 +51,9 @@ The neutral palette, restrained rust accent, large typography and real rooftop
 photograph set the direction. [Design notes](docs/DESIGN.md) explain extension.
 
 Only existing destinations appear in navigation. On small screens the navigation wraps below the brand and contact link; every destination stays visible without a menu script. The phone was confirmed by the founder. There is
-no invented mailbox, contact form, project data or customer testimonial.
+no invented mailbox, contact form, project data or attributed customer endorsement.
+The testimonial preview uses explicitly labelled sample copy pending verified
+reviews; see [replacement instructions](docs/TESTIMONIALS.md).
 
 ## Delivery boundaries
 
