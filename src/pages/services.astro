@@ -1,0 +1,153 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import SiteCTA from '../components/SiteCTA.astro';
+---
+
+<SiteLayout
+  title="Solar EPC & System Care | Incetekh Energy"
+  description="Explore solar EPC, free site visits, system performance checks, annual yield audits and a five-year warranty subject to written proposal terms."
+>
+  <PageIntro
+    eyebrow="Services & capabilities"
+    title="From a rooftop idea to a working system."
+    description="Solar engineering, procurement and construction, with services for the system after installation."
+  />
+  <div class="container services">
+    <section class="section-grid service-detail" aria-labelledby="epc-heading">
+      <p class="eyebrow">01 / Solar EPC</p>
+      <div class="prose">
+        <h2 id="epc-heading" class="section-title">
+          Engineering.
+          <br />
+          Procurement.
+          <br />
+          Construction.
+        </h2>
+        <p class="lead">
+          The three parts of taking a solar installation from a plan to a
+          physical system.
+        </p>
+        <dl class="epc-list">
+          <div>
+            <dt>Engineering</dt>
+            <dd>
+              Planning the solar installation around the site and its
+              requirements.
+            </dd>
+          </div>
+          <div>
+            <dt>Procurement</dt>
+            <dd>
+              Sourcing the equipment and materials specified for the
+              installation.
+            </dd>
+          </div>
+          <div>
+            <dt>Construction</dt>
+            <dd>Bringing the proposed installation together on site.</dd>
+          </div>
+        </dl>
+        <p>
+          Tell us whether you are enquiring about a home, business, industrial
+          building or institution. The site and proposed scope need to be
+          assessed before suitability, system size or cost can be confirmed.
+        </p>
+      </div>
+    </section>
+    <section
+      class="section-grid service-detail"
+      aria-labelledby="visit-heading"
+    >
+      <p class="eyebrow">02 / Get started</p>
+      <div class="prose">
+        <h2 id="visit-heading" class="section-title">
+          A free site visit.
+        </h2>
+        <p>
+          Call to discuss your location and arrange a site visit. Have a recent
+          electricity bill and an idea of your available roof space ready for
+          the conversation.
+        </p>
+        <p>
+          Site access, visit arrangements and any project-specific requirements
+          can be discussed directly with the team.
+        </p>
+      </div>
+    </section>
+    <section
+      class="section-grid service-detail"
+      aria-labelledby="checks-heading"
+    >
+      <p class="eyebrow">03 / System care</p>
+      <div class="prose">
+        <h2 id="checks-heading" class="section-title">
+          Keep performance
+          <br />
+          in view.
+        </h2>
+        <h3>System performance checks</h3>
+        <p>
+          A check on how your solar system is performing. When you call, explain
+          what you have noticed and share any generation records you already
+          have.
+        </p>
+        <h3>Annual yield audits</h3>
+        <p>
+          An annual review of energy generation. Ask about the information
+          needed and the scope of the audit for your system.
+        </p>
+        <p>
+          These services are not a promise of a particular generation figure,
+          saving or financial return.
+        </p>
+      </div>
+    </section>
+    <section
+      class="section-grid service-detail"
+      aria-labelledby="warranty-heading"
+    >
+      <p class="eyebrow">04 / Warranty</p>
+      <div class="prose">
+        <h2 id="warranty-heading" class="section-title">
+          5-year warranty.
+          <br />
+          Clear written terms.
+        </h2>
+        <p class="lead">
+          The five-year warranty is subject to your written proposal and the
+          applicable warranty terms.
+        </p>
+        <p>
+          Before proceeding, confirm what is covered, any exclusions, when the
+          warranty begins and how to request support. Coverage is not an
+          unconditional promise for every part of every system.
+        </p>
+      </div>
+    </section>
+  </div>
+  <SiteCTA />
+</SiteLayout>
+
+<style>
+  .service-detail {
+    padding-block: clamp(2.5rem, 5vw, 5rem);
+    border-top: 1px solid var(--color-line);
+  }
+  .epc-list {
+    margin-block: var(--space-8);
+  }
+  .epc-list > div {
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--color-line);
+  }
+  dt,
+  h3 {
+    font-weight: 600;
+    font-size: 1.125rem;
+  }
+  dd {
+    margin: var(--space-2) 0 0;
+    color: var(--color-muted);
+  }
+</style>

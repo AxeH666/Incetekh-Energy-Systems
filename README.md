@@ -1,7 +1,7 @@
 # Incetekh Energy
 
 Phase 1 public website, delivered in sequential components. Read [AGENTS.md](AGENTS.md) and
-[SCOPE.md](SCOPE.md) before making changes. The current component is the homepage. External deployment is not authorized.
+[SCOPE.md](SCOPE.md) before making changes. The current component adds the company and services pages. External deployment is not authorized.
 
 ## Run locally
 
@@ -50,9 +50,7 @@ CSS framework, animation library, client-side JavaScript, or remote fonts.
 The neutral palette, restrained rust accent, large typography and real rooftop
 photograph set the direction. [Design notes](docs/DESIGN.md) explain extension.
 
-Only existing destinations appear in navigation. On small screens the wordmark
-serves as the home link and the contact link remains visible; no menu is needed
-for this two-destination shell. The phone was confirmed by the founder. There is
+Only existing destinations appear in navigation. On small screens the navigation wraps below the brand and contact link; every destination stays visible without a menu script. The phone was confirmed by the founder. There is
 no invented mailbox, contact form, project data or customer testimonial.
 
 ## Delivery boundaries

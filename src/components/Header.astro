@@ -1,19 +1,28 @@
 ---
 import Wordmark from './Wordmark.astro';
-const isHome = Astro.url.pathname === '/';
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/about/', label: 'Company' },
+  { href: '/services/', label: 'Services' },
+];
 ---
 
 <header class="site-header">
   <div class="container header-inner">
     <Wordmark />
     <nav aria-label="Main navigation">
-      <a class="home-link" href="/" aria-current={isHome ? 'page' : undefined}>
-        Home
-      </a>
-      <a class="button button-dark" href="#contact">
-        Get in touch <span aria-hidden="true">↗</span>
-      </a>
+      {links.map((link) => (
+        <a
+          href={link.href}
+          aria-current={Astro.url.pathname === link.href ? 'page' : undefined}
+        >
+          {link.label}
+        </a>
+      ))}
     </nav>
+    <a class="button button-dark" href="#contact">
+      Get in touch <span aria-hidden="true">↗</span>
+    </a>
   </div>
 </header>
 
@@ -32,9 +41,10 @@ const isHome = Astro.url.pathname === '/';
   nav {
     display: flex;
     align-items: center;
-    gap: clamp(1rem, 4vw, 3.5rem);
+    gap: clamp(1rem, 2.5vw, 2.5rem);
+    margin-left: auto;
   }
-  .home-link {
+  nav a {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
@@ -42,10 +52,10 @@ const isHome = Astro.url.pathname === '/';
     text-underline-offset: 0.4em;
     font-size: var(--text-small);
   }
-  .home-link:not([aria-current]) {
+  nav a:not([aria-current]) {
     text-decoration: none;
   }
-  @media (max-width: 35rem) {
+  @media (max-width: 44rem) {
     .button {
       gap: var(--space-3);
       padding-inline: var(--space-3);
@@ -54,9 +64,14 @@ const isHome = Astro.url.pathname === '/';
       min-height: 5.5rem;
       flex-wrap: wrap;
     }
-    /* The wordmark remains the home link on narrow screens. */
-    .home-link {
-      display: none;
+    nav {
+      order: 3;
+      width: 100%;
+      margin-left: 0;
+      justify-content: space-between;
+      border-top: 1px solid var(--color-line);
+      padding-top: var(--space-2);
+      flex-wrap: wrap;
     }
   }
 </style>

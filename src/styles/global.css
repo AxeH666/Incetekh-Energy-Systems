@@ -82,6 +82,9 @@ img {
 .site-footer:focus-visible {
   outline-color: var(--color-accent-bright);
 }
+.care-band :focus-visible {
+  outline-color: var(--color-accent-bright);
+}
 .container {
   width: min(100% - var(--gutter) * 2, var(--content-width));
   margin-inline: auto;
