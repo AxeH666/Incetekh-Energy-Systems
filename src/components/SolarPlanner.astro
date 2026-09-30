@@ -96,8 +96,8 @@ const money = (value: number) =>
           </div>
         </div>
         <p class="input-help" id="bill-help">
-          Slide to your average monthly bill. Estimate uses &#8377;8 per unit;
-          your actual tariff and usage may differ.
+          Slide to your average monthly bill. Estimate uses &#8377;6.35 per
+          unit; your actual tariff and usage may differ.
         </p>
       </div>
       <div class="calculator-result">
@@ -164,7 +164,7 @@ const money = (value: number) =>
         </a>
         <p class="result-note">
           Illustrative usage, not a simultaneous appliance or backup guarantee.
-          Savings use an assumed ₹70,000/kW budget and 90% bill offset; see
+          Savings use an assumed ₹55,000/kW budget and 99.84% bill offset; see
           assumptions below.
         </p>
       </div>
@@ -172,25 +172,22 @@ const money = (value: number) =>
     <noscript>
       <p class="planner-note">
         Enable JavaScript to calculate your size. The 3 kW example above assumes
-        313 units/month at an assumed &#8377;8/unit. You can still compare sizes
-        below or contact us on WhatsApp.
+        394 units/month at an assumed &#8377;6.35/unit. You can still compare
+        sizes below or contact us on WhatsApp.
       </p>
     </noscript>
     <details class="planning-details">
       <summary>How the estimate and subsidy work</summary>
       <div class="details-copy">
         <p>
-          Financial comparison: ₹70,000/kW assumed installed budget, ₹8/unit and
-          up to 90% of estimated consumption offset. Simple payback divides this
-          budget, less eligible residential subsidy, by first-year savings. The
-          25-year total sums energy savings with a modelled 0.5% annual
-          generation decline and unchanged consumption/tariff. It is gross:
-          installation cost, loan interest, maintenance and replacements are not
-          deducted. Fixed/demand charges remain payable. Export settlement,
-          shading and actual usage can materially change savings. No commercial
-          tax saving is included. The budget is an illustration, not an Incetekh
-          quote; Indian Bank uses ₹70,000/kW in its residential loan
-          assumptions. Larger systems require individual pricing.
+          Reference estimate: a ₹2,500 bill corresponds to 394 units and ₹2,496
+          monthly savings. Savings scale with usage, capped by the modelled
+          system output. Payback uses an illustrative ₹55,000/kW budget, less
+          eligible subsidy, divided by annual savings. This is not a quote or
+          guaranteed return. Gross 25-year savings assume unchanged monthly
+          savings; degradation, tariff changes, installation cost, finance,
+          maintenance, replacements and tax benefits are excluded. Actual bills
+          retain fixed charges and depend on usage and export settlement.
         </p>
         <p>
           Appliance examples describe a household profile with limited AC
@@ -209,9 +206,6 @@ const money = (value: number) =>
           deduction; confirm with your tax adviser.
         </p>
         <div class="source-links">
-          <a class="text-link" href={solarSources.loan}>
-            Budget assumption source
-          </a>
           <a class="text-link" href={solarSources.tax}>
             Official depreciation schedule
           </a>
@@ -220,13 +214,11 @@ const money = (value: number) =>
           </a>
         </div>
         <p>
-          We estimate monthly units by dividing the bill by an assumed &#8377;8
-          per unit. This does not reproduce DISCOM tariff slabs, fixed charges
-          or credits. We then divide those units by 120 (4 units per kW per day
-          × 30 days), then round up to a whole kW, with a 1 kW minimum. Roof
-          planning allows about 10 m² per kW. These are starting assumptions:
-          local weather, shading, orientation, access and equipment change the
-          result. Use a 12-month consumption average where possible.
+          Sizing scales from the reference: 3 kW per 394 monthly units, rounded
+          up to a whole kW with a 1 kW minimum, and 100 sq ft of roof per kW.
+          The effective bill-to-unit ratio is ₹2,500 / 394, approximately
+          ₹6.35/unit, not a DISCOM tariff. Roof access, shading, weather and
+          equipment can change the final design. A site visit must confirm it.
         </p>
         <p>
           PM Surya Ghar remains an active residential rooftop programme in the

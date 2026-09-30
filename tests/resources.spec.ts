@@ -1,23 +1,57 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { financialEstimate, usageProfile } from '../src/data/solar';
+import {
+  billSlider,
+  estimateSolar,
+  financialEstimate,
+  usageProfile,
+} from '../src/data/solar';
 
 test('financial scenario caps offsets and keeps tax benefits out of returns', () => {
-  const home = financialEstimate(3, 312.5, 78000);
-  expect(home.cost).toBe(210000);
-  expect(home.monthlySavings).toBe(2250);
-  expect(home.payback).toBeCloseTo(132000 / 27000);
-  expect(home.savings25).toBeCloseTo(675000);
-  const business = financialEstimate(3, 312.5, 0);
+  const home = financialEstimate(3, 394, 78000);
+  expect(home.cost).toBe(165000);
+  expect(home.monthlySavings).toBe(2496);
+  expect(home.payback.toFixed(1)).toBe('2.9');
+  expect(home.savings25).toBe(748800);
+  const business = financialEstimate(3, 394, 0);
   expect(business.monthlySavings).toBe(home.monthlySavings);
   expect(business.savings25).toBe(home.savings25);
   expect(business.payback).toBeGreaterThan(home.payback);
   const constrained = financialEstimate(1, 1000, 0);
-  expect(constrained.monthlySavings).toBe(960);
-  expect(constrained.savings25).toBeLessThan(960 * 12 * 25);
-  expect(financialEstimate(1, 25, 30000).monthlySavings).toBe(180);
+  expect(constrained.monthlySavings).toBeCloseTo(832);
+  expect(constrained.savings25).toBeCloseTo(832 * 12 * 25);
+  expect(financialEstimate(1, 25, 30000).monthlySavings).toBeCloseTo(
+    (25 * 2496) / 394,
+  );
   expect(usageProfile(1, true)).not.toContain('ACs');
   expect(usageProfile(3, true)).toContain('2 ACs + 2 fans');
+});
+
+test('reference scales across every bill step without excess savings or subsidy', () => {
+  let previousKw = 0;
+  for (let bill = 200; bill <= 50000; bill += 100) {
+    const estimate = estimateSolar({
+      mode: 'bill',
+      amount: bill,
+      tariff: billSlider.tariff,
+      residential: true,
+    })!;
+    const finance = financialEstimate(
+      estimate.kw,
+      bill / billSlider.tariff,
+      estimate.subsidy,
+    );
+    expect(estimate.units).toBe(Math.round((bill * 394) / 2500));
+    expect(estimate.kw).toBe(Math.max(1, Math.ceil((bill * 3) / 2500)));
+    expect(estimate.kw).toBeGreaterThanOrEqual(previousKw);
+    expect(estimate.roofSqft).toBe(estimate.kw * 100);
+    expect(estimate.subsidy).toBeLessThanOrEqual(78000);
+    expect(finance.monthlySavings).toBeCloseTo((bill * 2496) / 2500);
+    expect(finance.monthlySavings).toBeLessThanOrEqual(bill);
+    expect(finance.payback).toBeGreaterThan(0);
+    expect(finance.savings25).toBeCloseTo(finance.monthlySavings * 300);
+    previousKw = estimate.kw;
+  }
 });
 
 test('six calculator results change with connection and retain simple controls', async ({
@@ -29,10 +63,10 @@ test('six calculator results change with connection and retain simple controls',
   await expect(calc.locator('dl > div')).toHaveCount(6);
   await expect(calc.locator('[data-profile]')).toContainText('2 ACs + 2 fans');
   await expect(calc.locator('[data-finance="monthlySavings"]')).toHaveText(
-    '₹2,250',
+    '₹2,496',
   );
   await expect(calc.locator('[data-finance="payback"]')).toHaveText(
-    '4.9 years',
+    '2.9 years',
   );
   await calc.getByText('Commercial', { exact: true }).click();
   await expect(calc.locator('[data-profile]')).toHaveText(
@@ -42,7 +76,7 @@ test('six calculator results change with connection and retain simple controls',
     'Potential tax benefit',
   );
   await expect(calc.locator('[data-finance="payback"]')).toHaveText(
-    '7.8 years',
+    '5.5 years',
   );
   await expect(calc.locator('[data-subsidy-note]')).toContainText(
     'not a cash subsidy',
