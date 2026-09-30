@@ -46,9 +46,10 @@ export function usageProfile(kw: number, residential: boolean) {
         ? 'Office / retail / daytime business use'
         : 'Larger commercial premises';
   if (kw < 3) return 'Small home · fans, lights & everyday essentials';
-  if (kw < 5) return 'Family home · 2 ACs + 2 fans';
-  if (kw < 7) return 'Larger home · 3 ACs + 3 fans';
-  return 'High-use home · 4 ACs + 5 fans';
+  if (kw < 5) return '1 AC + all other household loads';
+  if (kw < 7) return '2 ACs + all other household loads';
+  if (kw < 10) return '3 ACs + all other household loads';
+  return '4 ACs + all other household loads';
 }
 
 export function centralSubsidy(kw: number, residential: boolean): number {

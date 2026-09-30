@@ -192,13 +192,12 @@ const money = (value: number) =>
           not an installation quote or guaranteed return.
         </p>
         <p>
-          Appliance examples describe a household profile with limited AC
-          operating hours, not continuous or simultaneous operation. A 3 kW
-          example produces about 12 units/day: two ACs drawing an assumed 1 kW
-          each for 4 hours use 8 units; two 60 W fans for 8 hours use about 1
-          unit, leaving about 3 for other loads. Actual appliance consumption
-          varies. Grid-connected solar does not provide power-cut backup without
-          suitable backup equipment.
+          Household examples: 3 kW for 1 AC, 5 kW for 2 ACs, 7 kW for 3 ACs, and
+          10 kW for 4 ACs, plus other household loads. These assume limited AC
+          operating hours and typical household use, not every appliance running
+          continuously or simultaneously. Actual wattage and hours of use
+          determine suitability. Grid-connected solar needs suitable backup
+          equipment to operate during a power cut.
         </p>
         <p>
           Commercial solar does not receive the household subsidy. The Income
@@ -276,7 +275,7 @@ const money = (value: number) =>
             {kw === 10 ? '+' : ''} <span>kW</span>
           </p>
           <h3>{title}</h3>
-          <p>{usageProfile(kw, kw !== 10)}</p>
+          <p>{usageProfile(kw, true)}</p>
           <p>
             About {kw * 120} units / month
             <br />

@@ -23,7 +23,19 @@ test('generation value matches the approved example and excludes commercial tax 
   expect(small.monthlySavings).toBe(960);
   expect(small.savings25).toBe(960 * 12 * 25);
   expect(usageProfile(1, true)).not.toContain('ACs');
-  expect(usageProfile(3, true)).toContain('2 ACs + 2 fans');
+  for (const [kw, acs] of [
+    [3, 1],
+    [4, 1],
+    [5, 2],
+    [6, 2],
+    [7, 3],
+    [9, 3],
+    [10, 4],
+  ]) {
+    expect(usageProfile(kw, true)).toBe(
+      `${acs} AC${acs === 1 ? '' : 's'} + all other household loads`,
+    );
+  }
 });
 
 test('generation and costs scale with whole-kW sizing across every bill step', () => {
@@ -57,7 +69,17 @@ test('six calculator results change with connection and retain simple controls',
   const calc = page.locator('[data-solar-calculator]');
   await expect(calc).toContainText('Recommended for you');
   await expect(calc.locator('dl > div')).toHaveCount(6);
-  await expect(calc.locator('[data-profile]')).toContainText('2 ACs + 2 fans');
+  await expect(calc.locator('[data-profile]')).toHaveText(
+    '1 AC + all other household loads',
+  );
+  await expect(
+    page.locator('.size-options article > p:nth-of-type(2)'),
+  ).toHaveText([
+    '1 AC + all other household loads',
+    '2 ACs + all other household loads',
+    '3 ACs + all other household loads',
+    '4 ACs + all other household loads',
+  ]);
   await expect(calc.locator('[data-finance="monthlySavings"]')).toHaveText(
     '₹2,880',
   );
