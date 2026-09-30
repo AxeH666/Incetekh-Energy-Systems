@@ -9,6 +9,14 @@ export const site = {
   phone: '+919441259786',
   phoneDisplay: '+91 94412 59786',
   whatsapp: 'https://wa.me/919441259786',
+  email: 'support@incetekh.com',
+  businessName: 'INCETEKH ENERGY SOLUTIONS',
+  address: [
+    '7/1195-5, Block No.7, Shop No.2,',
+    'Siva Shankar Shopping Mall,',
+    'Korrapadu Road, Proddatur,',
+    'Y.S.R. Kadapa District, Andhra Pradesh',
+  ],
 };
 
 export const foundationImage = {

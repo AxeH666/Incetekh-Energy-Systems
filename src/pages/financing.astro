@@ -1,0 +1,124 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import WhatsAppLink from '../components/WhatsAppLink.astro';
+import { solarSources } from '../data/solar';
+---
+
+<SiteLayout
+  title="Solar Financing & Commercial Tax Guidance | Incetekh Energy"
+  description="Understand rooftop solar loans, compare borrowing costs and learn how commercial solar depreciation differs from a household subsidy."
+>
+  <PageIntro
+    eyebrow="Plan the investment"
+    title="A clearer route to solar finance."
+    description="Start with the installation quote. Then compare your own funds, eligible household subsidy and the total cost of borrowing."
+  />
+  <div class="container finance-copy">
+    <section class="prose">
+      <h2>Residential rooftop loans.</h2>
+      <p>
+        Indian Bank publishes a PM Surya Ghar rooftop loan scheme with loans up
+        to ₹2 lakh for the up-to-3 kW category and up to ₹6 lakh for systems
+        above 3 kW and up to 10 kW. Its published minimum contribution is 10%
+        and 20% respectively, with repayment up to 120 months including any
+        moratorium.
+      </p>
+      <p>
+        Eligibility includes roof rights, adequate roof area, an electricity
+        bill in the applicant's name and credit criteria. Rates are linked to
+        the bank's current lending terms. Confirm the latest rate, eligibility
+        and charges directly with the bank.
+      </p>
+      <a class="text-link" href={solarSources.loan}>
+        View Indian Bank's official solar loan
+      </a>
+      <p class="note">
+        Source checked 30 September 2026. This is an independent lender option,
+        not an Incetekh banking partnership or promise of approval.
+      </p>
+    </section>
+    <section class="prose">
+      <h2>Compare more than the EMI.</h2>
+      <ul>
+        <li>
+          Ask for the total repayable amount, floating-rate terms, fees and any
+          insurance costs.
+        </li>
+        <li>
+          Check your upfront contribution and when subsidy is credited or
+          applied to the loan.
+        </li>
+        <li>
+          Compare the EMI with conservative savings; fixed electricity charges
+          may continue.
+        </li>
+        <li>
+          Confirm which equipment, taxes, structure, metering and civil work the
+          quote includes.
+        </li>
+      </ul>
+      <p>
+        Keep your recent bills, roof ownership/right-to-use documents, identity
+        documents and installation quotation ready for the lender. Share
+        sensitive financial documents directly through its official channel.
+      </p>
+      <a class="text-link" href="/solar-guide/#subsidy">
+        Understand the household subsidy
+      </a>
+    </section>
+    <section class="prose" id="commercial">
+      <h2>Commercial solar: a different calculation.</h2>
+      <p>
+        The PM Surya Ghar household subsidy does not apply to commercial
+        connections. The Income Tax Department's depreciation schedule lists
+        solar power generating systems at 40% of written-down value.
+        Depreciation reduces eligible taxable income; it is not a 40% refund of
+        installation cost.
+      </p>
+      <p>
+        Your ownership, use, tax position and time the asset is put to use
+        affect the deduction. Ask your tax adviser to confirm the applicable
+        treatment. Our calculator excludes any tax benefit from its savings and
+        payback figures.
+      </p>
+      <a class="text-link" href={solarSources.tax}>
+        Read the official depreciation schedule
+      </a>
+    </section>
+    <section class="prose">
+      <h2>Get the system right first.</h2>
+      <p>
+        A free site visit helps establish suitable capacity and the equipment
+        needed before you compare finance options.
+      </p>
+      <WhatsAppLink
+        label="Talk to an expert"
+        message="Hi Incetekh, I would like to discuss a solar installation quote before comparing finance options."
+      />
+    </section>
+  </div>
+</SiteLayout>
+<style>
+  .finance-copy {
+    max-width: 60rem;
+    padding-bottom: 5rem;
+  }
+  section {
+    padding-block: 2.5rem;
+    border-top: 1px solid var(--color-line);
+  }
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    letter-spacing: -0.035em;
+  }
+  ul {
+    padding-left: 1.25rem;
+  }
+  li {
+    margin-block: 0.75rem;
+  }
+  .note {
+    font-size: 0.8125rem;
+  }
+</style>

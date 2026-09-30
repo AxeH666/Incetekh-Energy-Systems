@@ -100,7 +100,7 @@ test('one bill slider updates instantly with keyboard and pointer, and links to 
   await calc.getByText('Commercial', { exact: true }).click();
   await expect(calc.getByRole('radio', { name: 'Commercial' })).toBeChecked();
   await expect(calc.locator('[data-result="subsidy"]')).toHaveText(
-    'Not eligible',
+    '40% depreciation',
   );
   const box = (await slider.boundingBox())!;
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);

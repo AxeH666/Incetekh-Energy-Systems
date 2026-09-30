@@ -8,6 +8,9 @@ const routes = [
   '/products/',
   '/projects/',
   '/contact/',
+  '/solar-guide/',
+  '/financing/',
+  '/terms/',
   '/privacy/',
 ];
 const launch = process.env.PUBLIC_SITE_INDEXABLE === 'true';

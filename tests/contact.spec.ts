@@ -9,7 +9,7 @@ test('contact offers a real call path and keyboard-operable answers', async ({
     exact: true,
   });
   await expect(call).toHaveAttribute('href', 'tel:+919441259786');
-  await expect(page.locator('form, a[href^="mailto:"]')).toHaveCount(0);
+  await expect(page.locator('form')).toHaveCount(0);
   const whatsapp = page
     .locator('.call-panel')
     .getByRole('link', { name: 'Chat on WhatsApp' });

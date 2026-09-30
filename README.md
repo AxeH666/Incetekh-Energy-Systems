@@ -65,8 +65,7 @@ analytics beacon is the only external script when enabled.
 
 The founder confirmed the phone, more than 13 years of experience and 500+ completed projects, solar EPC,
 free site visits, free system performance checks, free annual yield audits and a five-year
-warranty subject to written proposal terms. No unverified mailbox, office, additional project
-statistics or customer identities are published. Waaree, Adani Solar and Tata Power Solar are presented as manufacturer sales
+warranty subject to written proposal terms. The founder-supplied Proddatur address and support@incetekh.com are displayed; mailbox delivery remains unverified. No additional project statistics or customer identities are published. Waaree, Adani Solar and Tata Power Solar are presented as manufacturer sales
 channels through confirmed dealership relationships. Temporary feedback is founder-authorized design copy, not verified testimonials.
 It must be replaced with verified feedback or removed before public deployment.
 Photos accompany the temporary comments for prelaunch design; authorship is unverified.

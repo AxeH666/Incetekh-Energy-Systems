@@ -1,12 +1,29 @@
 ---
 import WhatsAppLink from './WhatsAppLink.astro';
-import { solarSources, billSlider, estimateSolar } from '../data/solar';
+import {
+  solarSources,
+  billSlider,
+  estimateSolar,
+  financialEstimate,
+  usageProfile,
+} from '../data/solar';
 const initial = estimateSolar({
   mode: 'bill',
   amount: billSlider.initial,
   tariff: billSlider.tariff,
   residential: true,
 })!;
+const finance = financialEstimate(
+  initial.kw,
+  billSlider.initial / billSlider.tariff,
+  initial.subsidy,
+);
+const money = (value: number) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(value);
 ---
 
 <section
@@ -90,37 +107,51 @@ const initial = estimateSolar({
           aria-atomic="true"
           data-solar-result
         >
-          <p class="eyebrow">Your starting point</p>
+          <p class="eyebrow">Recommended for you</p>
           <h3>
             <span data-result="kw">{initial.kw}</span>{' '}
             <span class="unit">kW</span>
           </h3>
-          <p class="result-context">
-            For approximately <span data-result="units">{initial.units}</span>{' '}
-            units of monthly use.
+          <p class="result-context" data-profile>
+            {usageProfile(initial.kw, true)}
           </p>
           <dl>
             <div>
-              <dt>Estimated generation / month</dt>
+              <dt>Estimated units used / month</dt>
               <dd>
-                <span data-result="monthlyGeneration">
-                  {initial.monthlyGeneration}
-                </span>{' '}
-                units
+                <span data-result="units">{initial.units}</span>{' '}
+                <small>units / month</small>
               </dd>
             </div>
             <div>
-              <dt>Approximate clear roof area</dt>
+              <dt data-benefit-label>Potential subsidy</dt>
+              <dd data-result="subsidy">Up to ₹78,000</dd>
+            </div>
+            <div>
+              <dt>Roof needed</dt>
               <dd>
-                <span data-result="roofM2">{initial.roofM2}</span> m²{' '}
+                <span data-result="roofSqft">{initial.roofSqft}</span> sq ft
                 <small>
-                  (<span data-result="roofSqft">{initial.roofSqft}</span> sq ft)
+                  <span data-result="roofM2">{initial.roofM2}</span> m² clear
+                  roof
                 </small>
               </dd>
             </div>
             <div>
-              <dt>Potential central subsidy</dt>
-              <dd data-result="subsidy">Up to ₹78,000</dd>
+              <dt>Est. monthly savings</dt>
+              <dd data-finance="monthlySavings">
+                {money(finance.monthlySavings)}
+              </dd>
+            </div>
+            <div>
+              <dt>Simple payback</dt>
+              <dd data-finance="payback">{finance.payback.toFixed(1)} years</dd>
+            </div>
+            <div>
+              <dt>25-year savings · gross</dt>
+              <dd data-finance="savings25">
+                ₹{(finance.savings25 / 100000).toFixed(1)} lakh
+              </dd>
             </div>
           </dl>
           <p class="result-note" data-subsidy-note>
@@ -132,9 +163,9 @@ const initial = estimateSolar({
           Free site visit
         </a>
         <p class="result-note">
-          A planning estimate, not a quotation or a generation guarantee. Final
-          capacity depends on your roof, shade, sanctioned load and DISCOM
-          approval.
+          Illustrative usage, not a simultaneous appliance or backup guarantee.
+          Savings use an assumed ₹70,000/kW budget and 90% bill offset; see
+          assumptions below.
         </p>
       </div>
     </div>
@@ -148,6 +179,46 @@ const initial = estimateSolar({
     <details class="planning-details">
       <summary>How the estimate and subsidy work</summary>
       <div class="details-copy">
+        <p>
+          Financial comparison: ₹70,000/kW assumed installed budget, ₹8/unit and
+          up to 90% of estimated consumption offset. Simple payback divides this
+          budget, less eligible residential subsidy, by first-year savings. The
+          25-year total sums energy savings with a modelled 0.5% annual
+          generation decline and unchanged consumption/tariff. It is gross:
+          installation cost, loan interest, maintenance and replacements are not
+          deducted. Fixed/demand charges remain payable. Export settlement,
+          shading and actual usage can materially change savings. No commercial
+          tax saving is included. The budget is an illustration, not an Incetekh
+          quote; Indian Bank uses ₹70,000/kW in its residential loan
+          assumptions. Larger systems require individual pricing.
+        </p>
+        <p>
+          Appliance examples describe a household profile with limited AC
+          operating hours, not continuous or simultaneous operation. A 3 kW
+          example produces about 12 units/day: two ACs drawing an assumed 1 kW
+          each for 4 hours use 8 units; two 60 W fans for 8 hours use about 1
+          unit, leaving about 3 for other loads. Actual appliance consumption
+          varies. Grid-connected solar does not provide power-cut backup without
+          suitable backup equipment.
+        </p>
+        <p>
+          Commercial solar does not receive the household subsidy. The Income
+          Tax Department lists 40% written-down-value depreciation for solar
+          power generating systems. This is a deduction, not a 40% cash rebate.
+          Eligibility, time put to use and your tax position affect the
+          deduction; confirm with your tax adviser.
+        </p>
+        <div class="source-links">
+          <a class="text-link" href={solarSources.loan}>
+            Budget assumption source
+          </a>
+          <a class="text-link" href={solarSources.tax}>
+            Official depreciation schedule
+          </a>
+          <a class="text-link" href="/solar-guide/">
+            Solar guide &amp; common questions
+          </a>
+        </div>
         <p>
           We estimate monthly units by dividing the bill by an assumed &#8377;8
           per unit. This does not reproduce DISCOM tariff slabs, fixed charges
@@ -211,6 +282,7 @@ const initial = estimateSolar({
             {kw === 10 ? '+' : ''} <span>kW</span>
           </p>
           <h3>{title}</h3>
+          <p>{usageProfile(kw, kw !== 10)}</p>
           <p>
             About {kw * 120} units / month
             <br />
@@ -256,7 +328,7 @@ const initial = estimateSolar({
   }
   .calculator {
     display: grid;
-    grid-template-columns: 1fr 1.3fr;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
     gap: 1.5rem;
   }
   .calculator-inputs,
@@ -409,7 +481,8 @@ const initial = estimateSolar({
   }
   dd {
     margin: 0.3rem 0 0;
-    font-size: 1.4rem;
+    font-size: clamp(1.1rem, 1.65vw, 1.5rem);
+    font-weight: 600;
   }
   dd small {
     font-size: 0.8125rem;
@@ -511,7 +584,7 @@ const initial = estimateSolar({
   }
   @media (max-width: 44rem) {
     dl {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .planning-heading,
     .calculator {
@@ -522,6 +595,11 @@ const initial = estimateSolar({
     }
     .planning-heading {
       gap: 1.5rem;
+    }
+  }
+  @media (max-width: 23rem) {
+    dl {
+      grid-template-columns: 1fr;
     }
   }
   @media (forced-colors: active) {

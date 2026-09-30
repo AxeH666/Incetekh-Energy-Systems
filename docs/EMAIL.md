@@ -1,15 +1,12 @@
 # Business email: preparation only
 
-No mailbox exists yet according to the founder. No provider has been chosen,
-account purchased, DNS changed or email sent. Website enquiries currently use
-the confirmed phone number. Email setup is a separate, approval-dependent task.
+The founder explicitly supplied `support@incetekh.com` for the website on 30 September 2026. It is now displayed in the footer and Contact page with email links. Mailbox existence, provider, DNS and send/receive operation have not been verified. No account was purchased, DNS changed or email sent. Verify delivery before public launch; email setup remains a separate component.
 
 ## Decisions needed from the owner
 
-Choose the provider and budget, named mailbox owners, public enquiry address,
+Choose the provider and budget, named mailbox owners, the confirmed public address,
 any aliases/shared mailbox, and account recovery administrator. Confirm who
-already sends mail for this domain and who controls its DNS. Do not publish a
-suggested address until it exists and has passed send/receive tests.
+already sends mail for this domain and who controls its DNS. The current address was explicitly requested by the founder; do not treat its display as delivery verification.
 
 ## Setup after approval
 
@@ -33,8 +30,7 @@ explains the relationship; it is a reference, not a provider selection.
 - Inspect received message headers for SPF, DKIM and DMARC results; investigate
   failures before calling setup complete. Check inbox and spam placement.
 - Record DNS values, ownership and recovery procedure securely outside the repo.
-- Add the verified address to site data, contact/footer markup and structured
-  data in one focused follow-up PR; update privacy information if handling changes.
+- Confirm the displayed address matches the configured mailbox; update privacy information if handling changes.
 
 No website form backend, SMTP credentials or business automation is needed for
 the current phone-first website.

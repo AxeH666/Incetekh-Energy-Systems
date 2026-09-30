@@ -1,7 +1,7 @@
 ---
 import Wordmark from './Wordmark.astro';
 import WhatsAppLink from './WhatsAppLink.astro';
-import { site, navigation } from '../data/site';
+import { site } from '../data/site';
 ---
 
 <footer class="site-footer" id="contact" tabindex="-1">
@@ -10,33 +10,94 @@ import { site, navigation } from '../data/site';
       <div class="footer-identity">
         <Wordmark />
         <p class="footer-name">Incetekh Energy</p>
-        <p>Engineering. Procurement. Construction.</p>
+        <p>
+          Solar engineering, procurement and construction. More than 13 years of
+          experience, with care that continues after installation.
+        </p>
       </div>
-      <nav aria-label="Footer navigation">
-        <p class="eyebrow">Explore</p>
-        {navigation.map((link) => (
-          <a href={link.href}>{link.label}</a>
-        ))}
+      <nav aria-label="Footer solutions">
+        <p class="eyebrow">Solutions</p>
+        <a href="/solar-guide/#residential">Residential solar</a>
+        <a href="/services/">Commercial solar &amp; EPC</a>
+        <a href="/financing/">Solar financing</a>
+        <a href="/products/">Products we install</a>
+        <a href="/projects/">Our projects</a>
+        <a href="/about/">About Incetekh</a>
+      </nav>
+      <nav aria-label="Footer resources">
+        <p class="eyebrow">Resources</p>
+        <a href="/solar-guide/#subsidy">PM Surya Ghar guide</a>
+        <a href="/#solar-planner">Subsidy calculator</a>
+        <a href="/solar-guide/#maintenance">Panel maintenance</a>
+        <a href="/contact/#complaints">File a complaint</a>
+        <a href="/solar-guide/#faq">Solar FAQs</a>
+        <a
+          href="/terms/"
+          aria-current={Astro.url.pathname === '/terms/' ? 'page' : undefined}
+        >
+          Terms &amp; conditions
+        </a>
+        <a
+          href="/privacy/"
+          aria-current={Astro.url.pathname === '/privacy/' ? 'page' : undefined}
+        >
+          Privacy policy
+        </a>
       </nav>
       <div class="footer-contact">
-        <h2 class="eyebrow">Arrange a free site visit</h2>
-        <WhatsAppLink />
-        <a class="phone-link" href={`tel:${site.phone}`}>
-          <span>{site.phoneDisplay}</span>
+        <h2 class="eyebrow">Contact us</h2>
+        <a class="contact-link" href={`tel:${site.phone}`}>
+          {site.phoneDisplay}
         </a>
+        <a class="contact-link" href={`mailto:${site.email}`}>
+          {site.email}
+        </a>
+        <address>
+          <strong>{site.businessName}</strong>
+          {site.address.map((line) => (
+            <span>{line}</span>
+          ))}
+        </address>
+        <WhatsAppLink />
       </div>
+    </div>
+    <div class="footer-region">
+      <h2>Based in Proddatur, Andhra Pradesh.</h2>
+      <p>
+        Planning solar in your city? Share your location so we can confirm
+        site-visit availability.
+      </p>
+      <a class="text-link" href="/contact/">
+        Discuss your location
+      </a>
+      <nav class="city-links" aria-label="Ask about a site visit in your city">
+        {[
+          'Visakhapatnam',
+          'Vijayawada',
+          'Guntur',
+          'Nellore',
+          'Kurnool',
+          'Tirupati',
+          'Kadapa',
+          'Anantapur',
+          'Rajahmundry',
+          'Eluru',
+          'Ongole',
+          'Srikakulam',
+          'Vizianagaram',
+        ].map((city) => (
+          <a
+            href={`${site.whatsapp}?text=${encodeURIComponent(`Hi Incetekh, is a free site visit available in ${city}?`)}`}
+          >
+            {city}
+          </a>
+        ))}
+      </nav>
     </div>
     <div class="footer-bottom">
       <p>
         © {new Date().getFullYear()} {site.name}
       </p>
-      <a
-        class="text-link"
-        href="/privacy/"
-        aria-current={Astro.url.pathname === '/privacy/' ? 'page' : undefined}
-      >
-        Privacy
-      </a>
     </div>
   </div>
 </footer>
@@ -49,8 +110,10 @@ import { site, navigation } from '../data/site';
   }
   .footer-main {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) minmax(0, 1fr);
-    gap: clamp(2rem, 5vw, 5rem);
+    grid-template-columns:
+      minmax(0, 1.1fr) minmax(0, 0.8fr) minmax(0, 0.9fr)
+      minmax(0, 1.3fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
     align-items: start;
     padding-bottom: clamp(2.5rem, 5vw, 4rem);
   }
@@ -72,7 +135,7 @@ import { site, navigation } from '../data/site';
   }
   nav {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     column-gap: 1.5rem;
     align-content: start;
   }
@@ -93,15 +156,57 @@ import { site, navigation } from '../data/site';
     color: var(--color-on-dark-muted);
     margin-bottom: var(--space-4);
   }
-  .phone-link {
-    margin-top: 1rem;
+  .contact-link {
     display: flex;
     align-items: center;
     width: fit-content;
     min-height: 2.75rem;
-    font-size: clamp(1.2rem, 1.75vw, 1.6rem);
+    font-size: var(--text-small);
     letter-spacing: -0.035em;
     text-decoration: none;
+  }
+  address {
+    font-style: normal;
+    font-size: 0.8125rem;
+    color: var(--color-on-dark-muted);
+    line-height: 1.8;
+    margin: 1rem 0 1.5rem;
+  }
+  address span,
+  address strong {
+    display: block;
+  }
+  address strong {
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .footer-region {
+    border-top: 1px solid #444844;
+    padding: 2rem 0;
+    text-align: center;
+  }
+  .footer-region h2 {
+    font-size: 1.125rem;
+    font-weight: 500;
+  }
+  .footer-region p {
+    font-size: 0.8125rem;
+    color: var(--color-on-dark-muted);
+    margin: 0.75rem 0;
+  }
+  .footer-region a {
+    font-size: 0.8125rem;
+  }
+  .city-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin-top: 1rem;
+  }
+  .city-links a {
+    color: var(--color-on-dark-muted);
+    font-size: 0.75rem;
   }
   .footer-bottom {
     border-top: 1px solid #444844;
@@ -115,9 +220,9 @@ import { site, navigation } from '../data/site';
     font-size: var(--text-small);
   }
   nav a:hover,
-  .phone-link:hover,
+  .contact-link:hover,
   nav a:focus-visible,
-  .phone-link:focus-visible {
+  .contact-link:focus-visible {
     text-decoration: underline;
     text-underline-offset: 0.4em;
     text-decoration-thickness: 1px;
@@ -128,7 +233,7 @@ import { site, navigation } from '../data/site';
       grid-template-columns: 1fr 1fr;
     }
     .footer-identity {
-      grid-column: 1 / -1;
+      grid-column: auto;
     }
     .footer-contact {
       max-width: 24rem;
