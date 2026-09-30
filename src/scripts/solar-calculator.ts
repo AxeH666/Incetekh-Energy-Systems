@@ -49,11 +49,7 @@ if (root) {
     root!.querySelector('[data-benefit-label]')!.textContent = t(
       residential ? 'Potential subsidy' : 'Potential tax benefit',
     );
-    const finance = financialEstimate(
-      estimate.kw,
-      slider.valueAsNumber / billSlider.tariff,
-      estimate.subsidy,
-    );
+    const finance = financialEstimate(estimate.kw, estimate.subsidy);
     for (const key of ['monthlySavings', 'payback', 'savings25'] as const) {
       root!.querySelector(`[data-finance="${key}"]`)!.textContent =
         key === 'payback'

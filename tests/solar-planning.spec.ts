@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { centralSubsidy, estimateSolar } from '../src/data/solar';
+import { billSlider, centralSubsidy, estimateSolar } from '../src/data/solar';
 import { productGroups } from '../src/data/products';
 
 test('central subsidy is incremental, capped and residential only', () => {
@@ -29,8 +29,8 @@ test('bill and units produce consistent planning estimates with bounded inputs',
     units: 300,
     kw: 3,
     monthlyGeneration: 360,
-    roofM2: 30,
-    roofSqft: 323,
+    roofM2: 28,
+    roofSqft: 300,
     subsidy: 78000,
   });
   expect(
@@ -108,7 +108,7 @@ test('one bill slider updates instantly with keyboard and pointer, and links to 
   expect(amount).toBeGreaterThan(20000);
   expect(amount).toBeLessThan(30000);
   await expect(calc.locator('[data-result="kw"]')).toHaveText(
-    String(Math.ceil(amount / 8 / 120)),
+    String(Math.ceil(amount / billSlider.tariff / 120)),
   );
   await calc
     .getByRole('link', { name: 'Free site visit', exact: true })

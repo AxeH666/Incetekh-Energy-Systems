@@ -1,5 +1,26 @@
 # Deployment handoff
 
+## Cloudflare branch-preview correction — 30 September 2026
+
+The repository now has an existing Cloudflare Workers build integration for
+`incetekh-energy-systems`. The supplied log showed `npm run build` successfully
+generating 144 static pages, followed by `npx wrangler preview` failing because
+the required `previews` block was missing. The founder authorized completing
+the preview fix and Git workflow after reviewing the proposed configuration.
+
+`wrangler.jsonc` serves only `dist/`, uses `404-page` for missing paths, and
+includes an empty `previews` block. No Worker script, runtime bindings, DNS
+records or custom-domain changes are added. Wrangler 4.144.0 accepted this
+configuration in a local `deploy --dry-run`; remote status is recorded in the
+PR. The existing Cloudflare integration performs the branch-preview publication
+after push. This does not complete the production-domain, indexing, verified
+content, form-delivery or business-email launch gates below.
+
+Configuration references: [Preview configuration](https://developers.cloudflare.com/workers/previews/configuration/)
+and [static-site routing](https://developers.cloudflare.com/workers/static-assets/routing/static-site-generation/).
+
+## Original launch handoff
+
 Status: local website ready; no hosting account, domain connection, deployment,
 Search Console verification or analytics account was changed in this task.
 The wider SCOPE.md milestone remains incomplete until launch and business email

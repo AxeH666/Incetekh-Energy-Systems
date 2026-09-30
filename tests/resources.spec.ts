@@ -1,23 +1,65 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { financialEstimate, usageProfile } from '../src/data/solar';
+import {
+  billSlider,
+  estimateSolar,
+  financialEstimate,
+  usageProfile,
+} from '../src/data/solar';
 
-test('financial scenario caps offsets and keeps tax benefits out of returns', () => {
-  const home = financialEstimate(3, 312.5, 78000);
+test('generation value matches the approved example and excludes commercial tax benefits', () => {
+  const home = financialEstimate(3, 78000);
   expect(home.cost).toBe(210000);
-  expect(home.monthlySavings).toBe(2250);
-  expect(home.payback).toBeCloseTo(132000 / 27000);
-  expect(home.savings25).toBeCloseTo(675000);
-  const business = financialEstimate(3, 312.5, 0);
+  expect(home.cost - 78000).toBe(132000);
+  expect(home.monthlySavings).toBe(2880);
+  expect((home.payback * 12).toFixed(1)).toBe('45.8');
+  expect(home.payback.toFixed(1)).toBe('3.8');
+  expect(home.savings25).toBe(864000);
+  const business = financialEstimate(3, 0);
   expect(business.monthlySavings).toBe(home.monthlySavings);
   expect(business.savings25).toBe(home.savings25);
   expect(business.payback).toBeGreaterThan(home.payback);
-  const constrained = financialEstimate(1, 1000, 0);
-  expect(constrained.monthlySavings).toBe(960);
-  expect(constrained.savings25).toBeLessThan(960 * 12 * 25);
-  expect(financialEstimate(1, 25, 30000).monthlySavings).toBe(180);
+  const small = financialEstimate(1, 30000);
+  expect(small.monthlySavings).toBe(960);
+  expect(small.savings25).toBe(960 * 12 * 25);
   expect(usageProfile(1, true)).not.toContain('ACs');
-  expect(usageProfile(3, true)).toContain('2 ACs + 2 fans');
+  for (const [kw, acs] of [
+    [3, 1],
+    [4, 1],
+    [5, 2],
+    [6, 2],
+    [7, 3],
+    [9, 3],
+    [10, 4],
+  ]) {
+    expect(usageProfile(kw, true)).toBe(
+      `${acs} AC${acs === 1 ? '' : 's'} + all other household loads`,
+    );
+  }
+});
+
+test('generation and costs scale with whole-kW sizing across every bill step', () => {
+  let previousKw = 0;
+  for (let bill = 200; bill <= 50000; bill += 100) {
+    const estimate = estimateSolar({
+      mode: 'bill',
+      amount: bill,
+      tariff: billSlider.tariff,
+      residential: true,
+    })!;
+    const finance = financialEstimate(estimate.kw, estimate.subsidy);
+    expect(estimate.units).toBe(Math.round(bill / 8));
+    expect(estimate.kw).toBe(Math.max(1, Math.ceil(bill / 8 / 120)));
+    expect(estimate.kw).toBeGreaterThanOrEqual(previousKw);
+    expect(estimate.roofSqft).toBe(estimate.kw * 100);
+    expect(estimate.subsidy).toBeLessThanOrEqual(78000);
+    expect(estimate.monthlyGeneration).toBe(estimate.kw * 120);
+    expect(finance.monthlySavings).toBe(estimate.monthlyGeneration * 8);
+    expect(finance.cost).toBe(estimate.kw * 70000);
+    expect(finance.payback).toBeGreaterThan(0);
+    expect(finance.savings25).toBeCloseTo(finance.monthlySavings * 300);
+    previousKw = estimate.kw;
+  }
 });
 
 test('six calculator results change with connection and retain simple controls', async ({
@@ -27,12 +69,22 @@ test('six calculator results change with connection and retain simple controls',
   const calc = page.locator('[data-solar-calculator]');
   await expect(calc).toContainText('Recommended for you');
   await expect(calc.locator('dl > div')).toHaveCount(6);
-  await expect(calc.locator('[data-profile]')).toContainText('2 ACs + 2 fans');
+  await expect(calc.locator('[data-profile]')).toHaveText(
+    '1 AC + all other household loads',
+  );
+  await expect(
+    page.locator('.size-options article > p:nth-of-type(2)'),
+  ).toHaveText([
+    '1 AC + all other household loads',
+    '2 ACs + all other household loads',
+    '3 ACs + all other household loads',
+    '4 ACs + all other household loads',
+  ]);
   await expect(calc.locator('[data-finance="monthlySavings"]')).toHaveText(
-    '₹2,250',
+    '₹2,880',
   );
   await expect(calc.locator('[data-finance="payback"]')).toHaveText(
-    '4.9 years',
+    '3.8 years',
   );
   await calc.getByText('Commercial', { exact: true }).click();
   await expect(calc.locator('[data-profile]')).toHaveText(
@@ -42,7 +94,7 @@ test('six calculator results change with connection and retain simple controls',
     'Potential tax benefit',
   );
   await expect(calc.locator('[data-finance="payback"]')).toHaveText(
-    '7.8 years',
+    '6.1 years',
   );
   await expect(calc.locator('[data-subsidy-note]')).toContainText(
     'not a cash subsidy',
@@ -50,6 +102,15 @@ test('six calculator results change with connection and retain simple controls',
   await calc.getByText('Residential', { exact: true }).click();
   await expect(calc.locator('[data-result="subsidy"]')).toHaveText(
     'Up to ₹78,000',
+  );
+  await expect(calc).toContainText(
+    'all generation offsets usage or earns ₹8/unit credit',
+  );
+  await page
+    .getByText('How the estimate and subsidy work', { exact: true })
+    .click();
+  await expect(page.locator('.planning-details')).toContainText(
+    'not a guaranteed bill reduction',
   );
 });
 

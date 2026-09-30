@@ -6,6 +6,13 @@ export const planning = {
   maxMonthlyUnits: 12_000,
 };
 
+// Founder-approved generation-value scenario, not a tariff or installation quote.
+export const calculatorAssumptions = {
+  daysPerMonth: 30,
+  roofSqftPerKw: 100,
+  budgetPerKw: 70_000,
+};
+
 export const billSlider = {
   min: 200,
   max: 50_000,
@@ -15,13 +22,14 @@ export const billSlider = {
 };
 
 // Disclosed comparison scenario, not an installation quote or tariff model.
-export function financialEstimate(kw: number, units: number, subsidy: number) {
-  const cost = kw * 70_000;
-  const monthlySavings = Math.min(units * 0.9, kw * 120) * 8;
-  const savings25 = Array.from(
-    { length: 25 },
-    (_, year) => Math.min(units * 0.9, kw * 120 * 0.995 ** year) * 8 * 12,
-  ).reduce((total, value) => total + value, 0);
+export function financialEstimate(kw: number, subsidy: number) {
+  const cost = kw * calculatorAssumptions.budgetPerKw;
+  const monthlySavings =
+    kw *
+    planning.dailyYield *
+    calculatorAssumptions.daysPerMonth *
+    billSlider.tariff;
+  const savings25 = monthlySavings * 12 * 25;
   return {
     cost,
     monthlySavings,
@@ -38,9 +46,10 @@ export function usageProfile(kw: number, residential: boolean) {
         ? 'Office / retail / daytime business use'
         : 'Larger commercial premises';
   if (kw < 3) return 'Small home · fans, lights & everyday essentials';
-  if (kw < 5) return 'Family home · 2 ACs + 2 fans';
-  if (kw < 7) return 'Larger home · 3 ACs + 3 fans';
-  return 'High-use home · 4 ACs + 5 fans';
+  if (kw < 5) return '1 AC + all other household loads';
+  if (kw < 7) return '2 ACs + all other household loads';
+  if (kw < 10) return '3 ACs + all other household loads';
+  return '4 ACs + all other household loads';
 }
 
 export function centralSubsidy(kw: number, residential: boolean): number {
@@ -65,13 +74,20 @@ export function estimateSolar(input: {
     return null;
   const units = mode === 'bill' ? amount / tariff : amount;
   if (units > planning.maxMonthlyUnits) return null;
-  const kw = Math.max(1, Math.ceil(units / (planning.dailyYield * 30)));
+  const kw = Math.max(
+    1,
+    Math.ceil(
+      units / (planning.dailyYield * calculatorAssumptions.daysPerMonth),
+    ),
+  );
+  const roofSqft = kw * calculatorAssumptions.roofSqftPerKw;
   return {
     units: Math.round(units),
     kw,
-    monthlyGeneration: kw * planning.dailyYield * 30,
-    roofM2: kw * planning.roofM2PerKw,
-    roofSqft: Math.ceil(kw * planning.roofM2PerKw * 10.7639),
+    monthlyGeneration:
+      kw * planning.dailyYield * calculatorAssumptions.daysPerMonth,
+    roofM2: Math.round(roofSqft / 10.7639),
+    roofSqft,
     subsidy: centralSubsidy(kw, residential),
   };
 }
