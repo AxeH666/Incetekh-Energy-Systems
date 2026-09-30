@@ -71,6 +71,12 @@ The old Reviews route redirects to the homepage section.
 
 ## Approved homepage order (30 September 2026)
 
+The built-in language menu sits beside WhatsApp in the header. Its native-script
+labels, understated green selection and keyboard focus retain the existing visual
+language. Regional pages share these layouts, with more line height and smaller
+mobile hero type for long words. See [LANGUAGES.md](LANGUAGES.md) for routing,
+translation maintenance and editorial review status.
+
 Hero and project slideshow; prominent centered Trusted brands section; separate Products we install section; project/EPC story (From planning to the rooftop); reviews; solar-size calculator; efficiency/capacity choices; free services and after-installation care; site-visit form; shared footer.
 
 The brand section follows the founder's large-logo reference: centered heading,

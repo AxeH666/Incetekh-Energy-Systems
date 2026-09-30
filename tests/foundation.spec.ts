@@ -32,8 +32,10 @@ test('semantic shell, metadata, and main navigation', async ({ page }) => {
   await expect(
     page.getByRole('form', { name: 'Request a free site visit' }),
   ).toHaveCount(1);
-  await expect(page.locator('script[src]')).toHaveCount(0);
-  await expect(page.locator('script[type="module"]')).toHaveCount(3);
+  await expect(page.locator('script[src]:not([src^="/_astro/"])')).toHaveCount(
+    0,
+  );
+  await expect(page.locator('script[type="module"]')).toHaveCount(4);
 });
 
 test('keyboard skip link and contact navigation work', async ({ page }) => {
@@ -233,12 +235,20 @@ test('static output keeps planning and motion scripts small and local', async ()
   }
   await walk('dist');
   const scripts = files.filter((file) => file.endsWith('.js'));
-  expect(scripts).toHaveLength(0);
+  const scriptBytes = await Promise.all(
+    scripts.map(async (file) => (await stat(file)).size),
+  );
+  expect(scriptBytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(10_000);
   expect(
     files.some((file) => /review pictures|ChatGPT|hf_2026/.test(file)),
   ).toBe(false);
+  // Translated HTML shares the same assets; cap asset size and each page separately.
+  const assets = files.filter((file) => !file.endsWith('.html'));
   const bytes = await Promise.all(
-    files.map(async (file) => (await stat(file)).size),
+    assets.map(async (file) => (await stat(file)).size),
   );
-  expect(bytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(2_500_000);
+  expect(bytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(2_100_000);
+  for (const file of files.filter((file) => file.endsWith('.html'))) {
+    expect((await stat(file)).size, file).toBeLessThan(400_000);
+  }
 });

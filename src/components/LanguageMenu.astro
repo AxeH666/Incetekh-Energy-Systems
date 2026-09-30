@@ -1,0 +1,184 @@
+---
+interface Props {
+  current: string;
+  options: { code: string; name: string; href: string }[];
+}
+const { current, options } = Astro.props;
+const selected = options.find((option) => option.code === current)!;
+---
+
+<details class="language-menu" data-language-menu translate="no">
+  <summary aria-label={`Language: ${selected.name}`}>
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <ellipse cx="12" cy="12" rx="4" ry="9" />
+      <path d="M3 12h18M5 6.5h14M5 17.5h14" />
+    </svg>
+    <span data-language-label lang={selected.code}>
+      {selected.name}
+    </span>
+    <svg
+      class="chevron"
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      aria-hidden="true"
+    >
+      <path d="m4 6 4 4 4-4" />
+    </svg>
+  </summary>
+  <div class="language-options">
+    <ul aria-label="Website language">
+      {options.map((option) => (
+        <li>
+          <a
+            data-language-option={option.code}
+            href={option.href}
+            lang={option.code}
+            hreflang={option.code}
+            aria-current={option.code === current ? 'true' : undefined}
+          >
+            <span>{option.name}</span>
+            <span class="language-code" aria-hidden="true">
+              {option.code.toUpperCase()}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</details>
+
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>(
+    '[data-language-menu]',
+  );
+  if (menu) {
+    document.addEventListener('click', (event) => {
+      if (event.target instanceof Node && !menu.contains(event.target))
+        menu.open = false;
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu.open) {
+        menu.open = false;
+        menu.querySelector('summary')!.focus();
+      }
+    });
+    menu
+      .querySelectorAll<HTMLAnchorElement>('a[data-language-option]')
+      .forEach((link) => {
+        link.addEventListener('click', () => {
+          link.hash = location.hash;
+          menu.open = false;
+        });
+      });
+  }
+</script>
+
+<style>
+  .language-menu {
+    position: relative;
+    color: var(--color-ink);
+    flex: none;
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0.5rem 0.625rem;
+    list-style: none;
+    cursor: pointer;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:hover {
+    background: #edf2e9;
+  }
+  svg {
+    flex: none;
+  }
+  .chevron {
+    transition: transform 150ms ease;
+  }
+  [open] .chevron {
+    transform: rotate(180deg);
+  }
+  .language-options {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    width: 11rem;
+    max-width: calc(100vw - 2.5rem);
+    z-index: 20;
+    padding: 0.375rem;
+    background: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px #2026221a;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+  a[aria-current] {
+    background: #e2f3dd;
+    color: #175e30;
+  }
+  a:hover {
+    background: #edf2e9;
+  }
+  .language-code {
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+  }
+  @media (max-width: 36rem) {
+    summary {
+      gap: 0.375rem;
+      padding-inline: 0.375rem;
+    }
+    summary > span {
+      max-width: 5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chevron {
+      transition: none;
+    }
+  }
+  @media (forced-colors: active) {
+    a[aria-current] {
+      outline: 1px solid Highlight;
+    }
+  }
+</style>

@@ -1,8 +1,10 @@
 import { defineConfig } from 'astro/config';
+import languageRoutes from './src/i18n/routes.ts';
 
 export default defineConfig({
   site: 'https://incetekhenergy.com',
   output: 'static',
+  integrations: [languageRoutes()],
   trailingSlash: 'always',
   redirects: { '/reviews/': '/#reviews' },
   build: { inlineStylesheets: 'never' },

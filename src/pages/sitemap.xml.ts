@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { indexable } from '../data/visibility';
 import { cities, cityPath } from '../data/cities';
+import { languages, localPath } from '../i18n/languages';
 
 const paths = [
   '/',
@@ -15,8 +16,11 @@ const paths = [
   '/privacy/',
   ...cities.map((city) => cityPath(city.slug)),
 ];
+const localizedPaths = languages.flatMap(({ code }) =>
+  paths.map((path) => localPath(path, code)),
+);
 export const GET: APIRoute = ({ site }) =>
   new Response(
-    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable ? paths.map((path) => `<url><loc>${new URL(path, site)}</loc></url>`).join('') : ''}</urlset>`,
+    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable ? localizedPaths.map((path) => `<url><loc>${new URL(path, site)}</loc></url>`).join('') : ''}</urlset>`,
     { headers: { 'Content-Type': 'application/xml; charset=utf-8' } },
   );

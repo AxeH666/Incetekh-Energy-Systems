@@ -140,6 +140,7 @@ import WhatsAppLink from './WhatsAppLink.astro';
 </section>
 
 <script>
+  import { t } from '../i18n/text';
   const form = document.querySelector<HTMLFormElement>(
     '[data-site-visit-form]',
   );
@@ -150,8 +151,9 @@ import WhatsAppLink from './WhatsAppLink.astro';
       // Delivery intentionally remains unconnected. Never serialize, log or persist these inputs.
       const status = form.querySelector<HTMLElement>('[data-visit-status]')!;
       status.hidden = false;
-      status.textContent =
-        'Your request has not been sent. Online requests are not available yet. Please contact us on WhatsApp to arrange your free site visit.';
+      status.textContent = t(
+        'Your request has not been sent. Online requests are not available yet. Please contact us on WhatsApp to arrange your free site visit.',
+      );
       status.focus();
     });
   }
