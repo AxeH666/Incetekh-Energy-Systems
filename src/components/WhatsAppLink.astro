@@ -1,13 +1,38 @@
 ---
 import { site } from '../data/site';
+import { cities, cityPath } from '../data/cities';
 interface Props {
   label?: string;
   message?: string;
 }
 const { label = 'Chat on WhatsApp', message } = Astro.props;
-const href = message
-  ? `${site.whatsapp}?text=${encodeURIComponent(message)}`
-  : site.whatsapp;
+const pageMessages: Record<string, string> = {
+  '/': 'Hi Incetekh Energy, I am interested in rooftop solar for my property in Andhra Pradesh. Please help me understand suitable system sizes, costs and subsidy eligibility, and how to arrange a free site visit.',
+  '/about/':
+    'Hi Incetekh Energy, I would like to discuss a solar project for my property. Please tell me about your installation process and how to get started.',
+  '/services/':
+    'Hi Incetekh Energy, I would like to discuss your solar installation and system care services. Please help me choose the right service for my property.',
+  '/products/':
+    'Hi Incetekh Energy, please help me choose suitable solar panels, an inverter or a solar water heater. Could you share available models and installation options?',
+  '/projects/':
+    'Hi Incetekh Energy, I saw your project gallery and would like to discuss a solar installation for my property. Can we arrange a free site visit?',
+  '/contact/':
+    'Hi Incetekh Energy, I would like to speak with your team about solar for my property. Please guide me on the next steps and site-visit availability.',
+  '/solar-guide/':
+    'Hi Incetekh Energy, I read your solar guide and would like help with system sizing, PM Surya Ghar subsidy eligibility and the installation process.',
+  '/financing/':
+    'Hi Incetekh Energy, I would like a solar installation quote and guidance on financing options and subsidy eligibility. Please share the next steps.',
+  '/privacy/':
+    'Hi Incetekh Energy, I have a question about your privacy policy and how my enquiry details are handled.',
+  '/terms/':
+    'Hi Incetekh Energy, I have a question about your terms, written proposals and warranty conditions.',
+};
+const city = cities.find((item) => cityPath(item.slug) === Astro.url.pathname);
+const defaultMessage = city
+  ? `Hi Incetekh Energy, I am interested in rooftop solar in ${city.name}. Please share suitable system options and confirm free site-visit availability. My locality / pincode is: `
+  : (pageMessages[Astro.url.pathname] ??
+    'Hi Incetekh Energy, I would like to discuss solar for my property. Please help me get started.');
+const href = `${site.whatsapp}?text=${encodeURIComponent(message?.trim() ? message : defaultMessage)}`;
 ---
 
 <a class="button whatsapp-link" href={href}>
@@ -25,14 +50,14 @@ const href = message
 </a>
 <style>
   .whatsapp-link {
-    background: #075e54;
+    background: var(--color-green);
     color: #fff;
     justify-content: center;
     gap: 0.625rem;
     padding-inline: 1.25rem;
   }
   .whatsapp-link:hover {
-    background: #064c44;
+    background: var(--color-green-hover);
   }
   span {
     line-height: 1.4;

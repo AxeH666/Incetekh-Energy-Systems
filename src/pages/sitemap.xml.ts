@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { indexable } from '../data/visibility';
+import { cities, cityPath } from '../data/cities';
 
 const paths = [
   '/',
@@ -12,6 +13,7 @@ const paths = [
   '/financing/',
   '/terms/',
   '/privacy/',
+  ...cities.map((city) => cityPath(city.slug)),
 ];
 export const GET: APIRoute = ({ site }) =>
   new Response(

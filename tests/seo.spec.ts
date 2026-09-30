@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { cities, cityPath } from '../src/data/cities';
 
 const routes = [
   '/',
@@ -97,7 +98,11 @@ test('sitemap and robots agree with indexing mode and exclude error pages', asyn
   const xml = await sitemap.text();
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
   expect(urls).toEqual(
-    launch ? routes.map((path) => `https://incetekhenergy.com${path}`) : [],
+    launch
+      ? [...routes, ...cities.map((city) => cityPath(city.slug))].map(
+          (path) => `https://incetekhenergy.com${path}`,
+        )
+      : [],
   );
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('Allow: /');

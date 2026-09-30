@@ -7,10 +7,7 @@ import tata from '../../tata power solar logo.jpeg';
 
 <section class="manufacturers" aria-labelledby="manufacturers-heading">
   <div class="container manufacturer-inner">
-    <h2 id="manufacturers-heading">Equipment brands.</h2>
-    <a class="text-link product-link" href="/products/">
-      View products
-    </a>
+    <h2 id="manufacturers-heading">Trusted brands.</h2>
     <ul
       class="manufacturer-logos"
       aria-label="Manufacturers available through our sales channels"
@@ -19,19 +16,7 @@ import tata from '../../tata power solar logo.jpeg';
         <Image
           src={waaree}
           alt="Waaree"
-          width={440}
-          format="webp"
-          quality={90}
-        />
-      </li>
-      <li class="adani">
-        <Image
-          src={adani}
-          alt="Adani Solar"
-          width={320}
-          height={200}
-          fit="cover"
-          position="center"
+          width={640}
           format="webp"
           quality={90}
         />
@@ -40,8 +25,17 @@ import tata from '../../tata power solar logo.jpeg';
         <Image
           src={tata}
           alt="Tata Power Solar"
-          width={320}
-          height={210}
+          width={402}
+          format="webp"
+          quality={90}
+        />
+      </li>
+      <li class="adani">
+        <Image
+          src={adani}
+          alt="Adani Solar"
+          width={440}
+          height={275}
           fit="cover"
           position="center"
           format="webp"
@@ -63,76 +57,60 @@ import tata from '../../tata power solar logo.jpeg';
     border-bottom: 1px solid var(--color-line);
   }
   .manufacturer-inner {
-    padding-block: clamp(1.5rem, 3vw, 2.5rem);
-    display: grid;
-    grid-template-columns: 1fr 2fr auto;
-    column-gap: 2rem;
-    align-items: center;
+    padding-block: clamp(2.5rem, 4vw, 4rem);
+    text-align: center;
   }
   h2 {
-    font-size: clamp(1.125rem, 1.8vw, 1.5rem);
-    font-weight: 500;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 600;
+    line-height: 1.15;
     letter-spacing: -0.035em;
-  }
-  .product-link {
-    grid-column: 3;
-    grid-row: 1;
   }
   .manufacturer-logos {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: var(--space-8) 0 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-column: 2;
-    grid-row: 1;
-    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(1rem, 5vw, 5rem);
   }
   li {
     min-width: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 5rem;
+    min-height: clamp(5rem, 10vw, 9rem);
   }
   img {
-    width: 7rem;
+    width: 11rem;
+    max-width: 85%;
     height: auto;
     object-fit: contain;
   }
   .waaree img {
-    width: 9rem;
+    width: 15.25rem;
   }
   .tata img {
-    width: 7.5rem;
+    width: 21.25rem;
+    /* Show the horizontal wordmark from the supplied logo, as in the reference. */
+    height: auto;
+    aspect-ratio: 402 / 56;
+    object-fit: cover;
+    object-position: center 71%;
   }
   .manufacturer-note {
-    grid-column: 1 / -1;
-    margin-top: 1rem;
+    max-width: 54rem;
+    margin: var(--space-6) auto 0;
     color: var(--color-muted);
     font-size: 0.75rem;
-  }
-  @media (max-width: 56rem) {
-    .manufacturer-inner {
-      grid-template-columns: 1fr auto;
-      column-gap: 1rem;
-    }
-    .product-link {
-      grid-column: 2;
-    }
-    .manufacturer-logos {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-    .manufacturer-note {
-      max-width: 42rem;
-    }
   }
   @media (max-width: 36rem) {
     .manufacturer-logos {
       gap: 0.75rem;
+      margin-top: var(--space-6);
+    }
+    .manufacturer-note {
+      margin-top: var(--space-4);
     }
   }
 </style>

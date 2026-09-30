@@ -18,7 +18,7 @@
   --color-accent-bright: #ee865e;
   --color-on-dark-muted: #bec4bb;
   --font-body: 'Manrope Variable', 'Segoe UI', sans-serif;
-  --text-small: 0.8125rem;
+  --text-small: 0.875rem;
   --text-body: 1rem;
   --text-lead: clamp(1rem, 1.35vw, 1.1875rem);
   --space-2: 0.5rem;
@@ -28,8 +28,15 @@
   --space-8: 2rem;
   --space-12: 3rem;
   --space-16: 4rem;
-  --gutter: clamp(1.25rem, 4.5vw, 5rem);
-  --content-width: 84rem;
+  --gutter: clamp(1.25rem, 4.5vw, 4rem);
+  --content-width: 78rem;
+  --section-space: clamp(3rem, 5.5vw, 5rem);
+  --layout-gap: clamp(2rem, 4vw, 4rem);
+  --heading-gap: clamp(1.5rem, 3vw, 2.5rem);
+  --card-padding: clamp(1.25rem, 2.5vw, 2rem);
+  --radius: 0.5rem;
+  --color-green: #075e54;
+  --color-green-hover: #064c44;
 }
 
 *,
@@ -52,15 +59,32 @@ body {
 }
 h1,
 h2,
+h3,
 p,
 figure {
   margin: 0;
 }
 h1,
-h2 {
+h2,
+h3 {
   font-weight: 500;
   text-wrap: balance;
   overflow-wrap: anywhere;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+summary,
+input,
+select {
+  touch-action: manipulation;
+}
+section[id] {
+  scroll-margin-top: var(--space-6);
 }
 a {
   color: inherit;
@@ -86,6 +110,12 @@ img {
   width: min(100% - var(--gutter) * 2, var(--content-width));
   margin-inline: auto;
 }
+.container.reading-container {
+  width: min(100% - var(--gutter) * 2, 46rem);
+}
+.reading-container > .prose {
+  max-width: none;
+}
 .eyebrow {
   font-size: 0.6875rem;
   font-weight: 700;
@@ -94,12 +124,12 @@ img {
   text-transform: uppercase;
 }
 .section {
-  padding-block: clamp(3.5rem, 6vw, 6rem);
+  padding-block: var(--section-space);
 }
 .section-grid {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: var(--space-8);
+  gap: var(--layout-gap);
 }
 .section-title {
   font-size: clamp(1.875rem, 3.2vw, 3rem);
@@ -110,7 +140,13 @@ img {
   max-width: 42rem;
 }
 .prose > * + * {
-  margin-top: var(--space-6);
+  margin-top: var(--space-4);
+}
+.prose > :is(h2, h3):not(:first-child) {
+  margin-top: var(--space-8);
+}
+.prose > :is(h2, h3) + p {
+  margin-top: var(--space-3);
 }
 .prose p {
   color: var(--color-muted);
@@ -126,6 +162,9 @@ img {
   font-size: var(--text-small);
   font-weight: 700;
   text-underline-offset: 0.35em;
+  line-height: 1.5;
+  text-decoration-thickness: 1px;
+  max-width: 100%;
 }
 @media (max-width: 44rem) {
   .section-grid {
@@ -135,20 +174,45 @@ img {
 .button {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-6);
+  justify-content: center;
+  gap: var(--space-3);
   min-height: 3rem;
-  padding: 0.75rem 1.125rem;
-  font-size: var(--text-small);
+  max-width: 100%;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.35;
   text-decoration: none;
   border: 1px solid transparent;
-  border-radius: 3px;
+  border-radius: var(--radius);
+  text-align: center;
+  cursor: pointer;
   transition:
     transform 220ms ease,
     background-color 220ms ease,
     box-shadow 220ms ease;
+}
+.button-outline {
+  color: var(--color-green);
+  border-color: currentColor;
+  background: transparent;
+}
+.button-outline:hover {
+  background: #e6ede3;
+}
+.button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-6);
 }
 .button-dark {
   color: var(--color-paper);

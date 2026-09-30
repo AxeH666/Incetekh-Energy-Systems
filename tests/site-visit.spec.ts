@@ -58,7 +58,10 @@ test('homepage booking action reaches the form and expert contact stays on Whats
     page
       .locator('.site-visit')
       .getByRole('link', { name: 'Talk to an expert on WhatsApp' }),
-  ).toHaveAttribute('href', 'https://wa.me/919441259786');
+  ).toHaveAttribute(
+    'href',
+    /https:\/\/wa\.me\/919441259786\?text=.*free%20site%20visit/,
+  );
 });
 
 test('unconnected form cannot submit without JavaScript', async ({

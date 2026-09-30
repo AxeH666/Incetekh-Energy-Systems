@@ -61,6 +61,9 @@ keyboard inspection; they do not establish full WCAG conformance.
 
 ## Pre-deployment refinement
 
+See [SPACING-CITIES.md](SPACING-CITIES.md) for the 30 September spacing/button
+refinement and city-page design, research, implementation and content boundaries.
+
 See [POLISH.md](POLISH.md) for current reference research, page hierarchy and
 review decisions. Feedback now lives on Home in a native horizontal scroll track;
 projects remain documentary proof. Ten supplied photos accompany temporary feedback; authorship remains unverified.
@@ -68,6 +71,11 @@ The old Reviews route redirects to the homepage section.
 
 ## Approved homepage order (30 September 2026)
 
-Hero and project slideshow; compact static equipment-brand row; project/EPC story (From planning to the rooftop); reviews; solar-size calculator; efficiency/capacity choices; free services and after-installation care; site-visit form; shared footer.
+Hero and project slideshow; prominent centered Trusted brands section; separate Products we install section; project/EPC story (From planning to the rooftop); reviews; solar-size calculator; efficiency/capacity choices; free services and after-installation care; site-visit form; shared footer.
 
-The brand row shows each existing logo once and links to Products for detailed equipment information. Its dealership/sales-channel wording and proposal-dependent availability/warranty qualification remain visible. The free-services heading now reflects care after installation while retaining the free pre-installation visit. Calculator behavior, gallery/review motion, products, footer and deferred form delivery are unchanged. Keyboard navigation proceeds from the review track into the calculator's Residential control.
+The brand section follows the founder's large-logo reference: centered heading,
+Waaree left, Tata Power Solar's horizontal wordmark in the center, and Adani right.
+The Tata wordmark is displayed with a responsive CSS crop from the supplied logo;
+original assets are preserved. All three marks scale down together on mobile.
+
+The brand row shows each existing logo once. Immediately below it, Products we install presents panels, inverters and water heaters as open columns with catalogue links. Brand relationships and proposal-dependent availability/warranty qualification remain visible. Product/system options use whitespace and fine rules; city links are plain text, with no outlined chips. The free-services heading reflects care after installation while retaining the free pre-installation visit. Calculator behavior, gallery/review motion and deferred form delivery are unchanged. Keyboard navigation proceeds from the review track into the calculator's Residential control.
