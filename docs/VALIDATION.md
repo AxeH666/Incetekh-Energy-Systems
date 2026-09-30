@@ -1,5 +1,24 @@
 # Final polish validation
 
+## Independent language review correction — PR #20
+
+An independent agent reviewed pushed commit `e1c9087` against `00d0095` and
+found one P2 responsive issue: localized navigation stopped wrapping at 1024px,
+so Malayalam overflowed at 1025, 1100 and 1200px; Tamil also overflowed at 1025px.
+The reviewer reproduced it on development and production previews. No other
+blocking findings were reported in routing, value integrity, runtime messages,
+privacy or scope. Additional independent checks covered 80 mobile route/width
+combinations and the Hindi no-JavaScript calculator fallback.
+
+The focused fix extends localized navigation wrapping through 80rem, while
+retaining the existing WhatsApp compacting threshold. Regression coverage now
+includes 1024/1025, 1100 and 1280/1281px in all six languages. The production
+build, Astro/TypeScript check (78 files; zero diagnostics), formatting and all
+**25 affected foundation/language checks passed** after the fix. The prior full
+96-test run remains the broader regression evidence; the five new breakpoint
+cases bring the suite to 101 cases. The pushed correction receives a final
+independent re-review before merge, recorded on the PR.
+
 ## Language selector pre-push self-review — 30 September 2026
 
 Reviewed the complete component diff for routing, translation boundaries,

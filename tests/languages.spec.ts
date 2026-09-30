@@ -159,7 +159,7 @@ test('translated calculators and forms keep numbers, state and privacy behavior'
   }
 });
 
-for (const width of [320, 390, 768, 1440])
+for (const width of [320, 390, 768, 1024, 1025, 1100, 1280, 1281, 1440])
   test(`language layouts and menu fit at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     for (const { code } of languages) {

@@ -74,7 +74,7 @@ const path = sourcePath(Astro.url.pathname);
     gap: 0.5rem;
     flex: none;
   }
-  @media (max-width: 64rem) {
+  @media (max-width: 80rem) {
     :global(html:not([lang='en'])) .header-inner {
       flex-wrap: wrap;
     }
@@ -87,6 +87,8 @@ const path = sourcePath(Astro.url.pathname);
       border-top: 1px solid var(--color-line);
       padding-top: var(--space-2);
     }
+  }
+  @media (max-width: 64rem) {
     .header-inner {
       gap: 0.5rem 1rem;
     }
