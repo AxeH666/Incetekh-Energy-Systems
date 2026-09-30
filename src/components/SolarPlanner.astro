@@ -316,8 +316,8 @@ const money = (value: number) =>
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: end;
-    gap: 2rem;
-    margin-bottom: 2.5rem;
+    gap: var(--layout-gap);
+    margin-bottom: var(--heading-gap);
   }
   .planning-heading .eyebrow {
     margin-bottom: 1rem;
@@ -333,9 +333,9 @@ const money = (value: number) =>
   }
   .calculator-inputs,
   .calculator-result {
-    padding: clamp(1.5rem, 3vw, 3rem);
+    padding: var(--card-padding);
     min-width: 0;
-    border-radius: 1rem;
+    border-radius: var(--radius);
   }
   .calculator-inputs {
     background: #dce5d5;
@@ -439,7 +439,7 @@ const money = (value: number) =>
   }
   .input-help {
     color: var(--color-muted);
-    font-size: 0.75rem;
+    font-size: var(--text-small);
     margin-top: 1rem;
   }
   .calculator-result {
@@ -471,9 +471,8 @@ const money = (value: number) =>
     gap: 0.75rem;
   }
   dl > div {
-    padding: 1rem;
-    background: #172e24;
-    border-radius: 0.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid #698073;
   }
   dt {
     color: #d9e3d6;
@@ -489,7 +488,7 @@ const money = (value: number) =>
     display: block;
   }
   .result-note {
-    font-size: 0.75rem;
+    font-size: var(--text-small);
     color: #d9e3d6;
   }
   .visit-link {
@@ -525,7 +524,7 @@ const money = (value: number) =>
     margin-top: 0.75rem;
   }
   .efficiency-heading {
-    margin: 3.5rem 0 2rem;
+    margin: var(--space-12) 0 var(--heading-gap);
   }
   .efficiency-heading p {
     max-width: 42rem;
@@ -539,7 +538,7 @@ const money = (value: number) =>
   }
   .size-options article {
     border-top: 1px solid #b2bdb0;
-    padding-top: 1.5rem;
+    padding-top: var(--space-6);
     display: flex;
     flex-direction: column;
     align-items: start;
@@ -566,7 +565,7 @@ const money = (value: number) =>
     margin-top: auto;
   }
   .planner-note {
-    font-size: 0.75rem;
+    font-size: var(--text-small);
     color: var(--color-muted);
     margin-top: 1.5rem;
     max-width: 65rem;

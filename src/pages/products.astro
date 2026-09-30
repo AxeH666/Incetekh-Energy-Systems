@@ -107,14 +107,14 @@ import { productGroups } from '../data/products';
   .product-section {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2rem;
-    padding-block: clamp(3rem, 5vw, 5rem);
+    gap: var(--heading-gap);
+    padding-block: var(--section-space);
     border-bottom: 1px solid var(--color-line);
   }
   .category-intro {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 2rem;
+    column-gap: var(--heading-gap);
     align-items: end;
   }
   .category-intro .eyebrow {
@@ -136,9 +136,8 @@ import { productGroups } from '../data/products';
     gap: 1.5rem;
   }
   article {
-    background: #fff;
-    border: 1px solid var(--color-line);
-    padding: clamp(1.25rem, 2vw, 2rem);
+    border-top: 1px solid var(--color-line);
+    padding-block: var(--space-6);
     display: flex;
     flex-direction: column;
     align-items: start;
@@ -163,7 +162,7 @@ import { productGroups } from '../data/products';
     display: flex;
     flex-direction: column;
     align-items: start;
-    gap: 0.5rem;
+    gap: var(--space-3);
   }
   .selection-note {
     margin-top: 1.5rem;
@@ -174,7 +173,7 @@ import { productGroups } from '../data/products';
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
+    gap: var(--heading-gap);
   }
   .selection-help h2 {
     margin-block: 1rem;

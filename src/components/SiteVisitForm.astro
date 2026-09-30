@@ -32,7 +32,10 @@ import WhatsAppLink from './WhatsAppLink.astro';
           </dd>
         </div>
       </dl>
-      <WhatsAppLink label="Talk to an expert" />
+      <WhatsAppLink
+        label="Talk to an expert"
+        message="Hi Incetekh Energy, I would like to arrange a free site visit for rooftop solar. Please let me know what details you need and confirm availability in my area."
+      />
     </div>
     <form
       class="visit-form"
@@ -157,15 +160,16 @@ import WhatsAppLink from './WhatsAppLink.astro';
 <style>
   .site-visit {
     background: #fff;
+    border-top: 1px solid var(--color-line);
   }
   .visit-grid {
     display: grid;
     grid-template-columns: 1fr 1.25fr;
-    gap: clamp(2rem, 6vw, 6rem);
+    gap: var(--layout-gap);
     align-items: start;
   }
   .visit-copy {
-    padding-top: 1rem;
+    padding-top: 0;
   }
   h2 {
     margin: 1rem 0 1.5rem;
@@ -175,7 +179,7 @@ import WhatsAppLink from './WhatsAppLink.astro';
     color: var(--color-muted);
   }
   dl {
-    margin: 2.5rem 0;
+    margin: var(--space-8) 0;
   }
   dl > div {
     padding: 1.25rem 0;
@@ -192,11 +196,11 @@ import WhatsAppLink from './WhatsAppLink.astro';
   }
   .visit-form {
     background: #eef2e8;
-    padding: clamp(1.25rem, 3vw, 3rem);
+    padding: var(--card-padding);
     border: 1px solid #dce3d4;
-    border-radius: 1rem;
+    border-radius: var(--radius);
     display: grid;
-    gap: 1.25rem;
+    gap: var(--space-6);
     min-width: 0;
   }
   .field-row {
@@ -209,7 +213,7 @@ import WhatsAppLink from './WhatsAppLink.astro';
   }
   label {
     display: block;
-    font-size: 0.8125rem;
+    font-size: var(--text-small);
     font-weight: 600;
     margin-bottom: 0.5rem;
   }
@@ -238,7 +242,7 @@ import WhatsAppLink from './WhatsAppLink.astro';
   .field-help,
   .form-note,
   .form-status {
-    font-size: 0.75rem;
+    font-size: var(--text-small);
     color: var(--color-muted);
   }
   .field-help {
@@ -246,14 +250,15 @@ import WhatsAppLink from './WhatsAppLink.astro';
   }
   button {
     width: 100%;
-    font: inherit;
     font-weight: 600;
     justify-content: center;
-    background: #075e54;
+    background: var(--color-green);
     color: #fff;
     cursor: pointer;
-    min-height: 3.5rem;
-    border-radius: 0.5rem;
+    min-height: 3.25rem;
+  }
+  button:hover {
+    background: var(--color-green-hover);
   }
   button:disabled {
     cursor: not-allowed;

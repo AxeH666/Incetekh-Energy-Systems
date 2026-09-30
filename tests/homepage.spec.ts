@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
 
-test('approved homepage journey keeps brands early and reviews before solar planning', async ({
+test('homepage separates brands and products before the project story and solar planning', async ({
   page,
 }) => {
   await page.goto('/');
   const landmarks = [
     '.hero',
     '.manufacturers',
+    '.products-overview',
     '.project-story',
     '#reviews',
     '#solar-planner',
@@ -27,8 +28,27 @@ test('approved homepage journey keeps brands early and reviews before solar plan
   }
   await expect(page.locator('.manufacturers img')).toHaveCount(3);
   await expect(
-    page.locator('.manufacturers').getByRole('link', { name: 'View products' }),
+    page
+      .locator('.products-overview')
+      .getByRole('link', { name: 'View all products' }),
   ).toHaveAttribute('href', '/products/');
+  await expect(page.locator('.manufacturers + .products-overview')).toHaveCount(
+    1,
+  );
+  await expect(page.locator('.product-categories h3')).toHaveText([
+    'Solar panels',
+    'Solar inverters',
+    'Solar water heaters',
+  ]);
+  expect(
+    await page
+      .locator('.product-categories a')
+      .evaluateAll((links) => links.map((link) => link.getAttribute('href'))),
+  ).toEqual([
+    '/products/#panels',
+    '/products/#inverters',
+    '/products/#water-heaters',
+  ]);
 });
 
 test('homepage presents all three free services with details and WhatsApp path', async ({

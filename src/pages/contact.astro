@@ -149,13 +149,14 @@ import WhatsAppLink from '../components/WhatsAppLink.astro';
   .contact-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: clamp(2rem, 6vw, 6rem);
-    padding-bottom: clamp(3rem, 6vw, 6rem);
+    gap: var(--layout-gap);
+    padding-bottom: var(--section-space);
   }
   .call-panel {
     background: var(--color-ink);
     color: var(--color-paper);
-    padding: clamp(1.5rem, 3vw, 3rem);
+    padding: var(--card-padding);
+    border-radius: var(--radius);
     align-self: start;
   }
   .call-panel p {
@@ -213,6 +214,10 @@ import WhatsAppLink from '../components/WhatsAppLink.astro';
   }
   .questions .text-link {
     margin-top: var(--space-6);
+  }
+  #complaints .prose > :global(.button) {
+    display: flex;
+    width: fit-content;
   }
   @media (max-width: 44rem) {
     .contact-grid {

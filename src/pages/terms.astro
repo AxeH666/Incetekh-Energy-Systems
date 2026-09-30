@@ -9,11 +9,12 @@ import { site } from '../data/site';
   description="Terms for using Incetekh Energy's website, planning estimates and enquiry links, with clear boundaries for quotations, bookings and equipment availability."
 >
   <PageIntro
+    reading
     eyebrow="Website information"
     title="Terms & conditions."
     description="How to use the information and enquiry tools on this website. Updated 30 September 2026."
   />
-  <div class="container terms-copy prose">
+  <div class="container reading-container terms-copy prose">
     <h2>Information and estimates</h2>
     <p>
       The website explains our services and product options. Calculator results
@@ -62,8 +63,11 @@ import { site } from '../data/site';
 </SiteLayout>
 <style>
   .terms-copy {
-    max-width: 60rem;
-    padding-bottom: 5rem;
+    max-width: none;
+    padding-bottom: var(--section-space);
+  }
+  h2:first-child {
+    margin-top: 0;
   }
   h2 {
     margin-top: 2.5rem;

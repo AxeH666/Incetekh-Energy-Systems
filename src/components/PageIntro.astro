@@ -3,27 +3,30 @@ interface Props {
   eyebrow: string;
   title: string;
   description: string;
+  reading?: boolean;
 }
-const { eyebrow, title, description } = Astro.props;
+const { eyebrow, title, description, reading = false } = Astro.props;
 ---
 
-<header class="container page-intro">
+<header
+  class:list={['container', 'page-intro', { 'reading-container': reading }]}
+>
   <p class="eyebrow">{eyebrow}</p>
   <h1>{title}</h1>
   <p class="lead">{description}</p>
 </header>
 <style>
   .page-intro {
-    padding-block: clamp(3rem, 6vw, 6rem);
+    padding-block: var(--section-space) var(--heading-gap);
   }
   .eyebrow {
     color: var(--color-accent);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-4);
   }
   h1 {
-    font-size: clamp(2.25rem, 4.5vw, 4.5rem);
-    letter-spacing: -0.06em;
-    line-height: 1.1;
+    font-size: clamp(2.25rem, 4.5vw, 4rem);
+    letter-spacing: -0.045em;
+    line-height: 1.15;
     max-width: 58rem;
   }
   .lead {

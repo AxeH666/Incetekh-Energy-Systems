@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import SiteVisitForm from '../components/SiteVisitForm.astro';
 import Manufacturers from '../components/Manufacturers.astro';
+import ProductOverview from '../components/ProductOverview.astro';
 import Testimonials from '../components/Testimonials.astro';
 import ProjectGallery from '../components/ProjectGallery.astro';
 import SolarPlanner from '../components/SolarPlanner.astro';
@@ -48,6 +49,7 @@ import { metalRoofImage } from '../data/site';
   </section>
 
   <Manufacturers />
+  <ProductOverview />
 
   <section
     class="container project-story section"
@@ -135,8 +137,11 @@ import { metalRoofImage } from '../data/site';
 
 <style>
   .hero-visit {
-    background: #075e54;
-    color: #fff;
+    background: #f5f4ef;
+    color: #172720;
+  }
+  .hero-visit:hover {
+    background: #dfe8d9;
   }
   .hero {
     background: #172720;
@@ -147,8 +152,8 @@ import { metalRoofImage } from '../data/site';
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     width: min(100% - var(--gutter) * 2, var(--content-width));
     margin: auto;
-    gap: clamp(2rem, 4vw, 4rem);
-    padding-block: clamp(2rem, 4vw, 4rem);
+    gap: var(--layout-gap);
+    padding-block: var(--space-12);
   }
   .intro {
     min-width: 0;
@@ -158,7 +163,7 @@ import { metalRoofImage } from '../data/site';
   }
   .intro .eyebrow {
     color: #c9d6c8;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-6);
   }
   h1 {
     font-size: clamp(2.5rem, 3.8vw, 4.25rem);
@@ -169,13 +174,13 @@ import { metalRoofImage } from '../data/site';
     color: #c2d0c1;
   }
   .intro-copy {
-    margin-top: 1.75rem;
+    margin-top: var(--space-6);
     max-width: 28rem;
   }
   .intro-copy p {
     color: #d2dcd3;
     font-size: var(--text-lead);
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-6);
   }
   .hero-link {
     display: flex;
@@ -216,9 +221,9 @@ import { metalRoofImage } from '../data/site';
   .services-intro {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
-    gap: 3rem;
+    gap: var(--layout-gap);
     align-items: end;
-    margin-bottom: 3rem;
+    margin-bottom: var(--heading-gap);
   }
   .services-intro > p {
     max-width: 29rem;
@@ -232,7 +237,7 @@ import { metalRoofImage } from '../data/site';
   .free-service-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2.5rem;
+    gap: var(--space-8);
   }
   .free-service-list > a {
     display: flex;
@@ -277,12 +282,12 @@ import { metalRoofImage } from '../data/site';
   .project-story {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
-    gap: clamp(2rem, 7vw, 7rem);
+    gap: var(--layout-gap);
     align-items: center;
   }
   .project-story img {
     width: 100%;
-    aspect-ratio: 1.15;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
   }
   .project-story figcaption {
@@ -291,7 +296,7 @@ import { metalRoofImage } from '../data/site';
     color: var(--color-muted);
   }
   .project-story-copy > p:not(.eyebrow) {
-    margin-top: 1.5rem;
+    margin-top: var(--space-4);
     max-width: 28rem;
     color: var(--color-muted);
   }
@@ -310,6 +315,7 @@ import { metalRoofImage } from '../data/site';
   @media (max-width: 56rem) {
     .hero-inner {
       grid-template-columns: 1fr;
+      padding-block: var(--space-8);
     }
     .services-intro,
     .project-story {

@@ -149,11 +149,11 @@ import SiteCTA from '../components/SiteCTA.astro';
   .service-navigation {
     display: flex;
     flex-wrap: wrap;
-    column-gap: 2rem;
-    padding-bottom: 2rem;
+    gap: var(--space-2) var(--space-8);
+    padding-bottom: var(--heading-gap);
   }
   .service-detail {
-    padding-block: clamp(2.5rem, 5vw, 5rem);
+    padding-block: var(--section-space);
     border-top: 1px solid var(--color-line);
   }
   .epc-list {

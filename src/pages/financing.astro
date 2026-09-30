@@ -10,11 +10,12 @@ import { solarSources } from '../data/solar';
   description="Understand rooftop solar loans, compare borrowing costs and learn how commercial solar depreciation differs from a household subsidy."
 >
   <PageIntro
+    reading
     eyebrow="Plan the investment"
     title="A clearer route to solar finance."
     description="Start with the installation quote. Then compare your own funds, eligible household subsidy and the total cost of borrowing."
   />
-  <div class="container finance-copy">
+  <div class="container reading-container finance-copy">
     <section class="prose">
       <h2>Residential rooftop loans.</h2>
       <p>
@@ -101,11 +102,10 @@ import { solarSources } from '../data/solar';
 </SiteLayout>
 <style>
   .finance-copy {
-    max-width: 60rem;
-    padding-bottom: 5rem;
+    padding-bottom: var(--section-space);
   }
   section {
-    padding-block: 2.5rem;
+    padding-block: var(--space-8);
     border-top: 1px solid var(--color-line);
   }
   h2 {

@@ -1,5 +1,75 @@
 # Final polish validation
 
+## Final pre-PR review — 30 September 2026
+
+The complete spacing, separate brands/products sections, city guides and
+contextual WhatsApp draft change passed `npm run lint`, `npm run check`
+(70 files; zero diagnostics), `npm run build` and all **88 browser/output tests**
+in 1.7 minutes. Tests used the existing production preview and the documented
+ignored config override. Desktop/mobile visual checks include the final logo
+sizes and Serving Andhra Pradesh footer.
+
+Self-review covered the complete diff, static routing, explicit enquiry behavior,
+encoded drafts, accessibility/responsive coverage, SEO, unchanged calculation
+logic and business-claim boundaries. Corrected the directly affected launch
+checklist's sitemap count to 23. No blocking findings remain from self-review.
+Independent review is required before merge; no deployment is included.
+
+## Founder correction: separate products and remove decorative boxes
+
+30 September 2026: the homepage now places a dedicated Products we install
+section immediately after the brand strip. Product catalogue links and all three
+category destinations are checked. City links use balanced plain-text rows;
+product listings, system-size options, city subsidy figures and calculator
+results use open spacing and fine separators instead of decorative boxes.
+
+Lint, Astro/TypeScript and the production build passed. All **38 affected browser
+checks passed**, covering homepage order, category links, local destinations,
+responsive pages, accessibility and calculator behavior. After balancing the
+footer's city rows, **6 city/layout checks passed** at 320/390/768/1440px. Visually
+reviewed the brands/products transition, footer, catalogue, city products and
+calculator at desktop/mobile widths. Evidence: `.astro/visual-polish/minimal-*`.
+Existing local production preview on port 4322 was reused; no deployment.
+
+## Site spacing, buttons and 13 city guides — 30 September 2026
+
+See [SPACING-CITIES.md](SPACING-CITIES.md) for scope, research and implementation.
+
+- `npm run lint`: passed. `npm run check`: 0 errors, warnings or hints.
+- `npm run build`: passed; 24 pages (including 13 new city pages and the error
+  page), plus existing redirect and machine-readable routes. No dependencies or
+  client scripts added.
+- Complete browser/output suite: **86 passed** using installed Chrome. After
+  the reading-column refinement, **33 affected checks passed**; after the final
+  mobile-footer and privacy-action spacing fix, **10 affected checks passed**.
+- New checks follow every footer city link, verify all 13 unique titles,
+  descriptions and canonicals, check product fragments and internal actions,
+  check explicit city-specific WhatsApp messages without opening/sending them,
+  and exercise keyboard/no-JavaScript navigation.
+- Layout checks cover every page type at 320, 390, 768 and 1440px, including long
+  city and button labels. Existing suite also checks the homepage at 1920px,
+  reduced motion, forced colors, text scaling, slideshow/swipes, review motion,
+  calculator results, links, form privacy and accessibility. New city templates
+  pass WCAG-tagged axe scans on all four widths.
+- Visually reviewed desktop/mobile captures and detailed hero, calculator,
+  capacity-card, form, footer and contact-link screenshots. Local QA evidence is
+  in `.astro/visual-polish/`. Visual review does not establish full accessibility
+  conformance or physical handset testing.
+- Isolated indexing-enabled build in `.astro/launch-polish/`: verified 23 unique
+  public sitemap URLs, all 13 city canonicals and indexing directives, no error
+  route in the sitemap, a matching robots sitemap declaration, and no city-page
+  module scripts. Normal `dist/` and the local preview retain `noindex`.
+- `git diff --check`: passed. Self-review covered scope, preserved business
+  claims, shared styles, static routing, links and output behavior.
+
+The normal test command could not start a second Astro preview because an
+existing preview owned the workspace lock. That preview was preserved and
+verified to serve the new production output at `http://127.0.0.1:4322`. Tests used
+an ignored `.astro/polish.playwright.config.ts` override with the same suite and
+no server-start step. This is local verification, not deployment or independent
+PR approval. No DNS, email, live indexing, analytics or external messaging action
+was performed. The existing homepage form remains unconnected as documented.
+
 ## Final hero touch-ups
 
 Validated on 2026-09-30 with Node 22.23.3 and installed Chrome. All **64 default
