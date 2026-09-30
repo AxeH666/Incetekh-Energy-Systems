@@ -1,3 +1,5 @@
+import { t } from '../i18n/text';
+
 const gallery = document.querySelector<HTMLElement>('.project-gallery');
 if (gallery) {
   const track = gallery.querySelector<HTMLElement>('.gallery-track')!;
@@ -24,7 +26,10 @@ if (gallery) {
     clearTimeout(timer);
     toggle.hidden = reduced;
     toggle.dataset.paused = String(paused);
-    toggle.setAttribute('aria-label', `${paused ? 'Resume' : 'Pause'} gallery`);
+    toggle.setAttribute(
+      'aria-label',
+      t(`${paused ? 'Resume' : 'Pause'} gallery`),
+    );
     if (!paused && !reduced && visible && !document.hidden) {
       timer = setTimeout(() => {
         show(active + 1);

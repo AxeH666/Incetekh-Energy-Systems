@@ -1,5 +1,89 @@
 # Final polish validation
 
+## Independent language review correction — PR #20
+
+An independent agent reviewed pushed commit `e1c9087` against `00d0095` and
+found one P2 responsive issue: localized navigation stopped wrapping at 1024px,
+so Malayalam overflowed at 1025, 1100 and 1200px; Tamil also overflowed at 1025px.
+The reviewer reproduced it on development and production previews. No other
+blocking findings were reported in routing, value integrity, runtime messages,
+privacy or scope. Additional independent checks covered 80 mobile route/width
+combinations and the Hindi no-JavaScript calculator fallback.
+
+The focused fix extends localized navigation wrapping through 80rem, while
+retaining the existing WhatsApp compacting threshold. Regression coverage now
+includes 1024/1025, 1100 and 1280/1281px in all six languages. The production
+build, Astro/TypeScript check (78 files; zero diagnostics), formatting and all
+**25 affected foundation/language checks passed** after the fix. The prior full
+96-test run remains the broader regression evidence; the five new breakpoint
+cases bring the suite to 101 cases. The pushed correction receives a final
+independent re-review before merge, recorded on the PR.
+
+## Language selector pre-push self-review — 30 September 2026
+
+Reviewed the complete component diff for routing, translation boundaries,
+placeholder preservation, WhatsApp recipients/drafts, accessible controls,
+responsive behavior, privacy, dependencies and scope. No blocking findings
+remain from self-review. Regional editorial approval remains a public-launch
+requirement, as documented in LANGUAGES.md.
+
+`npm run lint`, `npm run check` (78 files; zero diagnostics), `npm run build`
+(144 static pages) and the complete **96-test browser/output suite passed**
+on Node 22.23.3 with installed Chrome. The full suite took 2.1 minutes and used
+the standard Playwright configuration with `PLAYWRIGHT_CHANNEL=chrome` and
+`PLAYWRIGHT_PORT=4322`. An earlier attempt using the old preview override could
+not connect because that server had stopped; verification was restarted with
+a Playwright-managed preview. The existing development server was preserved.
+
+The independent review follows the push and is recorded on the PR. No deployment
+is included in this release workflow.
+
+## Built-in languages — 30 September 2026
+
+See [LANGUAGES.md](LANGUAGES.md) for implementation and copy-review limits.
+
+- Final production build: **144 static pages**. Astro/TypeScript: **78 files,
+  zero errors, warnings or hints**. Final validation used pinned Node 22.23.3
+  and installed Chrome; the earlier prototype used the machine's Node 22.14.
+- The 96-test full run passed 94 checks. The remaining checks concerned the
+  newly split asset budget and an axe scan of navigation obscured by the open
+  dropdown. The asset budget now separates shared assets (under 2.1 MB), local
+  JS (under 10 KB) and individual HTML pages (under 400 KB). The open menu and
+  unobscured page are audited separately, with no accessibility rules disabled.
+  After those corrections and the error-route fix, **all 24 affected foundation,
+  language and SEO tests passed**. All 96 suite cases have passing coverage
+  across the full run and final focused rerun.
+- All 115 translated public routes return content with localized language,
+  metadata and navigation. City names, numerical placeholders and subsidy
+  values are checked. Contextual WhatsApp drafts use the selected language
+  and original recipient; no message was sent.
+- Language switching preserves page and fragment; native links work without
+  JavaScript. Keyboard opening, Escape/focus return, outside closing and
+  reselecting the current language passed. Calculator results and form behavior
+  passed in all five added languages, with no external requests or browser
+  storage. The form remains unconnected.
+- Six-language home/product/city layouts fit at 320, 390, 768 and 1440px.
+  Axe checks pass for the open language menu and normal page at 390px.
+  Desktop/mobile screenshots were inspected, including regional typography,
+  calculator, form, city page and catalogue. Evidence: `.astro/visual-languages/`.
+- An isolated indexing-enabled build verified **138 unique public sitemap
+  URLs**, canonical URLs and reciprocal alternates, with six noindex error
+  pages excluded from canonicals/alternates. The normal preview remains noindex
+  with an empty sitemap. Local emitted JavaScript totals **7,307 bytes**.
+
+Self-review corrected same-language menu closing, mobile heading wrapping,
+navigation translations, numeric-placeholder mistakes and Astro's `/404/`
+versus emitted `/404.html` mapping. Missing phrases or broken placeholders fail
+the build. Full catalogues are not sent to visitors. `parse5` is a build-only
+development dependency; there is no translation API or visitor-side service.
+
+Regional copy is machine-translated with detected errors corrected, **not
+native-speaker editorially approved**. That review remains a launch requirement.
+No physical-device, Safari/Firefox or complete WCAG-conformance claim is made.
+The existing preview on port 4322 was reused via the ignored Playwright override.
+This is local implementation evidence, not deployment approval. The language
+selector PR records the independent review and final merge disposition.
+
 ## Final pre-PR review — 30 September 2026
 
 The complete spacing, separate brands/products sections, city guides and

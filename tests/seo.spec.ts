@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { cities, cityPath } from '../src/data/cities';
+import { languages, localPath } from '../src/i18n/languages';
 
 const routes = [
   '/',
@@ -60,9 +61,11 @@ test('every public page has unique metadata, working local resources and safe co
     await expect(
       page.locator('meta[http-equiv="content-security-policy"]'),
     ).toHaveAttribute('content', /object-src 'none'/);
-    await expect(page.locator('script[src]')).toHaveCount(token ? 1 : 0);
+    await expect(
+      page.locator('script[src]:not([src^="/_astro/"])'),
+    ).toHaveCount(token ? 1 : 0);
     await expect(page.locator('script[type="module"]')).toHaveCount(
-      path === '/' ? 3 : 0,
+      path === '/' ? 4 : 1,
     );
     if (token)
       await expect(page.locator('script[data-cf-beacon]')).toHaveAttribute(
@@ -99,9 +102,13 @@ test('sitemap and robots agree with indexing mode and exclude error pages', asyn
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
   expect(urls).toEqual(
     launch
-      ? [...routes, ...cities.map((city) => cityPath(city.slug))].map(
-          (path) => `https://incetekhenergy.com${path}`,
-        )
+      ? languages
+          .flatMap(({ code }) =>
+            [...routes, ...cities.map((city) => cityPath(city.slug))].map(
+              (path) => localPath(path, code),
+            ),
+          )
+          .map((path) => `https://incetekhenergy.com${path}`)
       : [],
   );
   const robots = await (await request.get('/robots.txt')).text();
@@ -141,7 +148,12 @@ test('organization schema uses confirmed identity and never sample reviews', asy
     'content',
     'noindex, follow',
   );
-  await expect(page.locator('link[rel="canonical"], script')).toHaveCount(0);
+  await expect(
+    page.locator(
+      'link[rel="canonical"], script[type="application/ld+json"], script[src]',
+    ),
+  ).toHaveCount(0);
+  await expect(page.locator('script[type="module"]')).toHaveCount(1);
 });
 
 test('deployment header file sets bounded security and hashed-asset caching', async () => {

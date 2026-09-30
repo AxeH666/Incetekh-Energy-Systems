@@ -1,3 +1,5 @@
+import { t } from '../i18n/text';
+
 for (const section of document.querySelectorAll<HTMLElement>(
   '[data-floating-strip]',
 )) {
@@ -61,7 +63,7 @@ for (const section of document.querySelectorAll<HTMLElement>(
     const updateLabel = () => {
       toggle.setAttribute(
         'aria-label',
-        `${paused ? 'Resume' : 'Pause'} scrolling`,
+        t(`${paused ? 'Resume' : 'Pause'} scrolling`),
       );
       toggle.dataset.paused = String(paused);
     };

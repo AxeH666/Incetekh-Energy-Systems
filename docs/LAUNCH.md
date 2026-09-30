@@ -32,6 +32,9 @@ Do not enable automatic analytics injection alongside the manual token option.
 
 ## Before the approved launch
 
+Complete native-speaker editorial review of the machine-translated regional copy,
+especially subsidy, finance and legal terms. See [LANGUAGES.md](LANGUAGES.md).
+
 The homepage site-visit form is deliberately unconnected at the founder's request. Before offering online booking publicly, connect and verify the chosen email or WhatsApp delivery path, update its availability/privacy copy, and confirm a real request arrives. The current form validates locally and explicitly says nothing was sent. See [SOLAR-PLANNING.md](SOLAR-PLANNING.md).
 
 1. Confirm hosting account ownership, registrar/DNS access and deployment approval.
@@ -58,7 +61,7 @@ The homepage site-visit form is deliberately unconnected at the founder's reques
 - Load every route from the domain on desktop and a phone; check photos, font,
   header, footer, focus indicators and all call links. Arrange a real test call
   with the owner; automated tests did not place a call.
-- Verify HTTPS, canonical redirects, title/social tags, 23 sitemap URLs (including all 13 city guides) and the legacy `/reviews/` redirect to `/#reviews`,
+- Verify HTTPS, canonical redirects, title/social tags, 138 sitemap URLs (23 pages in six languages, including all 13 city guides) and the legacy `/reviews/` redirect to `/#reviews`,
   robots sitemap declaration and `index, follow` on content pages.
 - Request a nonexistent path: it must return HTTP 404 with the custom error
   page and noindex, not HTTP 200 or the homepage. Disable any SPA fallback.

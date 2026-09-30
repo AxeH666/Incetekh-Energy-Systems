@@ -2,6 +2,9 @@
 import Wordmark from './Wordmark.astro';
 import WhatsAppLink from './WhatsAppLink.astro';
 import { navigation } from '../data/site';
+import LanguageMenu from './LanguageMenu.astro';
+import { languages, localPath, sourcePath } from '../i18n/languages';
+const path = sourcePath(Astro.url.pathname);
 ---
 
 <header class="site-header">
@@ -11,13 +14,22 @@ import { navigation } from '../data/site';
       {navigation.map((link) => (
         <a
           href={link.href}
-          aria-current={Astro.url.pathname === link.href ? 'page' : undefined}
+          aria-current={path === link.href ? 'page' : undefined}
         >
           {link.label}
         </a>
       ))}
     </nav>
-    <WhatsAppLink label="WhatsApp" />
+    <div class="header-actions">
+      <WhatsAppLink label="WhatsApp" />
+      <LanguageMenu
+        current="en"
+        options={languages.map((language) => ({
+          ...language,
+          href: localPath(path, language.code),
+        }))}
+      />
+    </div>
   </div>
 </header>
 
@@ -56,6 +68,47 @@ import { navigation } from '../data/site';
   nav a:hover {
     text-decoration: underline;
   }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: none;
+  }
+  @media (max-width: 80rem) {
+    :global(html:not([lang='en'])) .header-inner {
+      flex-wrap: wrap;
+    }
+    :global(html:not([lang='en'])) nav {
+      order: 3;
+      width: 100%;
+      margin-left: 0;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--color-line);
+      padding-top: var(--space-2);
+    }
+  }
+  @media (max-width: 64rem) {
+    .header-inner {
+      gap: 0.5rem 1rem;
+    }
+    nav {
+      gap: 0.5rem;
+    }
+    .header-actions :global(.whatsapp-link) {
+      width: 3rem;
+      padding-inline: 0;
+    }
+    .header-actions :global(.whatsapp-link > span) {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
   @media (max-width: 44rem) {
     .header-inner {
       min-height: 0;
@@ -75,6 +128,14 @@ import { navigation } from '../data/site';
     nav a {
       font-size: 0.8125rem;
       padding-inline: 0;
+    }
+  }
+  @media (max-width: 36rem) {
+    .header-inner {
+      column-gap: 0.5rem;
+    }
+    .header-actions {
+      gap: 0.25rem;
     }
   }
 </style>

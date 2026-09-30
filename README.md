@@ -79,6 +79,7 @@ Earlier homepage/WhatsApp design: [HOMEPAGE-REFRESH.md](docs/HOMEPAGE-REFRESH.md
 
 - [Pre-deployment polish and research](docs/POLISH.md)
 - [Design rules](docs/DESIGN.md)
+- [Built-in languages and translation maintenance](docs/LANGUAGES.md)
 - [Asset and claims register](docs/ASSETS.md)
 - [Review replacement instructions](docs/TESTIMONIALS.md)
 - [Validation and limits](docs/VALIDATION.md)

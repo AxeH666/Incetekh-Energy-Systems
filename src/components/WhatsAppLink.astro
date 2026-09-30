@@ -1,6 +1,8 @@
 ---
 import { site } from '../data/site';
 import { cities, cityPath } from '../data/cities';
+import { sourcePath } from '../i18n/languages';
+const path = sourcePath(Astro.url.pathname);
 interface Props {
   label?: string;
   message?: string;
@@ -27,10 +29,10 @@ const pageMessages: Record<string, string> = {
   '/terms/':
     'Hi Incetekh Energy, I have a question about your terms, written proposals and warranty conditions.',
 };
-const city = cities.find((item) => cityPath(item.slug) === Astro.url.pathname);
+const city = cities.find((item) => cityPath(item.slug) === path);
 const defaultMessage = city
   ? `Hi Incetekh Energy, I am interested in rooftop solar in ${city.name}. Please share suitable system options and confirm free site-visit availability. My locality / pincode is: `
-  : (pageMessages[Astro.url.pathname] ??
+  : (pageMessages[path] ??
     'Hi Incetekh Energy, I would like to discuss solar for my property. Please help me get started.');
 const href = `${site.whatsapp}?text=${encodeURIComponent(message?.trim() ? message : defaultMessage)}`;
 ---

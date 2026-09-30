@@ -3,6 +3,8 @@ import Wordmark from './Wordmark.astro';
 import WhatsAppLink from './WhatsAppLink.astro';
 import { site } from '../data/site';
 import { cities, cityPath } from '../data/cities';
+import { sourcePath } from '../i18n/languages';
+const path = sourcePath(Astro.url.pathname);
 ---
 
 <footer class="site-footer" id="contact" tabindex="-1">
@@ -34,13 +36,13 @@ import { cities, cityPath } from '../data/cities';
         <a href="/solar-guide/#faq">Solar FAQs</a>
         <a
           href="/terms/"
-          aria-current={Astro.url.pathname === '/terms/' ? 'page' : undefined}
+          aria-current={path === '/terms/' ? 'page' : undefined}
         >
           Terms &amp; conditions
         </a>
         <a
           href="/privacy/"
-          aria-current={Astro.url.pathname === '/privacy/' ? 'page' : undefined}
+          aria-current={path === '/privacy/' ? 'page' : undefined}
         >
           Privacy policy
         </a>
@@ -76,9 +78,7 @@ import { cities, cityPath } from '../data/cities';
           <>
             <a
               href={cityPath(city.slug)}
-              aria-current={
-                Astro.url.pathname === cityPath(city.slug) ? 'page' : undefined
-              }
+              aria-current={path === cityPath(city.slug) ? 'page' : undefined}
             >
               {city.name}
             </a>{' '}
