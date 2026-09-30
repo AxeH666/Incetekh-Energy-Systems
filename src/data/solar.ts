@@ -14,6 +14,35 @@ export const billSlider = {
   tariff: 8,
 };
 
+// Disclosed comparison scenario, not an installation quote or tariff model.
+export function financialEstimate(kw: number, units: number, subsidy: number) {
+  const cost = kw * 70_000;
+  const monthlySavings = Math.min(units * 0.9, kw * 120) * 8;
+  const savings25 = Array.from(
+    { length: 25 },
+    (_, year) => Math.min(units * 0.9, kw * 120 * 0.995 ** year) * 8 * 12,
+  ).reduce((total, value) => total + value, 0);
+  return {
+    cost,
+    monthlySavings,
+    payback: (cost - subsidy) / (monthlySavings * 12),
+    savings25,
+  };
+}
+
+export function usageProfile(kw: number, residential: boolean) {
+  if (!residential)
+    return kw <= 3
+      ? 'Shop / clinic / small office'
+      : kw <= 10
+        ? 'Office / retail / daytime business use'
+        : 'Larger commercial premises';
+  if (kw < 3) return 'Small home · fans, lights & everyday essentials';
+  if (kw < 5) return 'Family home · 2 ACs + 2 fans';
+  if (kw < 7) return 'Larger home · 3 ACs + 3 fans';
+  return 'High-use home · 4 ACs + 5 fans';
+}
+
 export function centralSubsidy(kw: number, residential: boolean): number {
   if (!residential || !Number.isFinite(kw) || kw <= 0) return 0;
   return Math.round(
@@ -53,4 +82,6 @@ export const solarSources = {
   subsidy: 'https://solar.delhi.gov.in/page/central-subsidy',
   portal: 'https://pmsuryaghar.gov.in/',
   faq: 'https://online.ndmc.gov.in/solar/FAQs.aspx',
+  loan: 'https://indianbank.bank.in/en/pm-surya-ghar-muft-bijli-yojana-roof-top-solar-loan-scheme',
+  tax: 'https://www.incometaxindia.gov.in/documents/20117/42998/Appendix-I_2026-05-05_02-00-13_4242fc_en.pdf/28d049ac-bf1e-a110-a258-deff0f8cc6f8?t=1779517231846&version=1.0',
 };

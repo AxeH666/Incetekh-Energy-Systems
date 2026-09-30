@@ -1,0 +1,292 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import WhatsAppLink from '../components/WhatsAppLink.astro';
+import { solarSources } from '../data/solar';
+---
+
+<SiteLayout
+  title="Residential Solar & PM Surya Ghar Guide | Incetekh Energy"
+  description="Plan a rooftop solar installation in Andhra Pradesh: household subsidy, roof requirements, power-cut backup, panel care and practical answers."
+>
+  <PageIntro
+    eyebrow="Make an informed choice"
+    title="Solar, clearly explained."
+    description="From your first electricity bill to caring for an installed system. Practical guidance for your home or business."
+  />
+  <div class="container guide">
+    <nav aria-label="In this guide">
+      <a class="text-link" href="#residential">
+        Residential solar
+      </a>
+      <a class="text-link" href="#subsidy">
+        Subsidy
+      </a>
+      <a class="text-link" href="#maintenance">
+        Maintenance
+      </a>
+      <a class="text-link" href="#faq">
+        Questions
+      </a>
+    </nav>
+    <section id="residential" class="prose">
+      <h2>Start with your home.</h2>
+      <p>
+        Bring your last 12 months of electricity use, your site location and a
+        roof photograph if available. A site visit checks usable space, shade,
+        roof condition, access and the electrical connection before choosing
+        capacity.
+      </p>
+      <p>
+        Panels generate electricity; an inverter converts it for use in the
+        building. A grid-connected system works alongside your electricity
+        supply. Batteries and backup-capable equipment are a separate design
+        choice.
+      </p>
+      <ol>
+        <li>Estimate your size from your average monthly bill.</li>
+        <li>Arrange a free site visit and review the proposed layout.</li>
+        <li>
+          Confirm equipment, approvals, written pricing and warranty terms
+          before ordering.
+        </li>
+        <li>
+          Keep commissioning records, warranties and a baseline generation
+          report for future checks.
+        </li>
+      </ol>
+      <a class="text-link" href="/#solar-planner">
+        Find your solar size
+      </a>
+      <a class="text-link" href="/#site-visit">
+        Arrange a free site visit
+      </a>
+    </section>
+    <section id="subsidy" class="prose">
+      <h2>PM Surya Ghar: household support.</h2>
+      <p>
+        The programme remains active in official government updates checked on
+        30 September 2026. For a new eligible household rooftop installation in
+        Andhra Pradesh, standard central assistance is:
+      </p>
+      <dl>
+        <div>
+          <dt>1 kW</dt>
+          <dd>Up to ₹30,000</dd>
+        </div>
+        <div>
+          <dt>2 kW</dt>
+          <dd>Up to ₹60,000</dd>
+        </div>
+        <div>
+          <dt>3 kW or more</dt>
+          <dd>Up to ₹78,000</dd>
+        </div>
+      </dl>
+      <p>
+        Rates are ₹30,000 per kW for the first 2 kW and ₹18,000 for the next kW.
+        The cap does not increase for larger individual household systems.
+        Commercial connections and solar water heaters do not qualify for this
+        household PV subsidy; state top-ups are not included here.
+      </p>
+      <ol>
+        <li>
+          Register on the National Portal with your electricity connection
+          details.
+        </li>
+        <li>
+          Follow your DISCOM's current application and approval process before
+          installation.
+        </li>
+        <li>
+          Choose a registered vendor and equipment meeting the scheme's
+          domestic-content requirements.
+        </li>
+        <li>
+          Complete inspection, commissioning and the portal's bank/subsidy
+          steps.
+        </li>
+      </ol>
+      <p>
+        Approval and payment are conditional, not an automatic discount.
+        Existing installations, extensions and previously claimed assistance
+        need an individual eligibility check.
+      </p>
+      <a class="text-link" href={solarSources.portal}>
+        Open the official application portal
+      </a>
+      <a class="text-link" href={solarSources.subsidy}>
+        Check central rates
+      </a>
+      <a class="text-link" href={solarSources.status}>
+        Read the government update
+      </a>
+    </section>
+    <section id="maintenance" class="prose">
+      <h2>Keep your system performing.</h2>
+      <p>
+        Compare generation over similar weather periods and watch for inverter
+        alerts. A sudden sustained drop, new shading or visible damage is a
+        reason to request a check.
+      </p>
+      <ul>
+        <li>
+          Follow the module maker's cleaning instructions. Avoid abrasive
+          chemicals and pressure washing.
+        </li>
+        <li>
+          Use trained help for roof access, cleaning near wiring and electrical
+          inspections. Do not walk on panels or open electrical equipment.
+        </li>
+        <li>
+          Keep drainage and access paths clear. Check for new tree growth or
+          construction that creates shade.
+        </li>
+        <li>
+          Keep generation records and your equipment warranty documents
+          together.
+        </li>
+      </ul>
+      <p>
+        Incetekh offers free system performance checks and free annual yield
+        audits. Contact us to discuss your installation and arrange a visit.
+      </p>
+      <WhatsAppLink
+        label="Request a performance check"
+        message="Hi Incetekh, I would like to arrange a free system performance check."
+      />
+    </section>
+    <section id="faq" class="prose">
+      <h2>Before you decide.</h2>
+      <details>
+        <summary>Can solar run two ACs and fans?</summary>
+        <p>
+          It can offset the energy they use, but appliance counts alone do not
+          size a system. Wattage, hours of use, other loads and available
+          sunlight matter. Our 3 kW family-home illustration allows limited
+          daytime AC use; it does not promise continuous operation or power-cut
+          backup.
+        </p>
+      </details>
+      <details>
+        <summary>Does on-grid solar work during a power cut?</summary>
+        <p>
+          A standard grid-tied inverter shuts down when the grid fails. Backup
+          requires a compatible system designed for islanded operation, often
+          with a battery. Ask for the supported backup loads in writing.
+        </p>
+      </details>
+      <details>
+        <summary>How much roof space is needed?</summary>
+        <p>
+          For early planning, allow about 10 m² (108 sq ft) of clear roof per
+          kW. Access, shading, tilt and the final layout can change that
+          allowance. A 3 kW example needs about 30 m² (323 sq ft).
+        </p>
+        <a class="text-link" href={solarSources.faq}>
+          Utility rooftop guidance
+        </a>
+      </details>
+      <details>
+        <summary>Will my electricity bill become zero?</summary>
+        <p>
+          Not necessarily. Fixed and demand charges, consumption outside solar
+          hours, export settlement and your actual tariff affect the bill. Our
+          calculator uses disclosed assumptions rather than promising a zero
+          bill.
+        </p>
+      </details>
+      <details>
+        <summary>What happens to extra generation?</summary>
+        <p>
+          Grid export requires the approved metering arrangement. Your DISCOM's
+          rules determine how exports are credited or settled. Confirm these
+          terms and the permitted system capacity before ordering.
+        </p>
+      </details>
+      <details>
+        <summary>Can I finance the installation?</summary>
+        <p>
+          Some banks offer residential rooftop solar loans, subject to their
+          lending rules. Compare the loan's total cost with the written
+          installation quote and your expected savings.
+        </p>
+        <a class="text-link" href="/financing/">
+          Explore solar financing
+        </a>
+      </details>
+      <details>
+        <summary>Which products and warranties apply?</summary>
+        <p>
+          Panel, inverter and water-heater options are listed in our catalogue.
+          Stock, suitability and manufacturer warranties depend on the selected
+          model. Incetekh's 5-year warranty is subject to the written proposal
+          and applicable terms.
+        </p>
+        <a class="text-link" href="/products/">
+          Products we install
+        </a>
+      </details>
+    </section>
+  </div>
+</SiteLayout>
+<style>
+  .guide {
+    max-width: 64rem;
+    padding-bottom: 5rem;
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    padding-bottom: 2rem;
+  }
+  section {
+    border-top: 1px solid var(--color-line);
+    padding-block: 3rem;
+    scroll-margin-top: 7rem;
+  }
+  h2 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    letter-spacing: -0.04em;
+  }
+  li {
+    margin-block: 0.75rem;
+  }
+  ul,
+  ol {
+    padding-left: 1.25rem;
+  }
+  .text-link {
+    margin-right: 1.5rem;
+  }
+  dl {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #e8ede3;
+    margin-block: 1.5rem;
+  }
+  dd {
+    margin: 0.5rem 0 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  summary {
+    cursor: pointer;
+    padding: 1.25rem 0;
+    font-weight: 600;
+  }
+  details {
+    border-bottom: 1px solid var(--color-line);
+  }
+  details p {
+    padding-bottom: 1rem;
+  }
+  @media (max-width: 36rem) {
+    dl {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

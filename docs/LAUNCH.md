@@ -75,7 +75,7 @@ The homepage site-visit form is deliberately unconnected at the founder's reques
 
 ## Local visibility follow-up
 
-Business address, service area, opening hours, legal identifiers, social profiles
+The Proddatur office address and support@incetekh.com were supplied by the founder on 30 September 2026 and are displayed. Verify mailbox delivery before launch. Service area, pincode, opening hours, legal identifiers, social profiles
 and verified credentials remain unknown. Obtain them before creating/updating a
 Google Business Profile, adding a map or publishing LocalBusiness details. Keep
 name/phone consistent across the website and verified listings. No profiles were

@@ -61,7 +61,9 @@ remove it before public deployment; see [TESTIMONIALS.md](TESTIMONIALS.md).
 No capacities, project dates, locations, customer identities, government/PSU
 relationships, certifications, strategic partnerships, exclusive dealership/empanelment claims,
 performance statistics beyond the confirmed project count, savings or technical outcomes have adequate evidence for
-publication. No business address, service area, opening hours or email was given.
+publication as historical results. Calculator savings are separately labelled modelling illustrations, not installation evidence.
+
+On 30 September 2026 the founder supplied INCETEKH ENERGY SOLUTIONS, 7/1195-5, Block No.7, Shop No.2, Siva Shankar Shopping Mall, Korrapadu Road, Proddatur, Y.S.R. Kadapa District, Andhra Pradesh; and support@incetekh.com. These appear on the website. No pincode, statewide service coverage or opening hours was confirmed. Mailbox delivery is unverified.
 Generated/uncertain images are not presented as project proof. Coordinates and
 addresses visible in originals are not used to infer those business details.
 

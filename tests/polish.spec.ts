@@ -8,6 +8,9 @@ const routes = [
   '/products/',
   '/projects/',
   '/contact/',
+  '/solar-guide/',
+  '/financing/',
+  '/terms/',
   '/privacy/',
   '/404.html',
 ];
@@ -68,7 +71,7 @@ test('every visible action resolves, including service fragments and branded res
     }
     await expect(
       page.locator(
-        'button:not([data-strip-toggle]):not(.gallery-dot):not(.gallery-toggle):not([type="submit"]), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"], a[href^="mailto:"]',
+        'button:not([data-strip-toggle]):not(.gallery-dot):not(.gallery-toggle):not([type="submit"]), a:not([href]), a[href=""], a[href="#"], a[href^="javascript:"]',
       ),
     ).toHaveCount(0);
     const links = await page
@@ -80,6 +83,10 @@ test('every visible action resolves, including service fragments and branded res
         continue;
       }
       if (href.startsWith('https://wa.me/')) {
+        expect(isAllowedExternal(href)).toBe(true);
+        continue;
+      }
+      if (href.startsWith('mailto:')) {
         expect(isAllowedExternal(href)).toBe(true);
         continue;
       }

@@ -1,0 +1,75 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import { site } from '../data/site';
+---
+
+<SiteLayout
+  title="Website Terms & Conditions | Incetekh Energy"
+  description="Terms for using Incetekh Energy's website, planning estimates and enquiry links, with clear boundaries for quotations, bookings and equipment availability."
+>
+  <PageIntro
+    eyebrow="Website information"
+    title="Terms & conditions."
+    description="How to use the information and enquiry tools on this website. Updated 30 September 2026."
+  />
+  <div class="container terms-copy prose">
+    <h2>Information and estimates</h2>
+    <p>
+      The website explains our services and product options. Calculator results
+      are illustrations using the assumptions shown beside them. They are not a
+      site-specific design, installation quote, financial recommendation or
+      guarantee of generation, savings, subsidy or tax treatment.
+    </p>
+    <h2>Enquiries and bookings</h2>
+    <p>
+      Opening a phone, email or WhatsApp link does not send a message or confirm
+      a visit. Please complete the action in your chosen app. The homepage visit
+      form is not connected to a delivery service yet and does not send or save
+      a booking. Confirm visit arrangements directly with Incetekh.
+    </p>
+    <h2>Equipment and project terms</h2>
+    <p>
+      Product availability, system design, installation scope, prices, payment
+      schedules and timelines must be agreed in a written proposal. Manufacturer
+      warranties vary by model. Incetekh's 5-year warranty is subject to the
+      written proposal and applicable terms. This page does not replace your
+      project agreement or limit rights provided by applicable law.
+    </p>
+    <h2>Third-party information</h2>
+    <p>
+      Government, manufacturer and lender links lead to independently operated
+      websites. Scheme rules, lending terms and product details may change.
+      Verify the applicable conditions with the relevant provider before
+      committing to a purchase or loan.
+    </p>
+    <h2>Questions or service concerns</h2>
+    <p>
+      Contact {site.businessName} at the address shown below. For a service
+      concern, include the installation location and a clear description of the
+      issue.
+    </p>
+    <a class="text-link" href={`mailto:${site.email}`}>
+      {site.email}
+    </a>
+    <a class="text-link" href="/contact/#complaints">
+      Service &amp; complaints
+    </a>
+    <a class="text-link" href="/privacy/">
+      Privacy policy
+    </a>
+  </div>
+</SiteLayout>
+<style>
+  .terms-copy {
+    max-width: 60rem;
+    padding-bottom: 5rem;
+  }
+  h2 {
+    margin-top: 2.5rem;
+    font-size: 1.5rem;
+  }
+  .text-link {
+    margin-right: 1.5rem;
+  }
+</style>

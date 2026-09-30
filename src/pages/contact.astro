@@ -29,6 +29,15 @@ import WhatsAppLink from '../components/WhatsAppLink.astro';
       >
         94412 59786
       </a>
+      <a class="text-link" href={`mailto:${site.email}`}>
+        {site.email}
+      </a>
+      <address>
+        <strong>{site.businessName}</strong>
+        {site.address.map((line) => (
+          <span>{line}</span>
+        ))}
+      </address>
       <p>Calling from outside India? Use {site.phoneDisplay}.</p>
       <p>
         Tell us your site location and the support you are looking for. We’ll
@@ -85,9 +94,55 @@ import WhatsAppLink from '../components/WhatsAppLink.astro';
       </a>
     </div>
   </section>
+  <section
+    id="complaints"
+    class="container section section-grid questions"
+    aria-labelledby="complaints-heading"
+  >
+    <h2 class="section-title" id="complaints-heading">
+      Service &amp; complaints.
+    </h2>
+    <div class="prose">
+      <p>
+        Tell us your name, installation location, a callback number and what has
+        happened. Include your invoice or project reference if available, plus
+        any inverter error code. Photos can help when it is safe to take them.
+      </p>
+      <p>
+        Email your concern to our support address or open WhatsApp below. Review
+        and send the message in your chosen app; opening a link does not lodge a
+        complaint automatically. Keep your sent message for follow-up.
+      </p>
+      <a
+        class="text-link"
+        href={`mailto:${site.email}?subject=Service%20complaint`}
+      >
+        Email a complaint
+      </a>
+      <WhatsAppLink
+        label="Discuss a service issue"
+        message="Hi Incetekh, I need help with a service issue. My installation location is: "
+      />
+      <p>
+        For smoke, exposed wiring or a burning smell, keep clear of the
+        equipment and contact qualified emergency/electrical help. Do not open
+        the inverter or handle live wiring.
+      </p>
+    </div>
+  </section>
 </SiteLayout>
 
 <style>
+  address {
+    font-style: normal;
+    font-size: 0.875rem;
+    line-height: 1.8;
+    margin-top: 1rem;
+  }
+  address span,
+  address strong {
+    display: block;
+  }
   .whatsapp-action {
     margin-top: 1.5rem;
   }
