@@ -13,11 +13,7 @@ const initial = estimateSolar({
   tariff: billSlider.tariff,
   residential: true,
 })!;
-const finance = financialEstimate(
-  initial.kw,
-  billSlider.initial / billSlider.tariff,
-  initial.subsidy,
-);
+const finance = financialEstimate(initial.kw, initial.subsidy);
 const money = (value: number) =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -96,8 +92,8 @@ const money = (value: number) =>
           </div>
         </div>
         <p class="input-help" id="bill-help">
-          Slide to your average monthly bill. Estimate uses &#8377;6.35 per
-          unit; your actual tariff and usage may differ.
+          Slide to your average monthly bill. Estimate uses &#8377;8 per unit;
+          your actual tariff and usage may differ.
         </p>
       </div>
       <div class="calculator-result">
@@ -164,30 +160,36 @@ const money = (value: number) =>
         </a>
         <p class="result-note">
           Illustrative usage, not a simultaneous appliance or backup guarantee.
-          Savings use an assumed ₹55,000/kW budget and 99.84% bill offset; see
-          assumptions below.
+          Savings assume all generation offsets usage or earns ₹8/unit credit.
+          Actual bill savings and export rates may differ.
         </p>
       </div>
     </div>
     <noscript>
       <p class="planner-note">
         Enable JavaScript to calculate your size. The 3 kW example above assumes
-        394 units/month at an assumed &#8377;6.35/unit. You can still compare
-        sizes below or contact us on WhatsApp.
+        313 units/month at an assumed &#8377;8/unit. You can still compare sizes
+        below or contact us on WhatsApp.
       </p>
     </noscript>
     <details class="planning-details">
       <summary>How the estimate and subsidy work</summary>
       <div class="details-copy">
         <p>
-          Reference estimate: a ₹2,500 bill corresponds to 394 units and ₹2,496
-          monthly savings. Savings scale with usage, capped by the modelled
-          system output. Payback uses an illustrative ₹55,000/kW budget, less
-          eligible subsidy, divided by annual savings. This is not a quote or
-          guaranteed return. Gross 25-year savings assume unchanged monthly
-          savings; degradation, tariff changes, installation cost, finance,
-          maintenance, replacements and tax benefits are excluded. Actual bills
-          retain fixed charges and depend on usage and export settlement.
+          Savings illustration: 3 kW × 4 units/kW/day × 30 days = 360
+          units/month. At ₹8/unit, this is ₹2,880/month if all generation
+          offsets consumption or receives that export credit. This is generation
+          value, not a guaranteed bill reduction; fixed charges remain payable.
+          An assumed ₹70,000/kW budget gives ₹2,10,000 less ₹78,000 eligible
+          subsidy = ₹1,32,000. Simple payback is ₹1,32,000 / ₹2,880 = 45.8
+          months, or 3.8 years. Actual costs and export rates require
+          confirmation.
+        </p>
+        <p>
+          Gross 25-year savings assume unchanged monthly generation and value.
+          Degradation, tariff changes, installation cost, finance, maintenance,
+          replacements and tax benefits are excluded. This is an illustration,
+          not an installation quote or guaranteed return.
         </p>
         <p>
           Appliance examples describe a household profile with limited AC
@@ -214,11 +216,11 @@ const money = (value: number) =>
           </a>
         </div>
         <p>
-          Sizing scales from the reference: 3 kW per 394 monthly units, rounded
-          up to a whole kW with a 1 kW minimum, and 100 sq ft of roof per kW.
-          The effective bill-to-unit ratio is ₹2,500 / 394, approximately
-          ₹6.35/unit, not a DISCOM tariff. Roof access, shading, weather and
-          equipment can change the final design. A site visit must confirm it.
+          Monthly consumption is estimated as bill / ₹8. Capacity is consumption
+          / 120 units per kW per month, rounded up to a whole kW with a 1 kW
+          minimum. Roof allowance is 100 sq ft per kW. The model uses 4 units
+          per kW per day, not 4 units for the entire system. Actual tariffs,
+          weather, shading, roof access and equipment affect the final design.
         </p>
         <p>
           PM Surya Ghar remains an active residential rooftop programme in the

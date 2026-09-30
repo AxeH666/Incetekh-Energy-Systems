@@ -28,7 +28,7 @@ test('bill and units produce consistent planning estimates with bounded inputs',
   expect(fromBill).toEqual({
     units: 300,
     kw: 3,
-    monthlyGeneration: 394,
+    monthlyGeneration: 360,
     roofM2: 28,
     roofSqft: 300,
     subsidy: 78000,
@@ -42,11 +42,11 @@ test('bill and units produce consistent planning estimates with bounded inputs',
     }),
   ).toEqual(fromBill);
   expect(
-    estimateSolar({ mode: 'units', amount: 131, tariff: 8, residential: true })
+    estimateSolar({ mode: 'units', amount: 120, tariff: 8, residential: true })
       ?.kw,
   ).toBe(1);
   expect(
-    estimateSolar({ mode: 'units', amount: 132, tariff: 8, residential: true })
+    estimateSolar({ mode: 'units', amount: 121, tariff: 8, residential: true })
       ?.kw,
   ).toBe(2);
   expect(
@@ -56,7 +56,7 @@ test('bill and units produce consistent planning estimates with bounded inputs',
       tariff: 8,
       residential: false,
     }),
-  ).toMatchObject({ kw: 92, subsidy: 0 });
+  ).toMatchObject({ kw: 100, subsidy: 0 });
   for (const amount of [0, -1, NaN, Infinity, 12001])
     expect(
       estimateSolar({ mode: 'units', amount, tariff: 8, residential: true }),
@@ -93,7 +93,7 @@ test('one bill slider updates instantly with keyboard and pointer, and links to 
   );
   await slider.press('End');
   await expect(slider).toHaveValue('50000');
-  await expect(calc.locator('[data-result="kw"]')).toHaveText('60');
+  await expect(calc.locator('[data-result="kw"]')).toHaveText('53');
   await expect(calc.locator('[data-result="subsidy"]')).toHaveText(
     'Up to \u20b978,000',
   );
@@ -108,7 +108,7 @@ test('one bill slider updates instantly with keyboard and pointer, and links to 
   expect(amount).toBeGreaterThan(20000);
   expect(amount).toBeLessThan(30000);
   await expect(calc.locator('[data-result="kw"]')).toHaveText(
-    String(Math.ceil(((amount / billSlider.tariff) * 3) / 394)),
+    String(Math.ceil(amount / billSlider.tariff / 120)),
   );
   await calc
     .getByRole('link', { name: 'Free site visit', exact: true })

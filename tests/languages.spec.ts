@@ -130,24 +130,24 @@ test('translated calculators and forms keep numbers, state and privacy behavior'
     page.on('request', listener);
     await page.goto(`/${code}/`);
     await expect(page.locator('[data-result="kw"]')).toHaveText('3');
-    await expect(page.locator('[data-result="units"]')).toHaveText('394');
+    await expect(page.locator('[data-result="units"]')).toHaveText('313');
     await expect(page.locator('[data-result="roofSqft"]')).toHaveText('300');
     await expect(page.locator('[data-finance="monthlySavings"]')).toHaveText(
-      '₹2,496',
+      '₹2,880',
     );
-    await expect(page.locator('[data-finance="payback"]')).toContainText('2.9');
+    await expect(page.locator('[data-finance="payback"]')).toContainText('3.8');
     await expect(page.locator('[data-finance="savings25"]')).toContainText(
-      '7.5',
+      '8.6',
     );
     await page.locator('#solar-bill').evaluate((element: HTMLInputElement) => {
       element.value = '5000';
       element.dispatchEvent(new Event('input', { bubbles: true }));
     });
     await expect(page.locator('[data-result="kw"]')).toHaveText('6');
-    await expect(page.locator('[data-result="units"]')).toHaveText('788');
+    await expect(page.locator('[data-result="units"]')).toHaveText('625');
     await expect(page.locator('[data-result="roofSqft"]')).toHaveText('600');
     await expect(page.locator('[data-finance="monthlySavings"]')).toHaveText(
-      '₹4,992',
+      '₹5,760',
     );
     await expect(page.locator('[data-subsidy-note]')).toContainText(
       scripts[code],

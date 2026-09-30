@@ -6,15 +6,11 @@ export const planning = {
   maxMonthlyUnits: 12_000,
 };
 
-// Founder-supplied comparison, calibrated at a Rs 2,500 monthly bill.
-// These are illustrative ratios, not a DISCOM tariff or an installation quote.
-export const calculatorReference = {
-  bill: 2500,
-  units: 394,
-  kw: 3,
+// Founder-approved generation-value scenario, not a tariff or installation quote.
+export const calculatorAssumptions = {
+  daysPerMonth: 30,
   roofSqftPerKw: 100,
-  monthlySavings: 2496,
-  budgetPerKw: 55_000,
+  budgetPerKw: 70_000,
 };
 
 export const billSlider = {
@@ -22,15 +18,17 @@ export const billSlider = {
   max: 50_000,
   step: 100,
   initial: 2500,
-  tariff: calculatorReference.bill / calculatorReference.units,
+  tariff: 8,
 };
 
 // Disclosed comparison scenario, not an installation quote or tariff model.
-export function financialEstimate(kw: number, units: number, subsidy: number) {
-  const cost = kw * calculatorReference.budgetPerKw;
+export function financialEstimate(kw: number, subsidy: number) {
+  const cost = kw * calculatorAssumptions.budgetPerKw;
   const monthlySavings =
-    Math.min(units, (kw * calculatorReference.units) / calculatorReference.kw) *
-    (calculatorReference.monthlySavings / calculatorReference.units);
+    kw *
+    planning.dailyYield *
+    calculatorAssumptions.daysPerMonth *
+    billSlider.tariff;
   const savings25 = monthlySavings * 12 * 25;
   return {
     cost,
@@ -77,14 +75,16 @@ export function estimateSolar(input: {
   if (units > planning.maxMonthlyUnits) return null;
   const kw = Math.max(
     1,
-    Math.ceil((units * calculatorReference.kw) / calculatorReference.units),
+    Math.ceil(
+      units / (planning.dailyYield * calculatorAssumptions.daysPerMonth),
+    ),
   );
-  const roofSqft = kw * calculatorReference.roofSqftPerKw;
+  const roofSqft = kw * calculatorAssumptions.roofSqftPerKw;
   return {
     units: Math.round(units),
     kw,
     monthlyGeneration:
-      (kw * calculatorReference.units) / calculatorReference.kw,
+      kw * planning.dailyYield * calculatorAssumptions.daysPerMonth,
     roofM2: Math.round(roofSqft / 10.7639),
     roofSqft,
     subsidy: centralSubsidy(kw, residential),
