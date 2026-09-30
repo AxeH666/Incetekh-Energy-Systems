@@ -1,5 +1,29 @@
 # Final polish validation
 
+## Restrained wide-screen spacing refinement — 30 September 2026
+
+Two style changes: the shared content-width cap moves from 78rem to 92rem, and
+the homepage project-story image adopts the existing corner radius. At 1920px,
+the hero's side margins measure 224px instead of 336px; at 1440px, 64px instead
+of 96px. Fluid mobile gutters, reading-column limits, typography, content,
+section order and interaction logic are unchanged.
+
+Before/after screenshots were inspected for the desktop hero and story, company,
+services, products, projects and contact pages, plus detailed product/calculator
+sections and English/Telugu/Malayalam mobile views. Evidence is retained locally
+in `.astro/spacing-inspect/`. An early story capture preceded lazy-image decoding;
+the final capture waits for the photograph to decode and confirms correct rendering.
+
+Lint, Astro/TypeScript (78 files; zero diagnostics), the production build (144
+pages), `git diff --check` and all **101 browser/output tests passed**. Tests ran
+on Node 22.23.3 and Chrome in 2.3 minutes, reusing the persistent port-4322 preview
+through the ignored Playwright config. The persistent preview remains running.
+Pre-push self-review confirmed that the complete implementation is limited to
+these two style declarations, with no content, assets, dependencies, runtime
+logic or test expectations changed. No blocking self-review findings remain.
+The PR records independent review and final merge disposition. No deployment
+is included.
+
 ## Independent language review correction — PR #20
 
 An independent agent reviewed pushed commit `e1c9087` against `00d0095` and

@@ -29,7 +29,7 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --gutter: clamp(1.25rem, 4.5vw, 4rem);
-  --content-width: 78rem;
+  --content-width: 92rem;
   --section-space: clamp(3rem, 5.5vw, 5rem);
   --layout-gap: clamp(2rem, 4vw, 4rem);
   --heading-gap: clamp(1.5rem, 3vw, 2.5rem);
