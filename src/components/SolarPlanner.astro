@@ -1,6 +1,12 @@
 ---
 import WhatsAppLink from './WhatsAppLink.astro';
-import { solarSources } from '../data/solar';
+import { solarSources, billSlider, estimateSolar } from '../data/solar';
+const initial = estimateSolar({
+  mode: 'bill',
+  amount: billSlider.initial,
+  tariff: billSlider.tariff,
+  residential: true,
+})!;
 ---
 
 <section
@@ -24,64 +30,59 @@ import { solarSources } from '../data/solar';
       </p>
     </div>
     <div class="calculator" data-solar-calculator>
-      <form class="calculator-inputs" aria-label="Solar size estimator">
-        <fieldset disabled>
-          <legend>Andhra Pradesh planning estimate</legend>
-          <label for="solar-connection">Connection type</label>
-          <select id="solar-connection" name="connection">
-            <option value="residential">Residential home</option>
-            <option value="commercial">Commercial / business</option>
-          </select>
-          <label for="solar-mode">Calculate using</label>
-          <select id="solar-mode" name="mode">
-            <option value="bill">Monthly electricity bill</option>
-            <option value="units">Monthly units (more accurate)</option>
-          </select>
-          <label for="solar-amount" data-amount-label>
-            Monthly bill (₹)
-          </label>
-          <input
-            id="solar-amount"
-            name="amount"
-            type="number"
-            inputmode="decimal"
-            min="1"
-            max="100000"
-            step="any"
-            value="2400"
-            required
-            aria-describedby="consumption-help"
-          />
-          <p class="input-help" id="consumption-help">
-            Use a monthly average. For a two-month bill, divide the total by
-            two.
-          </p>
-          <div data-tariff-field>
-            <label for="solar-tariff">
-              Assumed electricity rate (₹ / unit)
+      <div class="calculator-inputs">
+        <p class="state-label">Your state</p>
+        <p class="state-value">Andhra Pradesh</p>
+        <fieldset class="connection-switch" disabled>
+          <legend>Connection type</legend>
+          <div class="connection-options">
+            <label>
+              <input
+                type="radio"
+                name="solar-connection"
+                value="residential"
+                checked
+              />
+              <span>Residential</span>
             </label>
-            <input
-              id="solar-tariff"
-              name="tariff"
-              type="number"
-              inputmode="decimal"
-              min="1"
-              max="30"
-              step="0.01"
-              value="8"
-              required
-              aria-describedby="tariff-help"
-            />
-            <p class="input-help" id="tariff-help">
-              ₹8 is an editable assumption, not your DISCOM tariff. Use billed
-              units if your bill includes fixed charges, credits or arrears.
-            </p>
+            <label>
+              <input type="radio" name="solar-connection" value="commercial" />
+              <span>Commercial</span>
+            </label>
           </div>
-          <button class="button button-dark" type="submit">
-            Calculate my solar size
-          </button>
         </fieldset>
-      </form>
+        <label class="bill-label" for="solar-bill">
+          Monthly electricity bill
+        </label>
+        <div class="bill-control">
+          <p class="bill-value">
+            <output for="solar-bill" data-bill-value aria-live="off">
+              &#8377;2,500
+            </output>
+            <span>/ month</span>
+          </p>
+          <input
+            id="solar-bill"
+            type="range"
+            min={billSlider.min}
+            max={billSlider.max}
+            step={billSlider.step}
+            value={billSlider.initial}
+            disabled
+            aria-describedby="bill-help"
+            aria-valuetext="2,500 rupees per month"
+          />
+          <div class="range-labels" aria-hidden="true">
+            <span>&#8377;200</span>
+            <span>&#8377;25,000</span>
+            <span>&#8377;50,000</span>
+          </div>
+        </div>
+        <p class="input-help" id="bill-help">
+          Slide to your average monthly bill. Estimate uses &#8377;8 per unit;
+          your actual tariff and usage may differ.
+        </p>
+      </div>
       <div class="calculator-result">
         <div
           role="status"
@@ -91,25 +92,29 @@ import { solarSources } from '../data/solar';
         >
           <p class="eyebrow">Your starting point</p>
           <h3>
-            <span data-result="kw">3</span> <span class="unit">kW</span>
+            <span data-result="kw">{initial.kw}</span>{' '}
+            <span class="unit">kW</span>
           </h3>
           <p class="result-context">
-            For approximately <span data-result="units">300</span> units of
-            monthly use.
+            For approximately <span data-result="units">{initial.units}</span>{' '}
+            units of monthly use.
           </p>
           <dl>
             <div>
               <dt>Estimated generation / month</dt>
               <dd>
-                <span data-result="monthlyGeneration">360</span> units
+                <span data-result="monthlyGeneration">
+                  {initial.monthlyGeneration}
+                </span>{' '}
+                units
               </dd>
             </div>
             <div>
               <dt>Approximate clear roof area</dt>
               <dd>
-                <span data-result="roofM2">30</span> m²{' '}
+                <span data-result="roofM2">{initial.roofM2}</span> m²{' '}
                 <small>
-                  (<span data-result="roofSqft">323</span> sq ft)
+                  (<span data-result="roofSqft">{initial.roofSqft}</span> sq ft)
                 </small>
               </dd>
             </div>
@@ -123,13 +128,9 @@ import { solarSources } from '../data/solar';
             conditions apply.
           </p>
         </div>
-        <p class="result-note" data-calculator-error role="alert" hidden></p>
-        <div data-calculator-enquiry>
-          <WhatsAppLink
-            label="Talk to an expert"
-            message="Hi Incetekh, please help me size a solar system for my property in Andhra Pradesh."
-          />
-        </div>
+        <a class="button visit-link" href="#site-visit">
+          Free site visit
+        </a>
         <p class="result-note">
           A planning estimate, not a quotation or a generation guarantee. Final
           capacity depends on your roof, shade, sanctioned load and DISCOM
@@ -140,19 +141,21 @@ import { solarSources } from '../data/solar';
     <noscript>
       <p class="planner-note">
         Enable JavaScript to calculate your size. The 3 kW example above assumes
-        300 units/month. You can still compare sizes below or ask us on
-        WhatsApp.
+        313 units/month at an assumed &#8377;8/unit. You can still compare sizes
+        below or contact us on WhatsApp.
       </p>
     </noscript>
     <details class="planning-details">
       <summary>How the estimate and subsidy work</summary>
       <div class="details-copy">
         <p>
-          We divide monthly units by 120 (4 units per kW per day × 30 days),
-          then round up to a whole kW, with a 1 kW minimum. Roof planning allows
-          about 10 m² per kW. These are starting assumptions: local weather,
-          shading, orientation, access and equipment change the result. Use a
-          12-month consumption average where possible.
+          We estimate monthly units by dividing the bill by an assumed &#8377;8
+          per unit. This does not reproduce DISCOM tariff slabs, fixed charges
+          or credits. We then divide those units by 120 (4 units per kW per day
+          × 30 days), then round up to a whole kW, with a 1 kW minimum. Roof
+          planning allows about 10 m² per kW. These are starting assumptions:
+          local weather, shading, orientation, access and equipment change the
+          result. Use a 12-month consumption average where possible.
         </p>
         <p>
           PM Surya Ghar remains an active residential rooftop programme in the
@@ -253,52 +256,119 @@ import { solarSources } from '../data/solar';
   }
   .calculator {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    background: #fff;
-    border: 1px solid var(--color-line);
+    grid-template-columns: 1fr 1.3fr;
+    gap: 1.5rem;
   }
   .calculator-inputs,
   .calculator-result {
     padding: clamp(1.5rem, 3vw, 3rem);
     min-width: 0;
+    border-radius: 1rem;
+  }
+  .calculator-inputs {
+    background: #dce5d5;
+  }
+  .state-label,
+  legend,
+  .bill-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+  .state-value {
+    margin: 0.5rem 0 1.75rem;
+    font-size: 1.125rem;
   }
   fieldset {
     padding: 0;
-    margin: 0;
+    margin: 0 0 2rem;
     border: 0;
     min-width: 0;
   }
   legend {
+    margin-bottom: 0.75rem;
+  }
+  .connection-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+    border: 1px solid #b5c0b1;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    background: #fff;
+  }
+  .connection-options label {
+    position: relative;
+    min-width: 0;
+    cursor: pointer;
+  }
+  .connection-options input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .connection-options span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    border: 1px solid transparent;
+    border-radius: 0.3rem;
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+  .connection-options input:checked + span {
+    background: #075e54;
+    color: #fff;
+  }
+  .connection-options input:focus-visible + span {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .bill-control {
+    margin-top: 0.75rem;
+    padding: 1.5rem;
+    background: #fff;
+    border-radius: 0.75rem;
+  }
+  .bill-value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+    justify-content: space-between;
+  }
+  .bill-value output {
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    letter-spacing: -0.04em;
+    font-weight: 600;
+    color: #075e54;
+  }
+  .bill-value > span {
     font-size: 0.8125rem;
     color: var(--color-muted);
-    margin-bottom: 1.5rem;
   }
-  label {
+  input[type='range'] {
     display: block;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    margin: 1rem 0 0.5rem;
-  }
-  input,
-  select {
     width: 100%;
-    min-height: 3rem;
-    padding: 0.7rem 0.8rem;
-    border: 1px solid #858d83;
-    border-radius: 3px;
-    background: #fff;
-    color: var(--color-ink);
-    font: inherit;
+    min-width: 0;
+    height: 3rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    accent-color: #075e54;
+    cursor: pointer;
+  }
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    color: var(--color-muted);
+    font-size: 0.6875rem;
   }
   .input-help {
     color: var(--color-muted);
     font-size: 0.75rem;
-    margin-top: 0.5rem;
-  }
-  button {
-    font-family: inherit;
-    cursor: pointer;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
   }
   .calculator-result {
     background: #20372d;
@@ -324,10 +394,14 @@ import { solarSources } from '../data/solar';
   }
   dl {
     margin: 1.5rem 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
   }
   dl > div {
-    padding: 0.9rem 0;
-    border-top: 1px solid #52665b;
+    padding: 1rem;
+    background: #172e24;
+    border-radius: 0.5rem;
   }
   dt {
     color: #d9e3d6;
@@ -339,17 +413,16 @@ import { solarSources } from '../data/solar';
   }
   dd small {
     font-size: 0.8125rem;
+    display: block;
   }
   .result-note {
     font-size: 0.75rem;
     color: #d9e3d6;
   }
-  .calculator-result :global(.whatsapp-link) {
+  .visit-link {
     background: #fff;
     color: #18382e;
-  }
-  .calculator-result :global(.whatsapp-link img) {
-    filter: brightness(0) saturate(100%);
+    align-self: start;
   }
   .calculator-result :global(:focus-visible) {
     outline-color: #ee865e;
@@ -431,7 +504,15 @@ import { solarSources } from '../data/solar';
       gap: 2rem;
     }
   }
+  @media (max-width: 56rem) {
+    .calculator {
+      grid-template-columns: 1fr;
+    }
+  }
   @media (max-width: 44rem) {
+    dl {
+      grid-template-columns: 1fr;
+    }
     .planning-heading,
     .calculator {
       grid-template-columns: 1fr;
@@ -444,6 +525,10 @@ import { solarSources } from '../data/solar';
     }
   }
   @media (forced-colors: active) {
+    .connection-options input:checked + span {
+      outline: 2px solid Highlight;
+      outline-offset: -3px;
+    }
     input,
     select,
     .calculator {

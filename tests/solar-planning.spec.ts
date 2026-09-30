@@ -67,56 +67,56 @@ test('bill and units produce consistent planning estimates with bounded inputs',
     ).toBeNull();
 });
 
-test('calculator changes units, subsidy and WhatsApp draft without network submission', async ({
+test('one bill slider updates instantly with keyboard and pointer, and links to the visit form', async ({
   page,
-  baseURL,
 }) => {
-  const external: string[] = [];
-  page.on('request', (request) => {
-    if (new URL(request.url()).origin !== baseURL) external.push(request.url());
-  });
   await page.goto('/');
   const calc = page.locator('[data-solar-calculator]');
-  await expect(page.getByLabel('Monthly bill')).toBeEnabled();
-  await page.getByLabel('Calculate using').selectOption('units');
-  await page.getByLabel('Monthly consumption').fill('600');
-  await page.getByRole('button', { name: 'Calculate my solar size' }).click();
-  await expect(calc.locator('[data-result="kw"]')).toHaveText('5');
-  await expect(calc.locator('[data-result="roofM2"]')).toHaveText('50');
-  await page.getByLabel('Connection type').selectOption('commercial');
+  const slider = page.getByRole('slider', { name: 'Monthly electricity bill' });
+  await expect(slider).toBeEnabled();
+  await expect(
+    calc.locator('select, input[type="number"], button'),
+  ).toHaveCount(0);
+  await expect(slider).toHaveValue('2500');
+  await expect(calc.locator('[data-result="kw"]')).toHaveText('3');
+  await slider.focus();
+  await slider.press('ArrowRight');
+  await expect(slider).toHaveValue('2600');
+  await expect(slider).toHaveAttribute(
+    'aria-valuetext',
+    '2,600 rupees per month',
+  );
+  await slider.press('Home');
+  await expect(calc.locator('[data-result="kw"]')).toHaveText('1');
+  await expect(calc.locator('[data-result="subsidy"]')).toHaveText(
+    'Up to \u20b930,000',
+  );
+  await slider.press('End');
+  await expect(slider).toHaveValue('50000');
+  await expect(calc.locator('[data-result="kw"]')).toHaveText('53');
+  await expect(calc.locator('[data-result="subsidy"]')).toHaveText(
+    'Up to \u20b978,000',
+  );
+  await calc.getByText('Commercial', { exact: true }).click();
+  await expect(calc.getByRole('radio', { name: 'Commercial' })).toBeChecked();
   await expect(calc.locator('[data-result="subsidy"]')).toHaveText(
     'Not eligible',
   );
-  const link = calc.getByRole('link', { name: /Talk to an expert/ });
-  const draft = new URL((await link.getAttribute('href'))!);
-  expect(draft.origin + draft.pathname).toBe('https://wa.me/919441259786');
-  expect(draft.searchParams.get('text')).toContain(
-    'Commercial connection; 600 units/month',
+  const box = (await slider.boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  const amount = Number(await slider.inputValue());
+  expect(amount).toBeGreaterThan(20000);
+  expect(amount).toBeLessThan(30000);
+  await expect(calc.locator('[data-result="kw"]')).toHaveText(
+    String(Math.ceil(amount / 8 / 120)),
   );
-  expect(draft.searchParams.get('text')).toContain('5 kW');
-  await page.getByLabel('Monthly consumption').fill('');
-  await expect(calc.locator('[data-solar-result]')).toBeHidden();
-  await expect(calc.getByRole('alert')).toBeVisible();
-  expect(
-    new URL((await link.getAttribute('href'))!).searchParams.get('text'),
-  ).not.toContain('5 kW');
-  await page.getByLabel('Calculate using').selectOption('bill');
-  await page.getByLabel('Assumed electricity rate').fill('8.25');
-  await page.getByLabel('Monthly bill').fill('2400.50');
-  await expect(calc.locator('[data-result="kw"]')).toHaveText('3');
-  expect(
-    new URL((await link.getAttribute('href'))!).searchParams.get('text'),
-  ).toContain('8.25');
-  expect(
-    new URL((await link.getAttribute('href'))!).searchParams.get('text'),
-  ).toContain('2,400.5');
-  expect(external).toEqual([]);
-  expect(await page.evaluate(() => localStorage.length)).toBe(0);
-  await page.route('https://wa.me/**', (route) =>
-    route.fulfill({ body: 'WhatsApp destination intercepted' }),
-  );
-  await link.click();
-  await expect(page).toHaveURL(/https:\/\/wa.me\/919441259786\?text=/);
+  await calc
+    .getByRole('link', { name: 'Free site visit', exact: true })
+    .click();
+  await expect(page).toHaveURL(/#site-visit$/);
+  await expect(
+    page.getByRole('heading', { name: 'Ready for a site visit?' }),
+  ).toBeInViewport();
 });
 
 test('system choices and product enquiries carry the selected context', async ({
@@ -161,12 +161,14 @@ test('calculator without JavaScript shows a labelled example and usable enquiry'
   });
   const page = await context.newPage();
   await page.goto('/');
-  await expect(page.getByLabel('Monthly bill')).toBeDisabled();
+  await expect(
+    page.getByRole('slider', { name: 'Monthly electricity bill' }),
+  ).toBeDisabled();
   await expect(page.locator('noscript p')).toContainText('3 kW example');
   await expect(page.locator('noscript p')).toBeVisible();
-  await expect(page.locator('[data-calculator-enquiry] a')).toHaveAttribute(
+  await expect(page.locator('.visit-link')).toHaveAttribute(
     'href',
-    /https:\/\/wa.me\/919441259786/,
+    '#site-visit',
   );
   await context.close();
 });

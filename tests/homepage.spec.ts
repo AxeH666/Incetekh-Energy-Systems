@@ -5,8 +5,8 @@ test('homepage presents all three free services with details and WhatsApp path',
 }) => {
   await page.goto('/');
   await expect(
-    page.getByRole('link', { name: 'Book a free site visit on WhatsApp' }),
-  ).toHaveAttribute('href', 'https://wa.me/919441259786');
+    page.getByRole('link', { name: 'Book a free site visit' }),
+  ).toHaveAttribute('href', '#site-visit');
   const offers = page.locator('.free-service-list>a');
   await expect(offers).toHaveCount(3);
   for (const offer of await offers.all())

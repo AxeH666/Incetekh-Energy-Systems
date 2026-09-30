@@ -6,6 +6,14 @@ export const planning = {
   maxMonthlyUnits: 12_000,
 };
 
+export const billSlider = {
+  min: 200,
+  max: 50_000,
+  step: 100,
+  initial: 2500,
+  tariff: 8,
+};
+
 export function centralSubsidy(kw: number, residential: boolean): number {
   if (!residential || !Number.isFinite(kw) || kw <= 0) return 0;
   return Math.round(

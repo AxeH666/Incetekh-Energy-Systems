@@ -1,7 +1,7 @@
 # Incetekh Energy
 
 Complete local Phase 1 public website: home, about, services, products, project photographs,
-homepage feedback, contact, privacy and a custom 404. Built with static
+homepage feedback and site-visit form, contact, privacy and a custom 404. Built with static
 Astro, TypeScript and plain CSS. Read [AGENTS.md](AGENTS.md) and [SCOPE.md](SCOPE.md)
 before changes. No public deployment, DNS changes or business-email setup has
 been performed. [Delivery report](docs/DELIVERY.md).
@@ -60,7 +60,7 @@ business facts, warranty qualifiers and feedback status aligned across pages.
 Warm paper, charcoal, restrained rust accents, large type and real installation
 photographs. Self-hosted Manrope, no remote fonts, no client app runtime. The
 navigation remains visible on narrow screens and FAQs use native HTML controls.
-Small inline scripts control the homepage gallery, review scrolling and local solar-size estimator. The optional Cloudflare
+Small inline scripts control the homepage gallery, review scrolling and bill-slider estimator and unconnected visit-form validation. The optional Cloudflare
 analytics beacon is the only external script when enabled.
 
 The founder confirmed the phone, more than 13 years of experience and 500+ completed projects, solar EPC,
@@ -73,7 +73,7 @@ Photos accompany the temporary comments for prelaunch design; authorship is unve
 
 ## Handoff
 
-Solar sizing, subsidy research and equipment options: [SOLAR-PLANNING.md](docs/SOLAR-PLANNING.md).
+Solar sizing, the deferred visit-form delivery connection, subsidy research and equipment options: [SOLAR-PLANNING.md](docs/SOLAR-PLANNING.md).
 
 Current gallery, hover and footer polish: [GALLERY-POLISH.md](docs/GALLERY-POLISH.md).
 Earlier homepage/WhatsApp design: [HOMEPAGE-REFRESH.md](docs/HOMEPAGE-REFRESH.md).

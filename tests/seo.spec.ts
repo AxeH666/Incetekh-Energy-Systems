@@ -58,7 +58,7 @@ test('every public page has unique metadata, working local resources and safe co
     ).toHaveAttribute('content', /object-src 'none'/);
     await expect(page.locator('script[src]')).toHaveCount(token ? 1 : 0);
     await expect(page.locator('script[type="module"]')).toHaveCount(
-      path === '/' ? 2 : 0,
+      path === '/' ? 3 : 0,
     );
     if (token)
       await expect(page.locator('script[data-cf-beacon]')).toHaveAttribute(
