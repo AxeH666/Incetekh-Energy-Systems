@@ -47,47 +47,7 @@ import { metalRoofImage } from '../data/site';
     </div>
   </section>
 
-  <section
-    class="free-services section"
-    aria-labelledby="free-services-heading"
-  >
-    <div class="container">
-      <div class="services-intro">
-        <div>
-          <p class="eyebrow">Three services. No charge.</p>
-          <h2 class="section-title" id="free-services-heading">
-            Good advice.
-            <br />
-            Right from the start.
-          </h2>
-        </div>
-        <p>
-          Planning a new installation or looking after an existing one? Start
-          with the support you need, free of charge.
-        </p>
-      </div>
-      <div class="free-service-list">
-        <a href="/services/#site-visit">
-          <span class="service-label">01 / Free</span>
-          <h3>Site visits</h3>
-          <p>Talk through your site, roof space and solar plans with us.</p>
-          <span class="service-detail-link">Explore site visits</span>
-        </a>
-        <a href="/services/#system-care">
-          <span class="service-label">02 / Free</span>
-          <h3>System performance checks</h3>
-          <p>Understand how your existing solar system is performing.</p>
-          <span class="service-detail-link">Explore performance checks</span>
-        </a>
-        <a href="/services/#system-care">
-          <span class="service-label">03 / Free</span>
-          <h3>Annual yield audits</h3>
-          <p>Review your system's energy generation over the year.</p>
-          <span class="service-detail-link">Explore yield audits</span>
-        </a>
-      </div>
-    </div>
-  </section>
+  <Manufacturers />
 
   <section
     class="container project-story section"
@@ -126,9 +86,50 @@ import { metalRoofImage } from '../data/site';
       </a>
     </div>
   </section>
-  <SolarPlanner />
-  <Manufacturers />
   <Testimonials />
+  <SolarPlanner />
+  <section
+    class="free-services section"
+    aria-labelledby="free-services-heading"
+  >
+    <div class="container">
+      <div class="services-intro">
+        <div>
+          <p class="eyebrow">Three services. No charge.</p>
+          <h2 class="section-title" id="free-services-heading">
+            Free services.
+            <br />
+            Care beyond installation.
+          </h2>
+        </div>
+        <p>
+          Planning a new installation or looking after an existing one? Start
+          with the support you need, free of charge.
+        </p>
+      </div>
+      <div class="free-service-list">
+        <a href="/services/#site-visit">
+          <span class="service-label">01 / Free</span>
+          <h3>Site visits</h3>
+          <p>Talk through your site, roof space and solar plans with us.</p>
+          <span class="service-detail-link">Explore site visits</span>
+        </a>
+        <a href="/services/#system-care">
+          <span class="service-label">02 / Free</span>
+          <h3>System performance checks</h3>
+          <p>Understand how your existing solar system is performing.</p>
+          <span class="service-detail-link">Explore performance checks</span>
+        </a>
+        <a href="/services/#system-care">
+          <span class="service-label">03 / Free</span>
+          <h3>Annual yield audits</h3>
+          <p>Review your system's energy generation over the year.</p>
+          <span class="service-detail-link">Explore yield audits</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <SiteVisitForm />
 </SiteLayout>
 

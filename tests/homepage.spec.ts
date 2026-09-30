@@ -1,5 +1,36 @@
 import { test, expect } from '@playwright/test';
 
+test('approved homepage journey keeps brands early and reviews before solar planning', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const landmarks = [
+    '.hero',
+    '.manufacturers',
+    '.project-story',
+    '#reviews',
+    '#solar-planner',
+    '.efficiency-heading',
+    '.free-services',
+    '#site-visit',
+    '.site-footer',
+  ];
+  let previousBottom = 0;
+  for (const selector of landmarks) {
+    const section = page.locator(selector);
+    await expect(section).toHaveCount(1);
+    const top = await section.evaluate(
+      (el) => el.getBoundingClientRect().top + window.scrollY,
+    );
+    expect(top).toBeGreaterThanOrEqual(previousBottom);
+    previousBottom = top;
+  }
+  await expect(page.locator('.manufacturers img')).toHaveCount(3);
+  await expect(
+    page.locator('.manufacturers').getByRole('link', { name: 'View products' }),
+  ).toHaveAttribute('href', '/products/');
+});
+
 test('homepage presents all three free services with details and WhatsApp path', async ({
   page,
 }) => {
