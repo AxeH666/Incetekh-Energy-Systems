@@ -71,6 +71,13 @@ The old Reviews route redirects to the homepage section.
 
 ## Approved homepage order (30 September 2026)
 
+The shared content frame is capped at 92rem. This reduces excessive outer margins
+on wide desktops (336px to 224px per side at 1920px) while retaining the existing
+fluid gutters on smaller screens. Paragraph/reading-column limits remain in
+place. The homepage project-story photograph uses the shared subtle corner radius,
+matching the hero and company photographs; the page structure and controls are
+unchanged.
+
 The built-in language menu sits beside WhatsApp in the header. Its native-script
 labels, understated green selection and keyboard focus retain the existing visual
 language. Regional pages share these layouts, with more line height and smaller
