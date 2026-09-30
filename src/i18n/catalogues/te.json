@@ -592,5 +592,12 @@
   "Monthly consumption is estimated as bill / ₹{0}. Capacity is consumption / {1} units per kW per month, rounded up to a whole kW with a {2} kW minimum. Roof allowance is {3} sq ft per kW. The model uses {4} units per kW per day, not {5} units for the entire system. Actual tariffs, weather, shading, roof access and equipment affect the final design.": "నెలవారీ వినియోగ అంచనా బిల్లు / ₹{0}. సామర్థ్యం = వినియోగం / నెలకు ప్రతి kWకి {1} యూనిట్లు, తదుపరి పూర్తి kWకి పెంచి, కనీసం {2} kW. ప్రతి kWకి {3} చదరపు అడుగుల పైకప్పు అవసరమని భావించాం. నమూనా ప్రతి kWకి రోజుకు {4} యూనిట్లు వాడుతుంది; మొత్తం వ్యవస్థకు {5} యూనిట్లు కాదు. వాస్తవ ధరలు, వాతావరణం, నీడ, పైకప్పు ప్రవేశం, పరికరాలు తుది రూపకల్పనను ప్రభావితం చేస్తాయి.",
   "{0} AC + all other household loads": "{0} AC + ఇతర గృహ విద్యుత్ అవసరాలన్నీ",
   "{0} ACs + all other household loads": "{0} ACలు + ఇతర గృహ విద్యుత్ అవసరాలన్నీ",
-  "Household examples: {0} kW for {1} AC, {2} kW for {3} ACs, {4} kW for {5} ACs, and {6} kW for {7} ACs, plus other household loads. These assume limited AC operating hours and typical household use, not every appliance running continuously or simultaneously. Actual wattage and hours of use determine suitability. Grid-connected solar needs suitable backup equipment to operate during a power cut.": "గృహ ఉదాహరణలు: {1} ACకి {0} kW, {3} ACలకు {2} kW, {5} ACలకు {4} kW, {7} ACలకు {6} kW, ఇతర గృహ విద్యుత్ అవసరాలతో కలిపి. పరిమిత గంటల AC వినియోగం, సాధారణ గృహ వినియోగాన్ని ఇవి ఊహిస్తాయి; ప్రతి పరికరం నిరంతరం లేదా ఒకేసారి నడవడం కాదు. వాస్తవ వాటేజ్, వాడే గంటలు అనుకూలతను నిర్ణయిస్తాయి. విద్యుత్ కోతలో పనిచేయడానికి గ్రిడ్-కనెక్టెడ్ సోలార్‌కు తగిన బ్యాకప్ పరికరాలు అవసరం."
+  "Household examples: {0} kW for {1} AC, {2} kW for {3} ACs, {4} kW for {5} ACs, and {6} kW for {7} ACs, plus other household loads. These assume limited AC operating hours and typical household use, not every appliance running continuously or simultaneously. Actual wattage and hours of use determine suitability. Grid-connected solar needs suitable backup equipment to operate during a power cut.": "గృహ ఉదాహరణలు: {1} ACకి {0} kW, {3} ACలకు {2} kW, {5} ACలకు {4} kW, {7} ACలకు {6} kW, ఇతర గృహ విద్యుత్ అవసరాలతో కలిపి. పరిమిత గంటల AC వినియోగం, సాధారణ గృహ వినియోగాన్ని ఇవి ఊహిస్తాయి; ప్రతి పరికరం నిరంతరం లేదా ఒకేసారి నడవడం కాదు. వాస్తవ వాటేజ్, వాడే గంటలు అనుకూలతను నిర్ణయిస్తాయి. విద్యుత్ కోతలో పనిచేయడానికి గ్రిడ్-కనెక్టెడ్ సోలార్‌కు తగిన బ్యాకప్ పరికరాలు అవసరం.",
+  "Approved vendor.": "ఆమోదిత విక్రేత.",
+  "NREDCAP-approved vendor. Approved vendor for IOCL, BPCL and HPCL petrol pumps.": "NREDCAP ఆమోదిత విక్రేత. IOCL, BPCL మరియు HPCL పెట్రోల్ పంపులకు ఆమోదిత విక్రేత.",
+  "Approved vendor credentials": "ఆమోదిత విక్రేత గుర్తింపులు",
+  "NREDCAP": "NREDCAP",
+  "IOCL": "IOCL",
+  "BPCL": "BPCL",
+  "HPCL": "HPCL"
 }

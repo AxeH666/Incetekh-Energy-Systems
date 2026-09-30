@@ -54,12 +54,12 @@ test('keyboard skip link and contact navigation work', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL('/contact/');
   const call = page.getByRole('link', {
-    name: 'Call +91 94412 59786',
+    name: 'Call +91 94401 68111',
     exact: true,
   });
   await call.focus();
   await expect(call).toBeFocused();
-  await expect(call).toHaveAttribute('href', 'tel:+919441259786');
+  await expect(call).toHaveAttribute('href', 'tel:+919440168111');
 });
 
 for (const width of [320, 390, 768, 1440, 1920]) {
@@ -183,7 +183,7 @@ test('works without JavaScript and with reduced motion', async ({
     .getByRole('link', { name: 'Contact', exact: true })
     .click();
   await expect(
-    page.getByRole('link', { name: 'Call +91 94412 59786', exact: true }),
+    page.getByRole('link', { name: 'Call +91 94401 68111', exact: true }),
   ).toBeInViewport();
   await context.close();
 });

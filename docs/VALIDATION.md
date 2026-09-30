@@ -395,3 +395,21 @@ Temporary comments are explicitly requested design copy, not verified customer
 feedback. Replace all 13 entries with verified permissioned statements, or remove
 the feedback text before public deployment. Confirm photo publication permissions.
 Hosting/domain/email remain separate tasks under [LAUNCH.md](LAUNCH.md).
+
+## Approved-vendor section and contact routing — 30 September 2026
+
+Added founder-supplied NREDCAP, IOCL, BPCL and HPCL logos with founder-confirmed
+approved-vendor wording. Both contact numbers are visible; 9440168111 is the
+primary call/display number and all WhatsApp drafts still target 9441259786.
+The screenshot's project-image replacement request was explicitly rejected;
+existing project imagery is unchanged.
+
+Lint, Astro/TypeScript (80 files, zero diagnostics) and the 144-page production
+build passed. The full 104-test suite initially passed 98 checks and found four
+logo layout-shift failures plus two new-test failures from expecting root-only
+Organization schema on translated pages. Fixed reserved logo space and corrected
+the test scope. All eight affected polish/contact tests then passed, including
+all six languages and delayed image loading at 390/768/1440/1920 px. Visually
+inspected English/Telugu vendor sections and contact panels at 390/1440 px;
+no overflow. Local preview remains available on port 4322. The PR records the
+subsequent independent review, Cloudflare preview check and merge disposition.

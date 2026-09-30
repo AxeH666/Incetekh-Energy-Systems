@@ -7,7 +7,7 @@ import WhatsAppLink from '../components/WhatsAppLink.astro';
 
 <SiteLayout
   title="Contact & Free Site Visits | Incetekh Energy"
-  description="Call Incetekh Energy on +91 94412 59786 to discuss rooftop solar, arrange a free site visit, or ask about system performance checks and annual yield audits."
+  description="Call Incetekh Energy on +91 94401 68111 to discuss rooftop solar, arrange a free site visit, or ask about system performance checks and annual yield audits."
 >
   <PageIntro
     eyebrow="Start a conversation"
@@ -27,7 +27,14 @@ import WhatsAppLink from '../components/WhatsAppLink.astro';
         href={`tel:${site.phone}`}
         aria-label={`Call ${site.phoneDisplay}`}
       >
-        94412 59786
+        94401 68111
+      </a>
+      <a
+        class="contact-secondary"
+        href={`tel:${site.secondaryPhone}`}
+        aria-label={`Call ${site.secondaryPhoneDisplay}`}
+      >
+        {site.secondaryPhoneDisplay}
       </a>
       <a class="text-link" href={`mailto:${site.email}`}>
         {site.email}
@@ -182,6 +189,15 @@ import WhatsAppLink from '../components/WhatsAppLink.astro';
   }
   .preparation .section-title {
     font-size: clamp(1.75rem, 3vw, 3rem);
+  }
+  .contact-secondary {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    width: fit-content;
+    margin-block: var(--space-2) var(--space-4);
+    font-size: 1.125rem;
+    text-underline-offset: 0.2em;
   }
   ul {
     padding-left: 1.25rem;
