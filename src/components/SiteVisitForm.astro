@@ -1,0 +1,280 @@
+---
+import WhatsAppLink from './WhatsAppLink.astro';
+---
+
+<section
+  class="site-visit section"
+  id="site-visit"
+  aria-labelledby="visit-heading"
+>
+  <div class="container visit-grid">
+    <div class="visit-copy">
+      <p class="eyebrow">Let's plan your installation</p>
+      <h2 class="section-title" id="visit-heading">
+        Ready for a site visit?
+      </h2>
+      <p class="lead">
+        Tell us about your property and the solar system you have in mind. Start
+        with a free site visit.
+      </p>
+      <dl>
+        <div>
+          <dt>A clearer picture of your roof</dt>
+          <dd>
+            Discuss the space, shade and layout before choosing your system.
+          </dd>
+        </div>
+        <div>
+          <dt>Advice around your electricity use</dt>
+          <dd>
+            Keep a recent electricity bill handy so we can talk through your
+            needs.
+          </dd>
+        </div>
+      </dl>
+      <WhatsAppLink label="Talk to an expert" />
+    </div>
+    <form
+      class="visit-form"
+      method="post"
+      aria-label="Request a free site visit"
+      data-site-visit-form
+    >
+      <div class="field-row">
+        <div>
+          <label for="visit-name">
+            Full name <span aria-hidden="true">*</span>
+          </label>
+          <input
+            id="visit-name"
+            name="fullName"
+            autocomplete="name"
+            maxlength="100"
+            placeholder="Your full name"
+            required
+          />
+        </div>
+        <div>
+          <label for="visit-phone">
+            Phone number <span aria-hidden="true">*</span>
+          </label>
+          <input
+            id="visit-phone"
+            name="phone"
+            type="tel"
+            autocomplete="tel"
+            inputmode="tel"
+            pattern="(?:\+91\s?)?[6-9][0-9]{9}"
+            maxlength="14"
+            placeholder="9876543210"
+            aria-describedby="phone-help"
+            required
+          />
+          <p class="field-help" id="phone-help">
+            10-digit Indian mobile number; +91 optional.
+          </p>
+        </div>
+      </div>
+      <div>
+        <label for="visit-email">
+          Email address <span class="optional">(optional)</span>
+        </label>
+        <input
+          id="visit-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          maxlength="254"
+          placeholder="you@example.com"
+        />
+      </div>
+      <div>
+        <label for="visit-location">
+          Pincode / location <span aria-hidden="true">*</span>
+        </label>
+        <input
+          id="visit-location"
+          name="location"
+          autocomplete="street-address"
+          maxlength="200"
+          placeholder="Your pincode, town or site location"
+          required
+        />
+      </div>
+      <div>
+        <label for="visit-plan">
+          Interested plan <span aria-hidden="true">*</span>
+        </label>
+        <select id="visit-plan" name="plan" required>
+          <option value="">Select a plan</option>
+          <option value="3kw">3 kW solar system</option>
+          <option value="5kw">5 kW solar system</option>
+          <option value="7kw">7 kW solar system</option>
+          <option value="10plus">10 kW or larger</option>
+          <option value="water-heater">Solar water heater</option>
+          <option value="advice">Not sure — help me choose</option>
+        </select>
+      </div>
+      <button class="button" type="submit" disabled>
+        Request free site visit
+      </button>
+      <p class="form-note">
+        Online requests are not available yet. Please use WhatsApp to arrange
+        your visit. Details entered here are not sent or saved.{' '}
+        <a class="text-link" href="/privacy/">
+          Privacy policy
+        </a>
+      </p>
+      <p
+        class="form-status"
+        data-visit-status
+        role="status"
+        tabindex="-1"
+        hidden
+      ></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>(
+    '[data-site-visit-form]',
+  );
+  if (form) {
+    form.querySelector<HTMLButtonElement>('button')!.disabled = false;
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      // Delivery intentionally remains unconnected. Never serialize, log or persist these inputs.
+      const status = form.querySelector<HTMLElement>('[data-visit-status]')!;
+      status.hidden = false;
+      status.textContent =
+        'Your request has not been sent. Online requests are not available yet. Please contact us on WhatsApp to arrange your free site visit.';
+      status.focus();
+    });
+  }
+</script>
+
+<style>
+  .site-visit {
+    background: #fff;
+  }
+  .visit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .visit-copy {
+    padding-top: 1rem;
+  }
+  h2 {
+    margin: 1rem 0 1.5rem;
+  }
+  .lead {
+    max-width: 32rem;
+    color: var(--color-muted);
+  }
+  dl {
+    margin: 2.5rem 0;
+  }
+  dl > div {
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--color-line);
+  }
+  dt {
+    font-weight: 600;
+  }
+  dd {
+    margin: 0.5rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    max-width: 30rem;
+  }
+  .visit-form {
+    background: #eef2e8;
+    padding: clamp(1.25rem, 3vw, 3rem);
+    border: 1px solid #dce3d4;
+    border-radius: 1rem;
+    display: grid;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .field-row > div {
+    min-width: 0;
+  }
+  label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  label span:not(.optional) {
+    color: var(--color-accent);
+  }
+  .optional {
+    font-weight: 400;
+  }
+  input,
+  select {
+    width: 100%;
+    min-width: 0;
+    min-height: 3.25rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid #a5b29d;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: var(--color-ink);
+    font: inherit;
+  }
+  input::placeholder {
+    color: #626b63;
+    opacity: 1;
+  }
+  .field-help,
+  .form-note,
+  .form-status {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+  .field-help {
+    margin-top: 0.4rem;
+  }
+  button {
+    width: 100%;
+    font: inherit;
+    font-weight: 600;
+    justify-content: center;
+    background: #075e54;
+    color: #fff;
+    cursor: pointer;
+    min-height: 3.5rem;
+    border-radius: 0.5rem;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  .form-note .text-link {
+    font-size: inherit;
+  }
+  .form-status {
+    border-top: 1px solid #a5b29d;
+    padding-top: 1rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  @media (max-width: 56rem) {
+    .visit-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 44rem) {
+    .field-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

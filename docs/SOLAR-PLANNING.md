@@ -6,17 +6,23 @@ This component adds a homepage estimator and capacity choices, plus a Products p
 
 On 30 September 2026 the founder requested the example's panel/inverter brands and Andhra Pradesh water-heater companies. The planner is explicitly an Andhra Pradesh estimate, not an all-India tariff engine or a claim of nationwide service coverage. Product listings are enquiry options. Manufacturer authorisation, stock, pricing, specific warranty terms and vendor registration are not inferred.
 
-The homepage groups the calculator and four capacity choices into one planning section. The existing manufacturer section links to the complete catalogue, and Products appears in the shared header/footer. The added catalogue uses restrained typography and written product descriptions without invented branded imagery.
+The homepage groups a single monthly-bill slider and four capacity choices into one planning section. A separate free-site-visit form is on the homepage; the founder explicitly deferred email/WhatsApp delivery connection. The existing manufacturer section links to the complete catalogue, and Products appears in the shared header/footer. The added catalogue uses restrained typography and written product descriptions without invented branded imagery.
 
 ## Calculation contract
 
-- Units mode accepts monthly kWh. Bill mode estimates monthly kWh as bill / editable assumed price per kWh. Default ₹8 is explicitly an assumption, not a DISCOM slab calculation. Fixed charges, credits and arrears make bill division less accurate; the UI recommends actual units and averaging 12 months.
+- The customer-facing control is one monthly-bill slider: INR 200 to INR 50,000 in INR 100 steps, starting at INR 2,500. A Residential/Commercial radio switch updates household subsidy eligibility. There is no units-mode selector, editable tariff field or Calculate button. Monthly kWh are estimated as bill / INR 8; the assumption is disclosed beside the slider. Fixed charges, credits and tariff slabs are not modelled.
 - Capacity = ceiling(monthly kWh / (4 kWh per kW per day × 30 days)), minimum 1 kW. Whole-kW rounding is a planning choice, not a restriction on actual module capacity.
 - Monthly generation = capacity × 120 kWh. Roof allowance = capacity × 10 m²; square feet use 10.7639 ft²/m². Neither output is site-specific or guaranteed.
-- Maximum consumption is 12,000 units/month (100 kW estimate). Invalid/empty/nonfinite/over-limit inputs hide stale outputs and replace the contextual WhatsApp draft with a generic enquiry. Commercial results show no household subsidy.
+- The slider always stays within the calculation engine limits. The engine retains its bounded, unit-tested calculation contract; commercial results show no household subsidy.
 - Standard central assistance = ₹30,000 × min(kW, 2) + ₹18,000 × min(max(kW − 2, 0), 1), capped at ₹78,000. This is for a new eligible individual residential rooftop PV system in Andhra Pradesh; no state top-ups, special-category uplifts, expansion claims, RWA calculation or water-heater subsidy are modelled.
 - No system prices, payback, appliance counts, tariff-slab accuracy or 25-year savings are asserted. A physical survey, sanctioned load, shading, equipment and DISCOM requirements determine the final design.
-- Calculation occurs locally without persistence or network submission. WhatsApp links encode the selected inputs and estimate as a draft; clicking does not send it automatically. Privacy copy explains this. Without JS, controls remain disabled and an explicit example notice plus contact links remain usable.
+- Calculation occurs locally without persistence or network submission. The calculator and hero booking links target the homepage visit form. Existing expert/product links still open WhatsApp. Without JavaScript, the slider and connection switch remain disabled and a labelled 3 kW example remains visible.
+
+## Site-visit form and deferred delivery
+
+`src/components/SiteVisitForm.astro` contains full name, Indian mobile number (+91 optional), optional email, pincode/location and a required plan selector, including water heating and help choosing. Native validation runs before the submit handler. Submitting valid fields explicitly says the request has **not** been sent. No fields are serialized, logged, transmitted or persisted; the page also states that online requests are not available. Without JavaScript the submit button remains disabled. CSP `form-action 'none'` is preserved.
+
+The founder will connect email or WhatsApp later. That later component should replace the local submit handler with the chosen delivery flow, validate destination/security/consent, test actual delivery, update the privacy and availability copy, and adjust CSP only if necessary. No recipient, mailbox, API, credentials or storage was guessed. The independent existing WhatsApp expert link is usable today and does not include form contents.
 
 ## Sources checked 30 September 2026
 
@@ -40,8 +46,8 @@ Exact product source URLs live next to each entry in `src/data/products.ts` and 
 
 ## Validation and release boundary
 
-Focused model tests cover subsidy tiers, fractional capacities, cap, commercial exclusion, sizing boundaries and invalid inputs. Browser checks cover input-mode changes, stale-result removal, WhatsApp draft context/navigation interception, no remote submission, no-JS fallback, product links and responsive accessibility. Existing gallery, review, navigation, metadata, CSP and static-output checks remain in the suite.
+Focused model tests cover subsidy tiers and calculation boundaries. Browser checks cover keyboard/pointer slider interaction, live results, residential/commercial subsidy, booking anchors, required/invalid form fields, explicit unsent state, no network submission or storage, no-JavaScript behavior, product links and responsive accessibility. Existing gallery, review, navigation, metadata, CSP and static-output checks remain in the suite.
 
-Verified: formatting lint, Astro/TypeScript check (zero diagnostics), production build and all 72 Playwright checks pass. Calculator and equipment sections were visually inspected at 390, 768 and 1440 px; the suite also covers 320 and 1920 px homepage accessibility. Output is approximately 2.11 MB with no added dependencies or external calculator requests. Two no-JS assertions were corrected to target the disabled input and visible fallback paragraph; the final full run is clean.
+Slider/form follow-up verified on 30 September 2026: lint, Astro/TypeScript (zero diagnostics), production build and all 75 Playwright checks passed. Desktop, tablet and mobile screenshots were inspected at 1440, 768 and 390 px. No deployment or delivery connection was performed.
 
 No publication is authorised by this component. Existing pre-launch testimonial replacement/permission requirements in `TESTIMONIALS.md` remain in force. Final product availability, subsidy eligibility and written equipment terms must be confirmed per project.

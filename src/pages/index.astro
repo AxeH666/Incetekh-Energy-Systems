@@ -1,8 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import SiteLayout from '../layouts/SiteLayout.astro';
-import SiteCTA from '../components/SiteCTA.astro';
-import WhatsAppLink from '../components/WhatsAppLink.astro';
+import SiteVisitForm from '../components/SiteVisitForm.astro';
 import Manufacturers from '../components/Manufacturers.astro';
 import Testimonials from '../components/Testimonials.astro';
 import ProjectGallery from '../components/ProjectGallery.astro';
@@ -25,7 +24,9 @@ import { metalRoofImage } from '../data/site';
             More than 13 years of experience. Engineering, procurement and
             construction, with care that continues after installation.
           </p>
-          <WhatsAppLink label="Book a free site visit" />
+          <a class="button hero-visit" href="#site-visit">
+            Book a free site visit
+          </a>
           <a class="hero-link text-link" href="/projects/">
             Explore our work
           </a>
@@ -128,10 +129,14 @@ import { metalRoofImage } from '../data/site';
   <SolarPlanner />
   <Manufacturers />
   <Testimonials />
-  <SiteCTA />
+  <SiteVisitForm />
 </SiteLayout>
 
 <style>
+  .hero-visit {
+    background: #075e54;
+    color: #fff;
+  }
   .hero {
     background: #172720;
     color: #fff;

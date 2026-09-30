@@ -30,10 +30,10 @@ test('semantic shell, metadata, and main navigation', async ({ page }) => {
     page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link'),
   ).toHaveText(['About', 'Services', 'Products', 'Projects', 'Contact']);
   await expect(
-    page.getByRole('form', { name: 'Solar size estimator' }),
+    page.getByRole('form', { name: 'Request a free site visit' }),
   ).toHaveCount(1);
   await expect(page.locator('script[src]')).toHaveCount(0);
-  await expect(page.locator('script[type="module"]')).toHaveCount(2);
+  await expect(page.locator('script[type="module"]')).toHaveCount(3);
 });
 
 test('keyboard skip link and contact navigation work', async ({ page }) => {
