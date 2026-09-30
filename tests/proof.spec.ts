@@ -73,10 +73,9 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     ).toBe(true);
     await page.keyboard.press('Tab');
     await expect(
-      page.locator('.site-visit').getByRole('link', {
-        name: 'Talk to an expert on WhatsApp',
-        exact: true,
-      }),
+      page
+        .locator('[data-solar-calculator]')
+        .getByRole('radio', { name: 'Residential', exact: true }),
     ).toBeFocused();
   });
 }
