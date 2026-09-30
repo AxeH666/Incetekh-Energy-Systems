@@ -1,0 +1,81 @@
+---
+import { Image } from 'astro:assets';
+import nredcap from '../../nredcap.jpeg';
+import iocl from '../../IOCL.jpeg';
+import bpcl from '../../bpcl.jpeg';
+import hpcl from '../../hpcl.png';
+const vendors = [
+  { name: 'NREDCAP', logo: nredcap },
+  { name: 'IOCL', logo: iocl },
+  { name: 'BPCL', logo: bpcl },
+  { name: 'HPCL', logo: hpcl },
+];
+---
+
+<section class="approved-vendors" aria-labelledby="approved-vendors-heading">
+  <div class="container">
+    <div class="vendor-heading">
+      <h2 id="approved-vendors-heading" class="section-title">
+        Approved vendor.
+      </h2>
+      <p>
+        NREDCAP-approved vendor. Approved vendor for IOCL, BPCL and HPCL petrol
+        pumps.
+      </p>
+    </div>
+    <ul class="vendor-logos" aria-label="Approved vendor credentials">
+      {vendors.map(({ name, logo }) => (
+        <li>
+          <Image src={logo} alt={name} width={360} format="webp" quality={90} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .approved-vendors {
+    padding-block: clamp(2.5rem, 5vw, 4.5rem);
+    background: #fff;
+    border-block: 1px solid var(--color-line);
+  }
+  .vendor-heading {
+    text-align: center;
+    max-width: 44rem;
+    margin-inline: auto;
+  }
+  .vendor-heading p {
+    margin-top: var(--space-4);
+    color: var(--color-muted);
+  }
+  .vendor-logos {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    list-style: none;
+    padding: 0;
+    margin: var(--space-8) 0 0;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+  img {
+    width: 100%;
+    max-width: 18rem;
+    height: 6.5rem;
+    object-fit: contain;
+  }
+  @media (max-width: 40rem) {
+    .vendor-logos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--space-8);
+    }
+    img {
+      height: 5rem;
+    }
+  }
+</style>

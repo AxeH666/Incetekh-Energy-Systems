@@ -1,5 +1,24 @@
 # Evidence and asset register
 
+## Vendor logos and contact update — 30 September 2026
+
+The founder supplied `nredcap.jpeg`, `IOCL.jpeg`, `bpcl.jpeg` and `hpcl.png`
+and explicitly confirmed the NREDCAP approved-vendor and IOCL/BPCL/HPCL
+petrol-pump approved-vendor wording. These four logos were visually inspected;
+original files remain unchanged and Astro creates WebP display derivatives.
+The homepage shows a separate approved-vendor section after the existing
+brand/product sections. The confirmation supports only the displayed vendor
+status, not exclusivity, contract counts, dates or a general government endorsement.
+
+Both business contact numbers are founder-confirmed. `9440168111` is the primary
+displayed/click-to-call number; `9441259786` remains a secondary visible phone
+number and the sole WhatsApp destination. The shared footer and Contact page
+show both, and Organization structured data lists both. The founder explicitly
+rejected the screenshot's request to replace the project image; gallery assets
+and image selection remain unchanged.
+
+## Earlier asset inventory
+
 All 43 supplied images were visually inspected for the polish pass: 39 photographs/
 supporting images and four newly supplied logos. No PDFs, brochures, certificates
 or written review spreadsheet were supplied. Original artwork bytes remain unchanged. The founder renamed three project-folder

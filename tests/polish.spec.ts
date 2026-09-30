@@ -79,7 +79,7 @@ test('every visible action resolves, including service fragments and branded res
       .evaluateAll((els) => els.map((el) => el.getAttribute('href')!));
     for (const href of new Set(links)) {
       if (href.startsWith('tel:')) {
-        expect(href).toBe('tel:+919441259786');
+        expect(['tel:+919441259786', 'tel:+919440168111']).toContain(href);
         continue;
       }
       if (href.startsWith('https://wa.me/')) {

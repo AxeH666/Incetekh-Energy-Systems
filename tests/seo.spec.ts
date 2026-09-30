@@ -133,7 +133,7 @@ test('organization schema uses confirmed identity and never sample reviews', asy
   expect(schema['@graph'][0]).toMatchObject({
     '@type': 'Organization',
     name: 'Incetekh Energy',
-    telephone: '+919441259786',
+    telephone: ['+919440168111', '+919441259786'],
     url: 'https://incetekhenergy.com/',
   });
   expect(schema['@graph'][0].logo).toBe(

@@ -5,10 +5,10 @@ test('contact offers a real call path and keyboard-operable answers', async ({
 }) => {
   await page.goto('/contact/');
   const call = page.getByRole('link', {
-    name: 'Call +91 94412 59786',
+    name: 'Call +91 94401 68111',
     exact: true,
   });
-  await expect(call).toHaveAttribute('href', 'tel:+919441259786');
+  await expect(call).toHaveAttribute('href', 'tel:+919440168111');
   await expect(page.locator('form')).toHaveCount(0);
   const whatsapp = page
     .locator('.call-panel')

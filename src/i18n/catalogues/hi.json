@@ -592,5 +592,12 @@
   "Monthly consumption is estimated as bill / ₹{0}. Capacity is consumption / {1} units per kW per month, rounded up to a whole kW with a {2} kW minimum. Roof allowance is {3} sq ft per kW. The model uses {4} units per kW per day, not {5} units for the entire system. Actual tariffs, weather, shading, roof access and equipment affect the final design.": "मासिक खपत का अनुमान बिल / ₹{0} है। क्षमता = खपत / {1} यूनिट प्रति kW प्रति माह, अगले पूर्ण kW तक बढ़ाकर, न्यूनतम {2} kW। प्रति kW {3} वर्ग फुट छत मानी गई है। मॉडल प्रति kW प्रतिदिन {4} यूनिट उपयोग करता है, पूरे सिस्टम के लिए {5} यूनिट नहीं। वास्तविक दरें, मौसम, छाया, छत तक पहुंच और उपकरण अंतिम डिजाइन को प्रभावित करते हैं।",
   "{0} AC + all other household loads": "{0} AC + घर के अन्य सभी उपकरण",
   "{0} ACs + all other household loads": "{0} AC + घर के अन्य सभी उपकरण",
-  "Household examples: {0} kW for {1} AC, {2} kW for {3} ACs, {4} kW for {5} ACs, and {6} kW for {7} ACs, plus other household loads. These assume limited AC operating hours and typical household use, not every appliance running continuously or simultaneously. Actual wattage and hours of use determine suitability. Grid-connected solar needs suitable backup equipment to operate during a power cut.": "घरेलू उदाहरण: {1} AC के लिए {0} kW, {3} AC के लिए {2} kW, {5} AC के लिए {4} kW और {7} AC के लिए {6} kW, साथ में घर के अन्य उपकरण। इनमें सीमित समय तक AC चलाना और सामान्य घरेलू उपयोग माना गया है, हर उपकरण का लगातार या एक साथ चलना नहीं। वास्तविक वाट क्षमता और उपयोग के घंटे उपयुक्तता तय करते हैं। बिजली कटौती में चलने के लिए ग्रिड-कनेक्टेड सोलर को उचित बैकअप उपकरण चाहिए।"
+  "Household examples: {0} kW for {1} AC, {2} kW for {3} ACs, {4} kW for {5} ACs, and {6} kW for {7} ACs, plus other household loads. These assume limited AC operating hours and typical household use, not every appliance running continuously or simultaneously. Actual wattage and hours of use determine suitability. Grid-connected solar needs suitable backup equipment to operate during a power cut.": "घरेलू उदाहरण: {1} AC के लिए {0} kW, {3} AC के लिए {2} kW, {5} AC के लिए {4} kW और {7} AC के लिए {6} kW, साथ में घर के अन्य उपकरण। इनमें सीमित समय तक AC चलाना और सामान्य घरेलू उपयोग माना गया है, हर उपकरण का लगातार या एक साथ चलना नहीं। वास्तविक वाट क्षमता और उपयोग के घंटे उपयुक्तता तय करते हैं। बिजली कटौती में चलने के लिए ग्रिड-कनेक्टेड सोलर को उचित बैकअप उपकरण चाहिए।",
+  "Approved vendor.": "अनुमोदित विक्रेता।",
+  "NREDCAP-approved vendor. Approved vendor for IOCL, BPCL and HPCL petrol pumps.": "NREDCAP का अनुमोदित विक्रेता। IOCL, BPCL और HPCL पेट्रोल पंपों के लिए अनुमोदित विक्रेता।",
+  "Approved vendor credentials": "अनुमोदित विक्रेता की मान्यताएँ",
+  "NREDCAP": "NREDCAP",
+  "IOCL": "IOCL",
+  "BPCL": "BPCL",
+  "HPCL": "HPCL"
 }
