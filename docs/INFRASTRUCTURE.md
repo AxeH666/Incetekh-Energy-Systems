@@ -5,10 +5,13 @@ engineer responsible for each approved infrastructure change.
 
 This is the current infrastructure reference. [SCOPE.md](../SCOPE.md) still controls
 Phase 1. Earlier delivery reports describe historical tasks, not today's hosting.
-The supplied `INCETEKH_INFRASTRUCTURE_HANDOFF.md` is preserved unchanged as input;
+The supplied `INCETEKH_INFRASTRUCTURE_HANDOFF.md` is preserved unchanged in the
+local recovery archive described below;
 its proposed WhatsApp Cloud API/backend work is **outside the locked scope**.
-This audit changes documentation only: no deployment, DNS changes, purchases,
-messages, account settings or integrations.
+The initial audit changed documentation only. The owner subsequently authorized
+commit, push, PR merge, synchronization and stale-branch cleanup. Existing
+Cloudflare Git integration may publish this documentation release; no manual
+deployment, DNS change, purchase, account-setting change or integration is included.
 
 ## Evidence and access
 
@@ -182,19 +185,20 @@ SHA/version, dashboard approval gates, token scope, or whether lint/tests run in
 the cloud. `npm run build` alone does not execute `npm run verify`. A green build
 check is not independent code review or full test evidence.
 
-Before the next authorized push, inspect Workers & Pages > this Worker > Settings
-
-> Builds: repository, production branch, commands, build root, watch paths, preview
-> branches, build variables and deployment credential permissions. Check Deployments
-> for the **active version ID and SHA**, not just the most recent successful build.
-> Keep credentials and account recovery material outside Git.
+For dashboard verification, inspect **Workers & Pages / this Worker / Settings /
+Builds**: repository, production branch, commands, build root, watch paths, preview
+branches, build variables and deployment credential permissions. Check Deployments
+for the **active version ID and SHA**, not just the most recent successful build.
+These remain manual verification tasks; the owner has authorized publication of
+this documentation component despite those recorded gaps. Keep credentials and
+account recovery material outside Git.
 
 Use fresh main, one component/branch/PR, focused validation, self-review, independent
 review, then approved merge. Consider required PR review and relevant successful
 checks using [GitHub branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
 No protections were changed here. **Pushes, including documentation branches, may
-publish previews; merges may publish production.** This audit stays local rather
-than triggering either. Do not start the next implementation component until
+publish previews; merges may publish production.** The initial audit stayed local;
+the owner subsequently authorized push and merge with this behavior already disclosed. Do not start the next implementation component until
 this documentation component is reviewed and merged under an approved release policy.
 
 Cloudflare's [build configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
@@ -383,9 +387,10 @@ Record date, verifier and non-secret evidence for each completed item.
 
 Each implementation below is a separate authorized component; no stacked PRs.
 
-1. **Close this documentation audit.** Independent review of the local diff;
-   arrange an approved push/merge once automatic deployment implications are
-   accepted or safely gated. Capture dashboard facts and rollback target first.
+1. **Close this documentation audit.** Publication, independent review, merge and
+   stale-branch cleanup are now authorized. Record PR/check results at closeout.
+   Dashboard facts and a verified rollback target remain follow-up tasks before
+   the next application or infrastructure release.
 2. **Repair public correctness urgently.** Owner confirms public contact address
    and testimonial evidence/permissions; focused PR removes/replaces unsupported
    comments and broken email links. Keep the truthful unavailable-form notice
@@ -424,9 +429,11 @@ Validated on Node 22.23.3 using the existing installed dependencies:
   desktop widths. No new tests were necessary for documentation-only edits.
 - Formatting passed for tracked supported files and the new infrastructure doc;
   relative documentation links and `git diff --check` passed.
-- The normal `npm run lint` is **not green**: it flags the pre-existing, untracked
-  owner handoff. That file was intentionally preserved byte-for-byte, SHA-256
-  `5E2DA7C7B611204EE3454BF8815CDFECF54C5BA01928600B260F8F5FA263C7D1`.
+- The initial `npm run lint` flagged the untracked owner handoff. During the
+  authorized hygiene follow-up it was archived outside the checkout, unchanged,
+  with SHA-256 `5E2DA7C7B611204EE3454BF8815CDFECF54C5BA01928600B260F8F5FA263C7D1`.
+  This removes the unrelated document from the repository formatting boundary;
+  the normal `npm run lint` now passes after the consistency sweep.
 - Independent local agent review found no blocking findings. It checked source,
   diff and saved evidence; it did not independently inspect provider dashboards.
 
@@ -435,10 +442,20 @@ penetration test, full Git-history secret scan, paid-service verification or
 rollback drill was performed. Browser tests used local production output and do
 not establish live form delivery or account configuration.
 
-The focused branch is `docs/infrastructure-audit`, based on current main. It is
-kept local because publishing it can trigger a Cloudflare preview. There is no
-new PR or merge; completing that workflow awaits an approved publication path.
-The supplied untracked handoff remains a retained workspace exception.
+The focused branch is `docs/infrastructure-audit`, based on current main. The
+owner's follow-up authorizes push, merge, pull main and stale-branch deletion.
+The associated GitHub PR/check history records the publication outcome; this
+paragraph records authorization, not a claim that a pending operation succeeded.
+
+Local recovery material is under
+`C:\Users\axehe\Desktop\incetekh-energy-recovery\hygiene-20261013`: the unchanged
+handoff, pre-cleanup ref inventory, merged-PR mapping, full Git bundle and a
+verified mirror restore. Fifty saved refs matched the restored bundle. The 23
+old feature-branch tips match their merged PR heads and their merge commits are
+ancestors of main. Delete only rechecked tips after the documentation PR merges;
+retain any branch that advances or has unmerged work. Recovery material stays
+local; ignored build/test evidence is retained. Future cleanup must likewise
+preserve unique material before deleting refs or moving files.
 
 ## Maintaining and rechecking this document
 

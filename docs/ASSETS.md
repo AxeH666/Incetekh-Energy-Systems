@@ -75,20 +75,23 @@ The founder explicitly authorized temporary short positive review copy while the
 verified spreadsheet is missing. The final brief requests natural presentation without sample labels. Ten
 illustrative comments are centralized and internally marked unverified, with no
 names/ratings or structured review data. Photographs accompany the requested temporary copy, without verified authorship. Replace the text with verified records or
-remove it before public deployment; see [TESTIMONIALS.md](TESTIMONIALS.md).
+remove it urgently: the 13 October audit confirmed it is already public. See
+[TESTIMONIALS.md](TESTIMONIALS.md) and [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
 
-No capacities, project dates, locations, customer identities, government/PSU
+Apart from the founder-confirmed approved-vendor wording in the addendum above,
+no capacities, project dates, locations, customer identities, other government/PSU
 relationships, certifications, strategic partnerships, exclusive dealership/empanelment claims,
 performance statistics beyond the confirmed project count, savings or technical outcomes have adequate evidence for
 publication as historical results. Calculator savings are separately labelled modelling illustrations, not installation evidence.
 
-On 30 September 2026 the founder supplied INCETEKH ENERGY SOLUTIONS, 7/1195-5, Block No.7, Shop No.2, Siva Shankar Shopping Mall, Korrapadu Road, Proddatur, Y.S.R. Kadapa District, Andhra Pradesh; and support@incetekh.com. These appear on the website. No pincode, statewide service coverage or opening hours was confirmed. Mailbox delivery is unverified.
+On 30 September 2026 the founder supplied INCETEKH ENERGY SOLUTIONS, 7/1195-5, Block No.7, Shop No.2, Siva Shankar Shopping Mall, Korrapadu Road, Proddatur, Y.S.R. Kadapa District, Andhra Pradesh; and support@incetekh.com. These appear on the website. No pincode, statewide service coverage or opening hours was confirmed. Mailbox delivery is unverified; the 13 October audit found that `incetekh.com` returns NXDOMAIN. The owner-confirmed administrative address is `incetekhenergy@gmail.com`, not an automatically approved public replacement.
 Generated/uncertain images are not presented as project proof. Coordinates and
 addresses visible in originals are not used to infer those business details.
 
 The supplied Incetekh artwork replaces the earlier provisional wordmark/favicon.
-Publication permission for photos should be confirmed by the owner before external
-launch. Temporary review copy is a deployment blocker until replaced or removed.
+Publication permission for photos still needs owner confirmation. The site is
+already public; unverified temporary review copy remains a public-readiness defect
+until replaced or removed, even while indexing is disabled.
 
 The founder confirmed all three services are free in the homepage-refresh session.
 WhatsApp uses the confirmed public phone via an ordinary click-to-chat link.

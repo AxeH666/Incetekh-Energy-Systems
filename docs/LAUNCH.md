@@ -28,8 +28,9 @@ as instructions for the existing Workers deployment.
 Cloudflare Workers Builds has successful GitHub checks on main and a feature
 branch. **A push can publish a preview; a merge can deploy production.** Check
 current triggers, watch paths, variables and approvals before pushing. The
-documentation audit deliberately did not push or merge because deployment was
-prohibited. Branch protection is currently absent; propose a focused release
+initial documentation audit did not push or merge because deployment was
+prohibited. The owner subsequently authorized publication, merge and branch
+cleanup; the existing Git integration can therefore run for this release. Branch protection is currently absent; propose a focused release
 safeguard separately rather than claiming review is enforced.
 
 The 30 September preview fix added the empty `previews` block after a build succeeded
