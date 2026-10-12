@@ -6,7 +6,8 @@ labels. These are not verified endorsements or statements attributed to the peop
 photographed. `data-review-status="illustrative"` records this internally. No names,
 ratings, locations, quantified outcomes or review schema are added.
 
-Before public deployment, replace the copy with verified, permissioned statements
+The 13 October 2026 [infrastructure audit](INFRASTRUCTURE.md) confirmed these
+temporary comments are already public. Urgently replace the copy with verified, permissioned statements
 from the review spreadsheet or remove it. Check photo permission and attribution
 separately. Noindex is not access control or authorization to publish draft reviews.
 
@@ -54,4 +55,4 @@ by CSS. Check these derivatives after any source/crop change. Originals remain
 unchanged outside the published directory.
 
 The old `/reviews/` route redirects to `/#reviews`, remains noindex and stays out
-of the sitemap. Main navigation includes About, Services, Projects and Contact.
+of the sitemap. Main navigation includes About, Services, Products, Projects and Contact.

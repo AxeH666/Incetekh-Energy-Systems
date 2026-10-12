@@ -1,6 +1,9 @@
 # Search, analytics and production safeguards
 
-No account has been connected or verified and nothing has been deployed.
+The website is deployed on Cloudflare Workers. The 13 October 2026 audit found
+live `noindex, follow`, an empty sitemap, no Search Console HTML verification tag
+and no analytics beacon in sampled HTML. Search/analytics account state remains
+unverified. See [INFRASTRUCTURE.md](INFRASTRUCTURE.md) for evidence and launch order.
 
 ## Build configuration
 
@@ -10,8 +13,7 @@ Rebuild after any change.
 
 - `PUBLIC_SITE_INDEXABLE=false` is the safe default. All pages emit
   `noindex, follow`, sitemap has no URLs, and robots omits the sitemap announcement.
-- Set `PUBLIC_SITE_INDEXABLE=true` only for an approved launch build. The six
-  content pages become indexable. The 404 remains noindex with no canonical.
+- Set `PUBLIC_SITE_INDEXABLE=true` only for an approved launch build. Six language versions of 23 content routes become indexable (138 sitemap URLs). The 404 remains noindex with no canonical.
 - `PUBLIC_GOOGLE_SITE_VERIFICATION` accepts the value from Google's HTML-tag
   verification method. Omit it until a real Search Console property exists.
 - `PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` accepts the public 32-character beacon
@@ -30,7 +32,7 @@ Each page has a distinct title/description, an absolute canonical, shared social
 metadata and one h1. Home includes Organization and WebSite JSON-LD with only
 confirmed identity/telephone and the supplied company logo. No address, service area, legal registration,
 founding date, rating or review is inferred. A small static sitemap endpoint
-keeps the six explicit routes readable without a new dependency. Add future
+lists the general and city routes across all six languages without a new dependency. Add future
 public routes there and update its regression test. The old `/reviews/` route
 is a noindex static redirect to `/#reviews`, excluded from the sitemap.
 
@@ -44,9 +46,15 @@ Astro's built-in CSP emits a policy in each HTML document. Scripts/styles remain
 local apart from the optional allowed Cloudflare beacon; objects and form posts
 are disallowed. `_headers` configures no-sniff, frame denial, referrer/permissions
 policies and immutable caching only for hashed Astro assets on compatible hosts
-such as Cloudflare Pages. On other hosts configure equivalent response headers.
-Astro preview does not apply `_headers`; hosted HTTP behavior still needs a
-post-deployment check. Keep HTML revalidatable; never cache it as immutable.
+including Cloudflare Workers Static Assets. Live checks on 13 October confirmed
+the configured headers, HTML revalidation and hashed-CSS immutable caching.
+Astro preview does not apply `_headers`; recheck hosted HTTP behavior after releases. Keep HTML revalidatable; never cache it as immutable.
+
+Before enabling indexing, fix the public contact/review gaps and HTTP redirects.
+Verify preview variable isolation and the public `workers.dev` alias: the production
+alias shares the built artifact and does not automatically remain noindex. Search
+Console ownership, analytics ingestion and native-speaker content review remain
+manual acceptance items. No integration was enabled by the documentation audit.
 
 ## Verification
 
@@ -64,4 +72,4 @@ dashboard ingestion. Check that separately after an approved deployment.
 - [Cloudflare Web Analytics setup](https://developers.cloudflare.com/web-analytics/get-started/)
 - [Cloudflare analytics privacy](https://developers.cloudflare.com/web-analytics/about/)
 - [Astro CSP configuration](https://docs.astro.build/en/reference/configuration-reference/#securitycsp)
-- [Cloudflare static headers](https://developers.cloudflare.com/pages/configuration/headers/)
+- [Cloudflare static headers](https://developers.cloudflare.com/workers/static-assets/headers/)
