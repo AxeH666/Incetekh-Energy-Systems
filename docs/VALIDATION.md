@@ -1,5 +1,10 @@
 # Final polish validation
 
+> Historical implementation validation. Counts, running previews and deployment
+> statements below describe their dated tasks, not current infrastructure.
+> See [INFRASTRUCTURE.md](INFRASTRUCTURE.md) for the 13 October 2026 audit and
+> focused documentation validation.
+
 ## Restrained wide-screen spacing refinement — 30 September 2026
 
 Two style changes: the shared content-width cap moves from 78rem to 92rem, and

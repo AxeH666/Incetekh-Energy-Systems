@@ -1,5 +1,9 @@
 # Final pre-deployment polish
 
+> Historical pre-deployment polish report. Its route counts and launch status
+> describe that task. See [INFRASTRUCTURE.md](INFRASTRUCTURE.md) for current
+> hosting and [VISIBILITY.md](VISIBILITY.md) for current sitemap behavior.
+
 Current follow-up: [HOMEPAGE-REFRESH.md](HOMEPAGE-REFRESH.md) supersedes the
 review motion, homepage composition and phone-only lead paths below.
 

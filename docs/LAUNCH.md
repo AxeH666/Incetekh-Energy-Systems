@@ -1,115 +1,97 @@
-# Deployment handoff
+# Deployment and launch acceptance
 
-## Cloudflare branch-preview correction — 30 September 2026
+The website is deployed on **Cloudflare Workers Static Assets** at
+<https://incetekhenergy.com/>. HTTPS `www` redirects to the apex. Hosting selection
+and domain connection are no longer pending. Phase 1 remains incomplete.
 
-The repository now has an existing Cloudflare Workers build integration for
-`incetekh-energy-systems`. The supplied log showed `npm run build` successfully
-generating 144 static pages, followed by `npx wrangler preview` failing because
-the required `previews` block was missing. The founder authorized completing
-the preview fix and Git workflow after reviewing the proposed configuration.
+The dated [INFRASTRUCTURE.md](INFRASTRUCTURE.md) is authoritative for observed
+infrastructure, discrepancies, costs, dashboard gaps, rollback and execution order.
+This file is the release checklist. Do not reuse the earlier Pages hosting proposal
+as instructions for the existing Workers deployment.
 
-`wrangler.jsonc` serves only `dist/`, uses `404-page` for missing paths, and
-includes an empty `previews` block. No Worker script, runtime bindings, DNS
-records or custom-domain changes are added. Wrangler 4.144.0 accepted this
-configuration in a local `deploy --dry-run`; remote status is recorded in the
-PR. The existing Cloudflare integration performs the branch-preview publication
-after push. This does not complete the production-domain, indexing, verified
-content, form-delivery or business-email launch gates below.
+## Release settings
 
-Configuration references: [Preview configuration](https://developers.cloudflare.com/workers/previews/configuration/)
-and [static-site routing](https://developers.cloudflare.com/workers/static-assets/routing/static-site-generation/).
+| Setting                      | Repository contract / verification limit                                                |
+| ---------------------------- | --------------------------------------------------------------------------------------- |
+| Source                       | Reviewed commit on `main`; current cloud production branch needs dashboard confirmation |
+| Node                         | 22.23.3 in `.nvmrc`, minimum 22.19; verify the cloud build log                          |
+| Install                      | `npm ci` for reproducible local validation; confirm cloud install behavior              |
+| Build                        | `npm run build`                                                                         |
+| Deploy                       | Owner reports `npx wrangler deploy`; verify Cloudflare Builds settings                  |
+| Preview                      | Historical integration uses `npx wrangler preview`; `previews: {}` exists in Wrangler   |
+| Assets                       | `dist/` only; no Worker script, database or server adapter                              |
+| Missing paths                | Wrangler `404-page`; live missing-path test returned 404                                |
+| Preview indexing             | `PUBLIC_SITE_INDEXABLE=false`                                                           |
+| Approved production indexing | `PUBLIC_SITE_INDEXABLE=true`, only after readiness gaps close                           |
+| Public options               | Search Console HTML token and optional Cloudflare beacon in `.env.example`              |
 
-## Original launch handoff
+Cloudflare Workers Builds has successful GitHub checks on main and a feature
+branch. **A push can publish a preview; a merge can deploy production.** Check
+current triggers, watch paths, variables and approvals before pushing. The
+initial documentation audit did not push or merge because deployment was
+prohibited. The owner subsequently authorized publication, merge and branch
+cleanup; the existing Git integration can therefore run for this release. Branch protection is currently absent; propose a focused release
+safeguard separately rather than claiming review is enforced.
 
-Status: local website ready; no hosting account, domain connection, deployment,
-Search Console verification or analytics account was changed in this task.
-The wider SCOPE.md milestone remains incomplete until launch and business email
-are separately approved, configured and verified.
+The 30 September preview fix added the empty `previews` block after a build succeeded
+but `wrangler preview` failed. Wrangler 4.144.0 dry-run acceptance was historical;
+Wrangler is not pinned in current package dependencies. See GitHub PR #22/#23 and
+the audit for build IDs; a past successful build does not identify today's active
+Worker version.
 
-## Hosting choice and build
+## Before the next approved release
 
-This is a static site. A static host is sufficient; no adapter, application
-server, database, VM or runtime secrets are needed. Cloudflare Pages is a
-compatible option for the included `_headers` file, not a purchased/selected
-service. Another static host can serve the same `dist/` directory with equivalent
-headers. Keep the existing repository; do not re-scaffold from a hosting guide.
+1. Confirm dashboard ownership/recovery, active SHA/version, previous accepted
+   version, commands, public variables, preview isolation and deployment triggers.
+   Export current DNS/rules securely before proposing any infrastructure changes.
+2. Fix the public `support@incetekh.com` contact path after confirming the intended
+   address. The audit found NXDOMAIN for that domain. Administrative Gmail is
+   `incetekhenergy@gmail.com`; do not substitute it publicly without owner approval.
+3. Replace the ten temporary comments with verified, permissioned feedback or
+   remove them. Verify selected photograph publication rights independently. These
+   comments are already live without visible sample labels; noindex is not privacy.
+4. Complete native-speaker review of regional copy, especially subsidy, financing
+   and legal terms. See [LANGUAGES.md](LANGUAGES.md).
+5. Correct HTTP routing through a separately approved Cloudflare change. HTTPS
+   `www` preserves path/query, but HTTP apex serves 200 and HTTP `www` returned 522.
+6. Use pinned Node, `npm ci`, then `npm run verify` for the default preview build.
+   Build the approved production artifact with matching public values and run
+   `npm test -- tests/seo.spec.ts` with those values. No test tokens in production.
+7. Set only approved analytics/verification options, avoid duplicate beacon
+   injection, and handle the public `workers.dev` alias before indexing. Confirm
+   previews stay non-indexable; they are not automatically private.
+8. Record SHA, Node/Wrangler versions, build configuration, artifact/version and
+   recovery target. Deploy only under release authorization.
 
-| Setting                  | Value                                    |
-| ------------------------ | ---------------------------------------- |
-| Source                   | Reviewed commit on `main`                |
-| Node                     | 22.23.3 (`.nvmrc`; minimum 22.19)        |
-| Install                  | `npm ci`                                 |
-| Build                    | `npm run build`                          |
-| Publish directory        | `dist`                                   |
-| Production domain        | `https://incetekhenergy.com`             |
-| Preview indexing         | `PUBLIC_SITE_INDEXABLE=false`            |
-| Launch indexing          | `PUBLIC_SITE_INDEXABLE=true`             |
-| Analytics / verification | Optional public values in `.env.example` |
-
-Only publish `dist/`, never the repository root or original asset folders.
-Disable automatic deployments until the founder approves the release policy.
-Preview and production environments must have separate indexing settings.
-Do not enable automatic analytics injection alongside the manual token option.
-
-## Before the approved launch
-
-Complete native-speaker editorial review of the machine-translated regional copy,
-especially subsidy, finance and legal terms. See [LANGUAGES.md](LANGUAGES.md).
-
-The homepage site-visit form is deliberately unconnected at the founder's request. Before offering online booking publicly, connect and verify the chosen email or WhatsApp delivery path, update its availability/privacy copy, and confirm a real request arrives. The current form validates locally and explicitly says nothing was sent. See [SOLAR-PLANNING.md](SOLAR-PLANNING.md).
-
-1. Confirm hosting account ownership, registrar/DNS access and deployment approval.
-2. Confirm use of the public phone number and permission to publish the selected
-   project/customer photographs. Replace all 10 temporary comments using the verified review sheet, or remove
-   the feedback text. The final polish has no visible sample labels and is not
-   approved to publish invented endorsements. See TESTIMONIALS.md.
-3. Inspect existing DNS records and save their values before proposing changes.
-   Use the host's actual domain instructions and assigned targets. Do not guess
-   an IP/CNAME or replace existing mail records. An apex-domain setup on Pages
-   can require Cloudflare nameservers; decide that only after inspecting DNS.
-4. Configure HTTPS and choose the apex domain as canonical. Redirect HTTP and
-   `www` to it while preserving paths. Restrict or redirect the host's production
-   alias; leave private previews authenticated and non-indexable.
-5. Run `npm ci`, then `npm run verify` with default preview settings. Inspect the
-   screenshots. Build the approved production artifact with indexing enabled.
-6. Set real optional analytics/verification values only if those accounts are
-   ready. Use the same environment for `npm test -- tests/seo.spec.ts` against
-   that build. No test identifiers should be used in a deployed artifact.
-7. Record the Git commit, build settings and last known good artifact for rollback.
+The site-visit form is deliberately unconnected. It explicitly says no request
+is sent; call/WhatsApp links are the available route. Do not imply booking receipt.
+Any delivery integration needs separate scope and approval; WhatsApp Cloud API
+automation remains excluded by `SCOPE.md`.
 
 ## Post-deployment acceptance
 
-- Load every route from the domain on desktop and a phone; check photos, font,
-  header, footer, focus indicators and all call links. Arrange a real test call
-  with the owner; automated tests did not place a call.
-- Verify HTTPS, canonical redirects, title/social tags, 138 sitemap URLs (23 pages in six languages, including all 13 city guides) and the legacy `/reviews/` redirect to `/#reviews`,
-  robots sitemap declaration and `index, follow` on content pages.
-- Request a nonexistent path: it must return HTTP 404 with the custom error
-  page and noindex, not HTTP 200 or the homepage. Disable any SPA fallback.
-- Check `_headers` response behavior on the selected host, including frame
-  denial/no-sniff and hashed asset caching. Check that HTML revalidates and
-  the browser console has no blocked resources. Astro preview cannot prove this.
-- Verify Search Console ownership, submit `/sitemap.xml`, inspect representative
-  URLs and run Google's Rich Results Test. Rankings/indexing are not guaranteed.
-- If analytics is enabled, confirm real visits appear once in the correct
-  account and the privacy page reflects that setting. Check deployed performance
-  with PageSpeed Insights; local byte-budget checks are not Core Web Vitals.
-- If launch fails, use the host's rollback to the recorded good artifact and
-  configuration. Recheck routes and indexing; avoid improvising DNS changes.
+- Check every top-level route and representative language/city pages on desktop
+  and a real phone; inspect navigation, photographs, focus, privacy and contact links.
+  Coordinate actual call/message/email receipt with the owner when authorized.
+- Test all four HTTP/HTTPS and apex/`www` combinations, including paths and queries.
+  Require a permanent, loop-free redirect to HTTPS apex for noncanonical URLs.
+- Verify content `index, follow`, apex canonical/social tags, language alternates,
+  homepage structured data, **138 sitemap URLs** and the robots sitemap declaration.
+  Current live output is noindex with an empty sitemap; this is a pending gate.
+- Check `/reviews/` navigates to `/#reviews`. Current static output is HTTP 200
+  with meta refresh, not an HTTP 301. Keep it out of the sitemap and noindex.
+- Require a real 404 and noindex for a nonexistent path, no canonical, no SPA fallback.
+- Recheck Workers `_headers`, CSP meta policy, HTML revalidation and hashed asset
+  immutable caching; inspect browser resource failures. Local preview cannot prove
+  edge headers. See [Workers headers](https://developers.cloudflare.com/workers/static-assets/headers/).
+- Verify Search Console ownership and submit sitemap; inspect representative URLs
+  and structured data. Search visibility is not guaranteed by successful submission.
+- If analytics is enabled, verify one beacon, correct privacy copy and actual
+  dashboard ingestion. Run deployed performance checks; local builds are not
+  real-user Core Web Vitals evidence.
+- Follow the documented rollback procedure if acceptance fails; rollback is itself
+  a deployment requiring authorization. Preserve evidence and avoid improvised DNS.
 
-## Local visibility follow-up
-
-The Proddatur office address and support@incetekh.com were supplied by the founder on 30 September 2026 and are displayed. Verify mailbox delivery before launch. Service area, pincode, opening hours, legal identifiers, social profiles
-and verified credentials remain unknown. Obtain them before creating/updating a
-Google Business Profile, adding a map or publishing LocalBusiness details. Keep
-name/phone consistent across the website and verified listings. No profiles were
-created in this task.
-
-## Official references
-
-- [Astro build settings on Cloudflare Pages](https://developers.cloudflare.com/pages/framework-guides/deploy-an-astro-site/)
-- [Custom domain requirements](https://developers.cloudflare.com/pages/configuration/custom-domains/)
-- [Static routes and 404 handling](https://developers.cloudflare.com/pages/configuration/serving-pages/)
-- [Search Console ownership verification](https://support.google.com/webmasters/answer/9008080?hl=en)
-- [Search/analytics implementation notes](VISIBILITY.md)
-- [Separate business-email preparation](EMAIL.md)
+Business email remains a separate component: [EMAIL.md](EMAIL.md). Confirm business
+listing details before Business Profile setup; do not invent hours, service areas,
+legal identifiers or credentials. Do not start later-scope automation.

@@ -1,5 +1,9 @@
 # Phase 1 local website delivery
 
+> Historical local-delivery record. The site is now deployed on Cloudflare Workers.
+> See [INFRASTRUCTURE.md](INFRASTRUCTURE.md) for the 13 October 2026 audit, current
+> launch gaps and authorization boundaries; statements below describe the earlier task.
+
 Current authorization: deliver the complete local website through sequential,
 reviewed and merged PRs. No external deployment, purchases, DNS or mailbox changes.
 

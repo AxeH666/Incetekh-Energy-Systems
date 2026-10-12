@@ -1,5 +1,9 @@
 # Phase 1 local delivery
 
+> Historical local-delivery record. The site is now deployed on Cloudflare Workers.
+> See [INFRASTRUCTURE.md](INFRASTRUCTURE.md) for the 13 October 2026 audit, current
+> launch gaps and authorization boundaries; statements below describe the earlier task.
+
 This records the initial delivery through PR #7. The subsequent pre-deployment
 polish, new confirmed facts and branding supersede the initial choices below;
 see [POLISH.md](POLISH.md) and [VALIDATION.md](VALIDATION.md).
