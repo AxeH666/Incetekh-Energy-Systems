@@ -10,10 +10,11 @@ The homepage shows a separate approved-vendor section after the existing
 brand/product sections. The confirmation supports only the displayed vendor
 status, not exclusivity, contract counts, dates or a general government endorsement.
 
-Both business contact numbers are founder-confirmed. `9440168111` is the primary
-displayed/click-to-call number; `9441259786` remains a secondary visible phone
-number and the sole WhatsApp destination. The shared footer and Contact page
-show both, and Organization structured data lists both. The founder explicitly
+The original two-number contact decision was superseded on 13 October 2026:
+the founder confirmed `+91 9441259786` as the single current public phone and
+WhatsApp number, and `incetekhenergy@gmail.com` as the public email. Shared
+contacts, translations, metadata and Organization telephone use that decision.
+The founder explicitly
 rejected the screenshot's request to replace the project image; gallery assets
 and image selection remain unchanged.
 
@@ -84,7 +85,7 @@ relationships, certifications, strategic partnerships, exclusive dealership/empa
 performance statistics beyond the confirmed project count, savings or technical outcomes have adequate evidence for
 publication as historical results. Calculator savings are separately labelled modelling illustrations, not installation evidence.
 
-On 30 September 2026 the founder supplied INCETEKH ENERGY SOLUTIONS, 7/1195-5, Block No.7, Shop No.2, Siva Shankar Shopping Mall, Korrapadu Road, Proddatur, Y.S.R. Kadapa District, Andhra Pradesh; and support@incetekh.com. These appear on the website. No pincode, statewide service coverage or opening hours was confirmed. Mailbox delivery is unverified; the 13 October audit found that `incetekh.com` returns NXDOMAIN. The owner-confirmed administrative address is `incetekhenergy@gmail.com`, not an automatically approved public replacement.
+On 30 September 2026 the founder supplied INCETEKH ENERGY SOLUTIONS, 7/1195-5, Block No.7, Shop No.2, Siva Shankar Shopping Mall, Korrapadu Road, Proddatur, Y.S.R. Kadapa District, Andhra Pradesh. The address remains current. No pincode, statewide service coverage or opening hours was confirmed. The accompanying historical `support@incetekh.com` address is invalid (NXDOMAIN in the 13 October audit) and superseded by the explicitly confirmed public and administrative `incetekhenergy@gmail.com`. Mailbox delivery was not tested; see [EMAIL.md](EMAIL.md).
 Generated/uncertain images are not presented as project proof. Coordinates and
 addresses visible in originals are not used to infer those business details.
 

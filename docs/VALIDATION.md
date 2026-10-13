@@ -403,6 +403,11 @@ Hosting/domain/email remain separate tasks under [LAUNCH.md](LAUNCH.md).
 
 ## Approved-vendor section and contact routing — 30 September 2026
 
+Historical validation below describes the two-number contact contract at that
+date. The 13 October contact-correctness release supersedes it with the single
+confirmed phone/WhatsApp number `+91 9441259786` and public
+`incetekhenergy@gmail.com`; see [INFRASTRUCTURE.md](INFRASTRUCTURE.md#contact-correctness-follow-up-validation).
+
 Added founder-supplied NREDCAP, IOCL, BPCL and HPCL logos with founder-confirmed
 approved-vendor wording. Both contact numbers are visible; 9440168111 is the
 primary call/display number and all WhatsApp drafts still target 9441259786.

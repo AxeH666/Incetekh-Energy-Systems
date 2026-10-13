@@ -130,7 +130,7 @@ for (const width of [390, 1440]) {
         '7/1195-5, Block No.7, Shop No.2,',
       );
       await expect(
-        page.locator('footer a[href="mailto:support@incetekh.com"]'),
+        page.locator('footer a[href="mailto:incetekhenergy@gmail.com"]'),
       ).toBeVisible();
       expect(
         await page.evaluate(
@@ -150,7 +150,7 @@ for (const width of [390, 1440]) {
       page.locator('#complaints a[href^="mailto:"]'),
     ).toHaveAttribute(
       'href',
-      'mailto:support@incetekh.com?subject=Service%20complaint',
+      'mailto:incetekhenergy@gmail.com?subject=Service%20complaint',
     );
   });
 }

@@ -1,13 +1,14 @@
 # Business email: current status and preparation
 
 As of 13 October 2026, **incetekhenergy@gmail.com** is the owner-confirmed
-administrative address. It is not automatically the public enquiry address or
-proof of the login/recovery address on each service.
+public enquiry and administrative address. The contact-correctness release uses
+it throughout all six website languages, including complaint links. This is not
+proof of the login/recovery address on each service or a delivery test.
 
-The live website still links to **support@incetekh.com**, a different domain from
-`incetekhenergy.com`. Two public DNS resolvers returned NXDOMAIN for `incetekh.com`;
-this public contact path needs an owner-approved correction. The audit did not
-change website contact details or send email.
+The earlier infrastructure audit found the invalid `support@incetekh.com` on
+the website and NXDOMAIN for its domain through two public resolvers. The owner
+has explicitly replaced it with Gmail. Do not reintroduce the old address.
+The release PR records post-merge live verification; no email was sent by the audit.
 
 For `incetekhenergy.com`, public DNS has no MX or apex TXT/SPF answers and no DMARC
 record. DKIM provider/selectors and any purchased mailbox subscription are unknown.
@@ -18,7 +19,9 @@ mail records there even if Hostinger supplies the mailboxes. See
 
 ## Historical contact decision
 
-The founder explicitly supplied `support@incetekh.com` for the website on 30 September 2026. It is now displayed in the footer and Contact page with email links. Mailbox existence, provider and send/receive operation have not been verified; current DNS findings above supersede the earlier unknown DNS status. No account was purchased, DNS changed or email sent. Correct and verify the public contact path urgently; email setup remains a separate component.
+The 30 September 2026 instruction to publish `support@incetekh.com` is superseded
+by the owner's 13 October confirmation above. Professional email setup remains
+a separate component. No account was purchased, DNS changed or email sent.
 
 ## Decisions needed from the owner
 

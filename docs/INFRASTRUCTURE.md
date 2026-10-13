@@ -13,16 +13,26 @@ commit, push, PR merge, synchronization and stale-branch cleanup. Existing
 Cloudflare Git integration may publish this documentation release; no manual
 deployment, DNS change, purchase, account-setting change or integration is included.
 
+The contact-correctness follow-up starts from PR #24's merged `main`,
+`b288d393c8936ece63081d1b4098026ce015f496`. The owner explicitly confirmed one
+public phone/WhatsApp number and the public Gmail address below. This follow-up
+changes public contacts and their tests/documentation through the existing Git
+deployment process. Customer reviews, indexing settings and form functionality
+are unchanged. Cloudflare dashboard changes still require separate approval.
+The associated release PR is the durable record of post-merge live acceptance;
+repository checks alone do not establish that production has updated.
+
 ## Evidence and access
 
-- **Verified — repository:** inspected at `a59cd724f7bd090465b5f1ce959a5c4b782fc947`
+- **Verified — initial audit repository:** inspected at `a59cd724f7bd090465b5f1ce959a5c4b782fc947`
   (`main` and fetched `origin/main` agreed). This proves source configuration only.
 - **Verified — live:** unauthenticated HTTP GETs, validated TLS, public DNS via
   Google DNS, selected mail checks repeated via Cloudflare DNS, and Verisign RDAP.
   These are point-in-time observations, not an uptime or device-acceptance claim.
 - **Verified — GitHub:** authenticated read-only API inspection of repository,
   checks, workflows, environments, deployments, rulesets and branch protection.
-- **Owner reported:** the supplied handoff and current administrative email.
+- **Owner reported:** the supplied handoff and the subsequently confirmed public
+  phone, WhatsApp and public/administrative email.
 - **Inferred:** a conclusion supported by evidence but not directly inspected.
 - **Pending / manual:** a required task or dashboard fact not yet established.
 
@@ -39,18 +49,18 @@ the supplied client date, 13 October in India.
 ## Current state and priorities
 
 The HTTPS website and HTTPS `www` redirect work. Phase 1 is **not complete**:
-HTTP redirects, public content/contact correctness, indexing, search/measurement,
+HTTP redirects, public content approval, contact-release acceptance, indexing, search/measurement,
 operational ownership and professional email still need closure.
 
-| Finding                               | Evidence                                                                                    | Required follow-up                                                                                    |
-| ------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Production excludes search indexing   | Live content has `noindex, follow`; sitemap has zero URLs                                   | Fix public-readiness gaps first, then approve an indexable production build                           |
-| HTTP is not canonicalized             | Apex HTTP returns 200; HTTP `www` returns 522 on root and a path/query test                 | Inspect redirect rules and HTTPS enforcement; approve a focused correction                            |
-| Public email cannot presently resolve | Live `support@incetekh.com`; `incetekh.com` returns NXDOMAIN through two resolvers          | Confirm the intended public mailbox; remove/replace the broken contact path through a reviewed change |
-| Temporary endorsements are live       | Ten source comments, live `data-review-status="illustrative"`, no visible sample disclaimer | Replace with verified, permissioned feedback or remove; review photo permission separately            |
-| Form is deliberately unavailable      | Live notice says inputs are not sent/saved; source prevents submission                      | Keep truthful call/WhatsApp fallback; delivery is not configured                                      |
-| Release safeguards are procedural     | No `main` branch protection or repository rulesets; successful Cloudflare check exists      | Confirm deployment policy and propose minimal review/check protection before subsequent releases      |
-| Active Worker version is unknown      | GitHub proves a successful build, not the currently active version                          | Record dashboard version ID, deployed SHA, variables and rollback target                              |
+| Finding                                 | Evidence                                                                                      | Required follow-up                                                                                 |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Production excludes search indexing     | Live content has `noindex, follow`; sitemap has zero URLs                                     | Fix public-readiness gaps first, then approve an indexable production build                        |
+| HTTP is not canonicalized               | Apex HTTP returns 200; HTTP `www` returns 522 on root and a path/query test                   | Inspect redirect rules and HTTPS enforcement; approve a focused correction                         |
+| Public contacts corrected in repository | Owner confirms `+91 9441259786` and `incetekhenergy@gmail.com`; old email domain was NXDOMAIN | Verify the release live across all six languages; actual receipt remains an owner acceptance check |
+| Temporary endorsements are live         | Ten source comments, live `data-review-status="illustrative"`, no visible sample disclaimer   | Replace with verified, permissioned feedback or remove; review photo permission separately         |
+| Form is deliberately unavailable        | Live notice says inputs are not sent/saved; source prevents submission                        | Keep truthful call/WhatsApp fallback; delivery is not configured                                   |
+| Release safeguards are procedural       | No `main` branch protection or repository rulesets; successful Cloudflare check exists        | Confirm deployment policy and propose minimal review/check protection before subsequent releases   |
+| Active Worker version is unknown        | GitHub proves a successful build, not the currently active version                            | Record dashboard version ID, deployed SHA, variables and rollback target                           |
 
 ## Architecture and inventory
 
@@ -130,12 +140,64 @@ Additional live GETs returned 200 for `/about/`, `/services/`, `/products/`,
 the Hindi, Tamil, Malayalam and Kannada homepages. This is route availability
 evidence, not a complete visual, translation or real-device review.
 
-The handoff describes an HTTPS-only `www` rule. Its scope could explain the HTTP
-failure, but exact rule order and cause require dashboard inspection. After
-approval, inspect [Always Use HTTPS](https://developers.cloudflare.com/ssl/edge-certificates/additional-options/always-use-https/)
-and the [hostname redirect pattern](https://developers.cloudflare.com/rules/url-forwarding/examples/redirect-www-to-root/).
-Accept only a loop-free permanent redirect to HTTPS apex with paths and queries
-preserved for both schemes/hostnames. Do not change DNS speculatively.
+The four-scheme/hostname path tests were repeated on 13 October at
+05:06–05:07 UTC using `/about/?audit=contact&test=1`: HTTP apex 200, HTTP www 522,
+HTTPS apex 200, HTTPS www 301 to the exact HTTPS apex path and query.
+Evidence: ignored `.astro/contact-correctness/routing-before.json`.
+
+**Confirmed:** these failures occur at the HTTP/edge-routing boundary. The static
+Astro artifact has no request handler to enforce host or scheme. An HTML/meta
+redirect cannot repair a 522 returned before HTML is served. **Inferred:** the
+handoff's HTTPS-only www rule leaves HTTP traffic reaching the placeholder
+origin. **Unknown:** exact current rule expression, order and HTTPS enforcement;
+only dashboard inspection can establish the precise configuration cause.
+
+### Manual Cloudflare correction (approval required)
+
+Recommended change: one host-scoped Single Redirect, covering HTTP apex and both
+www schemes while excluding HTTPS apex. No DNS or application changes are needed
+for this proposed correction, provided the existing records are proxied.
+
+1. After owner approval, select the `incetekhenergy.com` zone. Record/export the
+   existing Rules configuration and order, SSL/TLS settings and DNS proxy status.
+   Confirm the apex Worker custom domain, proxied www record and certificates
+   still work. Do not change the placeholder record or encryption mode by guesswork.
+2. Open **Rules > Overview > Create rule > Redirect Rule**. Name it
+   `Canonical HTTPS apex`. Choose **Custom filter expression** and enter:
+
+   ```text
+   (http.host eq "www.incetekhenergy.com") or (http.host eq "incetekhenergy.com" and not ssl)
+   ```
+
+3. Set URL redirect **Type: Dynamic**, expression:
+
+   ```text
+   concat("https://incetekhenergy.com", http.request.uri.path)
+   ```
+
+   Set **Status code: 301** and **Preserve query string: enabled**. Place it
+   before any overlapping redirects; preserve the old HTTPS-www rule as fallback.
+   Inspect any earlier Page/Bulk Redirects for conflicts before deployment.
+
+4. Use Cloudflare Trace if available to inspect matches. After confirming the
+   saved configuration matches the approved proposal, select **Deploy**.
+   These instructions do not mean that this audit has deployed the rule.
+5. Check all four URL variants with GET, first without following redirects:
+   root `/`, `/about/?test=1&source=redirect`, and a query with encoded characters.
+   The three noncanonical variants must return 301 to the exact HTTPS apex path
+   and query; HTTPS apex must return 200. Follow redirects with a finite limit to
+   verify no loop, missing query, duplicate query or 522. Recheck 404 behavior.
+6. If acceptance fails, disable only the new rule and restore the saved ordering;
+   verify the previously working HTTPS apex/www paths, retain evidence, and
+   investigate with Trace. Do not compensate with speculative DNS changes.
+
+This uses the documented [dashboard workflow](https://developers.cloudflare.com/rules/url-forwarding/single-redirects/create-dashboard/),
+[dynamic redirect target](https://developers.cloudflare.com/fundamentals/manage-domains/manage-subdomains/)
+and [`ssl` client-connection field](https://developers.cloudflare.com/ruleset-engine/rules-language/fields/reference/ssl/).
+Cloudflare's [HTTPS-only www example](https://developers.cloudflare.com/rules/url-forwarding/examples/redirect-www-to-root/)
+does not cover HTTP. Zone-wide [Always Use HTTPS](https://developers.cloudflare.com/ssl/edge-certificates/additional-options/always-use-https/)
+is an alternative after checking every hostname's TLS support; do not enable both
+strategies blindly. No Cloudflare setting was modified during this follow-up.
 
 Python urllib received Cloudflare 403/error 1010 while normal curl succeeded.
 This is a client-dependent result, not proof of a general outage or blocked
@@ -244,23 +306,33 @@ disclaimer or permission to publish endorsements. Follow [TESTIMONIALS.md](TESTI
 Review translations and claims before promoting the site; deployment did not
 establish native-speaker approval, customer consent or official vendor status.
 
-Public contact routing, verified in source and sampled live HTML:
+Public contact contract, owner-confirmed on 13 October and corrected in source:
 
-- Primary call: `+91 94401 68111`; secondary call: `+91 94412 59786`.
+- Sole public call number: `+91 94412 59786` (`tel:+919441259786`), including
+  Contact metadata/heading and Organization structured data. The older primary
+  number and duplicate secondary-phone fields were removed.
 - WhatsApp drafts: `https://wa.me/919441259786`; user must choose to send.
   These are ordinary outbound links, not a Meta API integration.
-- Email: `support@incetekh.com`, including the service-complaint link — broken
-  domain resolution observed. Do not silently substitute the administrative Gmail.
+- Public email: `incetekhenergy@gmail.com`, including the service-complaint link,
+  all five translation catalogues and shared page/footer contact paths. The
+  invalid historical `support@incetekh.com` and inactive future
+  `info@incetekhenergy.com` must be absent from generated public HTML.
 - Site-visit form validates locally and reports that nothing was sent. No
   server handler, persistence or delivery integration exists. No real enquiry,
   call, WhatsApp message or email was sent during this audit.
+
+`tests/public-contacts.spec.ts` checks every generated HTML artifact (all six
+languages, error pages and legacy redirect), contact destinations, invalid
+addresses/numbers, and internal page/fragment links. Browser checks cover contact
+and footer layout at mobile/desktop sizes. Post-merge live checks must confirm
+the same contact contract before declaring this release accepted.
 
 ## Email and external services
 
 | Service                            | State / ownership boundary                                                                                                               |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | Administrative Gmail               | `incetekhenergy@gmail.com`, confirmed by owner; actual logins, recovery and MFA not inspected                                            |
-| Current public address             | `support@incetekh.com`; distinct domain from `incetekhenergy.com`; DNS NXDOMAIN confirmed via Google and Cloudflare resolvers            |
+| Current public address             | `incetekhenergy@gmail.com`, explicitly owner-confirmed for enquiries; source corrected, actual receipt not tested                        |
 | Future branded mail                | `info@incetekhenergy.com` / possible support mailbox are proposals, not active mailboxes; provider, owners, aliases and budget undecided |
 | Mail DNS                           | No MX/SPF/DMARC observed for `incetekhenergy.com`; DKIM selectors/provider not known, so DKIM cannot be exhaustively checked             |
 | Cloudflare Web Analytics           | Optional repository support; beacon absent and live privacy copy says disabled; account configuration/ingestion unknown                  |
@@ -387,14 +459,15 @@ Record date, verifier and non-secret evidence for each completed item.
 
 Each implementation below is a separate authorized component; no stacked PRs.
 
-1. **Close this documentation audit.** Publication, independent review, merge and
-   stale-branch cleanup are now authorized. Record PR/check results at closeout.
-   Dashboard facts and a verified rollback target remain follow-up tasks before
-   the next application or infrastructure release.
-2. **Repair public correctness urgently.** Owner confirms public contact address
-   and testimonial evidence/permissions; focused PR removes/replaces unsupported
-   comments and broken email links. Keep the truthful unavailable-form notice
-   and call/WhatsApp route; a new backend is not needed to fix these issues.
+1. **Audit closed; accept the contact correction release.** PR #24 merged at
+   `b288d39`, main was synchronized and the audited stale branches were removed.
+   The contact follow-up uses the confirmed single phone and Gmail address;
+   record its PR/check results and verify production HTML before closing it.
+   A dashboard version ID and rollback target still need an operator's record.
+2. **Resolve content approval separately.** Customer reviews are explicitly
+   unchanged by the contact task. The existing testimonial evidence/permission
+   gap remains a pre-indexing decision for the owner, including photo permission.
+   Keep the truthful unavailable-form notice and call/WhatsApp route.
 3. **Repair HTTP routing.** Owner-approved Cloudflare rule/HTTPS change after a
    configuration snapshot. Validate both hostnames/schemes and path/query
    preservation. Review security events without weakening protection blindly.
@@ -410,7 +483,7 @@ Each implementation below is a separate authorized component; no stacked PRs.
 6. **Complete business email as its own component.** Approve provider, budget,
    mailbox owners and public address; configure Cloudflare mail DNS and verify
    send/receive/authentication. Update all contact links only after acceptance.
-   An approved temporary contact correction in step 2 need not wait for purchase.
+   The approved Gmail contact correction in step 1 does not require a purchase.
 7. **Close Phase 1 operationally.** Record renewal/billing ownership, monitoring,
    recovery evidence and remaining acceptance items against `SCOPE.md`.
 
@@ -418,7 +491,7 @@ WhatsApp automation, Meta Cloud API, AI agents, CRM and backend/VM work are not
 launch prerequisites under current scope. The supplied handoff does not override
 that boundary.
 
-## Audit validation and workflow disposition
+## Initial audit validation and workflow disposition (PR #24)
 
 Validated on Node 22.23.3 using the existing installed dependencies:
 
@@ -442,20 +515,34 @@ penetration test, full Git-history secret scan, paid-service verification or
 rollback drill was performed. Browser tests used local production output and do
 not establish live form delivery or account configuration.
 
-The focused branch is `docs/infrastructure-audit`, based on current main. The
-owner's follow-up authorizes push, merge, pull main and stale-branch deletion.
-The associated GitHub PR/check history records the publication outcome; this
-paragraph records authorization, not a claim that a pending operation succeeded.
+The audit branch `docs/infrastructure-audit` merged as
+[PR #24](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/24), producing
+`b288d393c8936ece63081d1b4098026ce015f496`. Main was synchronized and the
+documentation branch and 23 older merged branches were deleted after preservation.
 
 Local recovery material is under
 `C:\Users\axehe\Desktop\incetekh-energy-recovery\hygiene-20261013`: the unchanged
 handoff, pre-cleanup ref inventory, merged-PR mapping, full Git bundle and a
 verified mirror restore. Fifty saved refs matched the restored bundle. The 23
 old feature-branch tips match their merged PR heads and their merge commits are
-ancestors of main. Delete only rechecked tips after the documentation PR merges;
-retain any branch that advances or has unmerged work. Recovery material stays
+ancestors of main. Recovery material stays
 local; ignored build/test evidence is retained. Future cleanup must likewise
 preserve unique material before deleting refs or moving files.
+
+### Contact-correctness follow-up validation
+
+On Node 22.23.3, the follow-up passed Astro/TypeScript checking (81 files, zero
+errors/warnings/hints), the 144-page production build and 47 focused Chrome tests.
+The artifact audit covers all 145 HTML files including the legacy redirect, all
+public contact links and every internal page/fragment link. The browser suite
+also covers translated contacts, metadata/schema, accessibility/layout, resources,
+SEO configuration and the unchanged unavailable-form behavior. It does not test
+actual call, message or mailbox receipt. Customer-review source is unchanged.
+
+The focused branch is `fix/public-contact-correctness`. Its release PR records
+independent review, the exact head and Cloudflare checks, and post-merge live
+verification. The source validation above must not be read as a deployment claim.
+Dashboard redirect correction and SEO activation remain separate approved work.
 
 ## Maintaining and rechecking this document
 

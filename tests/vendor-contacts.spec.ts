@@ -2,9 +2,9 @@ import { test, expect } from '@playwright/test';
 import { languages, localPath } from '../src/i18n/languages';
 
 for (const width of [390, 1440]) {
-  test(`vendor logos and both contacts work across languages at ${width}px`, async ({
+  test(`vendor logos and public contacts work across languages at ${width}px`, async ({
     page,
-  }) => {
+  }, testInfo) => {
     await page.setViewportSize({ width, height: 1000 });
     for (const { code } of languages) {
       await page.goto(localPath('/', code));
@@ -29,25 +29,24 @@ for (const width of [390, 1440]) {
             .locator('script[type="application/ld+json"]')
             .textContent())!,
         );
-        expect(schema['@graph'][0].telephone).toEqual([
-          '+919440168111',
-          '+919441259786',
-        ]);
+        expect(schema['@graph'][0].telephone).toBe('+919441259786');
       }
       await page.goto(localPath('/contact/', code));
       await expect(page.locator('.contact-number')).toHaveAttribute(
         'href',
-        'tel:+919440168111',
-      );
-      await expect(page.locator('.contact-number')).toHaveText('94401 68111');
-      await expect(page.locator('.contact-secondary')).toHaveAttribute(
-        'href',
         'tel:+919441259786',
       );
-      for (const number of ['+919440168111', '+919441259786'])
-        await expect(
-          page.locator(`footer a[href="tel:${number}"]`),
-        ).toBeVisible();
+      await expect(page.locator('.contact-number')).toHaveText('94412 59786');
+      await expect(page.locator('.contact-secondary')).toHaveCount(0);
+      await expect(
+        page.locator('footer a[href="tel:+919441259786"]'),
+      ).toBeVisible();
+      await expect(
+        page.locator('footer a[href="mailto:incetekhenergy@gmail.com"]'),
+      ).toBeVisible();
+      await expect(page.locator('body')).not.toContainText(
+        'support@incetekh.com',
+      );
       for (const href of await page
         .locator('a[href^="https://wa.me/"]')
         .evaluateAll((links) =>
@@ -56,6 +55,14 @@ for (const width of [390, 1440]) {
         const url = new URL(href);
         expect(url.pathname).toBe('/919441259786');
         expect(url.searchParams.get('text')?.trim()).toBeTruthy();
+      }
+      if (['en', 'te', 'ml'].includes(code)) {
+        await page.locator('.call-panel').screenshot({
+          path: testInfo.outputPath(`contact-${code}-${width}.png`),
+        });
+        await page.locator('.footer-contact').screenshot({
+          path: testInfo.outputPath(`footer-${code}-${width}.png`),
+        });
       }
       expect(
         await page.evaluate(
