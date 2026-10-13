@@ -19,12 +19,35 @@ and all 145 live route/contact checks passed. The owner then enabled Always Use
 HTTPS. Fresh GETs confirm all host/scheme variants reach HTTPS apex with paths
 and queries intact. Customer reviews and form functionality remain unchanged.
 
-The SEO activation component starts from that main commit. It adds build-context
-indexing safeguards and workers.dev response headers, retaining the existing
-metadata/sitemap system. **Production activation is not yet approved or verified.**
-Its PR must stay unmerged until the owner approves the release and required build
-settings. See [VISIBILITY.md](VISIBILITY.md#approved-release-procedure) for the
-exact procedure and [LAUNCH.md](LAUNCH.md) for acceptance.
+Production SEO activation is verified on **13 October 2026, 12:21 IST**.
+[PR #26](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/26) merged after
+owner approval as `50512542cd37d1f6e5c5bd690ce2818192aad1e1`. The owner set
+`PUBLIC_SITE_INDEXABLE=true` in Production build variables only and retried that
+commit; Previews Base stayed unchanged. GitHub independently confirms successful
+build `c955fe18-92b5-43e8-a7f9-fa6fb84a3543`. Public HTTP acceptance confirms the
+indexable output; dashboard Worker version ID remains a manual check.
+
+### SEO release acceptance
+
+| Check                    | Verified result                                                                                                                                                                                                                                                                                            |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production content       | All 138 eligible URLs return 200 and exactly one `index, follow` meta tag, without a noindex response header                                                                                                                                                                                               |
+| Sitemap and robots       | Exactly 138 distinct eligible URLs; robots allows crawling and references `https://incetekhenergy.com/sitemap.xml`                                                                                                                                                                                         |
+| Canonicals and languages | All 138 self-canonicals use HTTPS apex; correct HTML language and seven reciprocal alternates (six languages plus x-default)                                                                                                                                                                               |
+| Metadata                 | All 138 titles/descriptions unique; Open Graph title/description/URL agree; homepage Organization/WebSite JSON-LD preserves confirmed identity                                                                                                                                                             |
+| Production Workers alias | Root, Telugu contact and sitemap over HTTP and HTTPS return `X-Robots-Tag: noindex`, even though the shared production HTML is indexable                                                                                                                                                                   |
+| Redirects                | Eight root/path/query checks cover HTTP/HTTPS apex/www; permanent redirects preserve encoded queries and reach HTTPS apex                                                                                                                                                                                  |
+| Exclusions               | Genuine missing URL returns 404/noindex; five localized error routes and legacy reviews redirect remain noindex and outside sitemap                                                                                                                                                                        |
+| Contacts                 | Approved Gmail and sole telephone link present across all 138 content pages; historical invalid/inactive emails absent                                                                                                                                                                                     |
+| Preview isolation        | PR #26 preview passed all 138 pages and ten HTTP/HTTPS probes before cleanup. After branch deletion, five probes returned preview-not-found 404 while HTTPS Telugu contact still served protected noindex content. Fresh post-activation documentation-preview verification is pending in the follow-up PR |
+
+Local evidence: `.astro/seo-activation/live-production-true.json` and the PR's
+release record. Normal TLS validation was used. These checks establish technical
+indexability, not actual Google indexing, rankings, native-speaker approval,
+review/photo permission or real-device acceptance. No Search Console property,
+analytics integration, DNS rule or contact/review content changed in this closeout.
+See [VISIBILITY.md](VISIBILITY.md#approved-release-procedure) for the reusable
+release procedure and [LAUNCH.md](LAUNCH.md) for future acceptance.
 
 ## Evidence and access
 
@@ -53,18 +76,18 @@ the supplied client date, 13 October in India.
 ## Current state and priorities
 
 The HTTPS website and HTTPS `www` redirect work. Phase 1 is **not complete**:
-Public content approval, indexing, search/measurement,
+Public content approval, Search Console/measurement,
 operational ownership and professional email still need closure.
 
-| Finding                             | Evidence                                                                                    | Required follow-up                                                                               |
-| ----------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Production excludes search indexing | Live content has `noindex, follow`; sitemap has zero URLs                                   | Fix public-readiness gaps first, then approve an indexable production build                      |
-| HTTP canonicalization verified      | HTTP apex to HTTPS apex; HTTP www via HTTPS www to HTTPS apex, all 301                      | Preserve working rules; no redirect changes in SEO component                                     |
-| Public contacts verified live       | PR #25: +91 9441259786 and incetekhenergy@gmail.com; all 145 route checks passed            | Actual call/message/mail receipt remains owner acceptance                                        |
-| Temporary endorsements are live     | Ten source comments, live `data-review-status="illustrative"`, no visible sample disclaimer | Replace with verified, permissioned feedback or remove; review photo permission separately       |
-| Form is deliberately unavailable    | Live notice says inputs are not sent/saved; source prevents submission                      | Keep truthful call/WhatsApp fallback; delivery is not configured                                 |
-| Release safeguards are procedural   | No `main` branch protection or repository rulesets; successful Cloudflare check exists      | Confirm deployment policy and propose minimal review/check protection before subsequent releases |
-| Active Worker version is unknown    | GitHub proves a successful build, not the currently active version                          | Record dashboard version ID, deployed SHA, variables and rollback target                         |
+| Finding                           | Evidence                                                                                    | Required follow-up                                                                                       |
+| --------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Production SEO activated          | All 138 content URLs indexable, populated sitemap, matching robots declaration              | Preserve production-only flag and alias safeguards; Search Console ownership/submission remains separate |
+| HTTP canonicalization verified    | HTTP apex to HTTPS apex; HTTP www via HTTPS www to HTTPS apex, all 301                      | Preserve working rules; no redirect changes in SEO component                                             |
+| Public contacts verified live     | PR #25: +91 9441259786 and incetekhenergy@gmail.com; all 145 route checks passed            | Actual call/message/mail receipt remains owner acceptance                                                |
+| Temporary endorsements are live   | Ten source comments, live `data-review-status="illustrative"`, no visible sample disclaimer | Replace with verified, permissioned feedback or remove; review photo permission separately               |
+| Form is deliberately unavailable  | Live notice says inputs are not sent/saved; source prevents submission                      | Keep truthful call/WhatsApp fallback; delivery is not configured                                         |
+| Release safeguards are procedural | No `main` branch protection or repository rulesets; successful Cloudflare check exists      | Confirm deployment policy and propose minimal review/check protection before subsequent releases         |
+| Active Worker version is unknown  | GitHub proves a successful build, not the currently active version                          | Record dashboard version ID, deployed SHA, variables and rollback target                                 |
 
 ## Architecture and inventory
 
@@ -144,7 +167,7 @@ Additional live GETs returned 200 for `/about/`, `/services/`, `/products/`,
 the Hindi, Tamil, Malayalam and Kannada homepages. This is route availability
 evidence, not a complete visual, translation or real-device review.
 
-### Current HTTP acceptance (SEO preparation, 13 October 2026)
+### Current HTTP acceptance (SEO activation, 13 October 2026)
 
 The owner reports **Always Use HTTPS enabled**. Fresh GETs independently verified
 root and `/about/?seo=test&value=a%20b` without disabling TLS validation:
@@ -154,13 +177,14 @@ root and `/about/?seo=test&value=a%20b` without disabling TLS validation:
 | HTTP apex  | 301 to HTTPS apex, preserving path/query |
 | HTTP www   | 301 to HTTPS www, then 301 to HTTPS apex |
 | HTTPS www  | 301 to HTTPS apex, preserving path/query |
-| HTTPS apex | 200, currently noindex                   |
+| HTTPS apex | 200, eligible content indexable          |
 
 The previous HTTP 200/522 defect is resolved. The old proposed Single Redirect
 was not implemented by this agent and is no longer a pending correction. Leave
 the working DNS, redirect rules and HTTPS setting unchanged. Dashboard expressions
 and rule order remain uninspected; the table proves behavior, not their values.
-Local evidence: `.astro/seo-activation/live-before.json`.
+Local evidence: `.astro/seo-activation/live-production-true.json`; the earlier
+`live-before.json` preserves the pre-activation state.
 
 Python urllib received Cloudflare 403/error 1010 while normal curl succeeded.
 This is a client-dependent result, not proof of a general outage or blocked
@@ -206,7 +230,8 @@ Repository configuration: [wrangler.jsonc](../wrangler.jsonc),
 
 **Inferred:** this integration has automatically built main and preview commits.
 **Owner confirmed:** main and preview builds are enabled with the commands below.
-**Unknown:** watch paths, exact active production SHA/version, dashboard approval
+**Owner reports deployed SHA:** `5051254`; GitHub confirms its successful rebuild
+and public checks confirm expected output. **Unknown:** Worker version ID, watch paths, dashboard approval
 gates, token scope, or whether lint/tests run in
 the cloud. `npm run build` alone does not execute `npm run verify`. A green build
 check is not independent code review or full test evidence.
@@ -215,8 +240,8 @@ For dashboard verification, inspect **Workers & Pages / this Worker / Settings /
 Builds**: repository, production branch, commands, build root, watch paths, preview
 branches, build variables and deployment credential permissions. Check Deployments
 for the **active version ID and SHA**, not just the most recent successful build.
-These remain manual verification tasks. For SEO activation, production build settings
-and release approval must be established before merge. Keep credentials and
+Version/rollback identifiers remain manual verification tasks. SEO activation
+settings and release approval were established for PR #26. Keep credentials and
 account recovery material outside Git.
 
 Use fresh main, one component/branch/PR, focused validation, self-review, independent
@@ -224,9 +249,9 @@ review, then approved merge. Consider required PR review and relevant successful
 checks using [GitHub branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
 No protections were changed here. **Pushes, including documentation branches, may
 publish previews; merges may publish production.** The initial audit stayed local;
-the owner subsequently authorized the audit and contact releases. That historical
-authorization does not authorize merging the SEO activation PR. The current goal
-explicitly requires approval after release implications/settings are established.
+the owner subsequently authorized the audit/contact releases and explicitly
+approved PR #26 after its release implications/settings were established. Future
+production changes still follow the agreed review and approval process.
 
 Cloudflare's [build configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
 distinguishes production deployment, preview commands, and build variables from
@@ -235,30 +260,31 @@ runtime variables. These are provider capabilities, not verification of this acc
 **Owner dashboard verification during SEO preparation, 13 October:** Production
 branch `main`, build `npm run build`, deploy `npx wrangler deploy`, root `/`, builds
 enabled. Previews Base: enabled, build `npm run build`, preview `npx wrangler preview`,
-root `/`. Both build-variable/secret lists are empty; neither the public indexing
-flag nor manual `WORKERS_CI` / `WORKERS_CI_BRANCH` overrides is configured. These
+root `/`. Both lists were initially empty. The owner subsequently added only
+`PUBLIC_SITE_INDEXABLE=true` to Production and rebuilt `5051254`; Previews Base
+remains unset. No manual `WORKERS_CI` / `WORKERS_CI_BRANCH` overrides were reported. These
 values are owner-verified rather than directly inspected by the agent. They
 supersede the corresponding command/branch/root/variable unknowns in the initial
 audit inventory. Runtime, credentials, active version and watch-path details remain
-unverified. Only Production will receive the true build flag after approval and
-after the guarded code/header release is verified; Previews Base stays unset.
+unverified. Public acceptance confirms production indexing; the branch guard and
+alias response header remain in place. Previews Base stays unset.
 
 ### Public build variables
 
-| Variable                            | Repository behavior                                                   | Live evidence / remaining check                                                                       |
-| ----------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `PUBLIC_SITE_INDEXABLE`             | Defaults false; dev/non-main Workers builds stay noindex even if true | Owner confirms unset in both build configurations; live still noindex                                 |
-| `PUBLIC_GOOGLE_SITE_VERIFICATION`   | Optional HTML meta token                                              | No tag observed. Search Console ownership can use other methods; account state unknown                |
-| `PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` | Optional 32-hex public beacon ID; emitted only in indexable builds    | No beacon in sampled HTML; privacy says disabled. Token could be configured but suppressed by noindex |
+| Variable                            | Repository behavior                                                   | Live evidence / remaining check                                                                                       |
+| ----------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `PUBLIC_SITE_INDEXABLE`             | Defaults false; dev/non-main Workers builds stay noindex even if true | Owner confirms true in Production only; all 138 live content URLs indexable                                           |
+| `PUBLIC_GOOGLE_SITE_VERIFICATION`   | Optional HTML meta token                                              | No tag observed. Search Console ownership can use other methods; account state unknown                                |
+| `PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` | Optional 32-hex public beacon ID; emitted only in indexable builds    | Beacon present in Chrome but absent in curl/local artifacts; privacy says disabled; dashboard reconciliation required |
 
 These values are baked into static HTML; changing runtime variables cannot repair
 the deployed output. An approved rebuild/deployment is required. Never put API
 keys in `PUBLIC_*`. Keep preview builds non-indexable and analytics-free. The
 public `workers.dev` production alias shares the deployment and can inherit an
-indexable build. The SEO PR adds host-specific `X-Robots-Tag: noindex` through
-`public/_headers` for `https://:version.:subdomain.workers.dev/*`. Confirm this
-header on the production alias after the approved guarded release, before indexing
-is enabled. Canonicals alone are not the duplicate-indexing safeguard.
+indexable build. PR #26 deployed host-specific `X-Robots-Tag: noindex` through
+`public/_headers` for `https://:version.:subdomain.workers.dev/*`. This header is
+verified on HTTP and HTTPS production alias responses after activation. Canonicals
+alone are not the duplicate-indexing safeguard.
 
 ## SEO, content and lead paths
 
@@ -267,14 +293,14 @@ Twitter metadata, language alternates and Organization/WebSite JSON-LD on the
 English homepage. No review/rating schema is generated. Source sitemap covers
 23 content routes (10 general pages and 13 city guides) across six languages:
 English, Telugu, Hindi, Tamil, Malayalam and Kannada — **138 eligible URLs** when
-indexing is enabled. 404s and `/reviews/` are excluded. This is not the current
-live sitemap count, which is zero.
+indexing is enabled. The live sitemap now contains exactly those 138 URLs; 404s
+and `/reviews/` are excluded.
 
 Google Search Console property, ownership, submission and indexing are unknown.
 No apex TXT verification or HTML tag was observed; that does not rule out another
 ownership method. Recommend the domain property under the owner-approved Google
 account, DNS verification in Cloudflare, then sitemap submission after public
-readiness and indexing correction. [Google's verification methods](https://support.google.com/webmasters/answer/9008080?hl=en)
+readiness approval. Technical indexing configuration is now verified. [Google's verification methods](https://support.google.com/webmasters/answer/9008080?hl=en)
 distinguish domain-wide DNS verification from URL-prefix methods. Google Business
 Profile ownership/details and real-user performance metrics remain unverified.
 
@@ -305,6 +331,34 @@ addresses/numbers, and internal page/fragment links. Browser checks cover contac
 and footer layout at mobile/desktop sizes. PR #25 post-merge checks confirmed the same contract across all 145 live routes.
 Actual recipient delivery was not tested.
 
+### Analytics discrepancy found during browser acceptance
+
+**Confirmed:** fresh Chrome contexts received a script from
+`https://static.cloudflareinsights.com/beacon.min.js/...` with `data-cf-beacon`.
+The live English privacy page still says website analytics is disabled. Ordinary
+curl responses and both retained local build modes contain no beacon. The first
+browser check expecting no beacon failed; subsequent checks record its presence
+and block `cloudflareinsights.com` requests during verification rather than hiding
+this discrepancy. This interception does not prove that every possible collection
+endpoint was blocked. All 12 browser checks (six language homepages at 390px and
+1440px) observed one beacon; navigation, contact links, social images and layout
+checks passed. No token values are recorded here.
+
+**Inferred:** Cloudflare edge automatic injection is the likely source, rather
+than the repository's optional build-token path. Cloudflare documents automatic
+injection for proxied sites, but this account setting and ingestion have not been
+inspected. This is a privacy/measurement consistency issue, not an indexing block.
+
+**Next action:** owner inspects **Cloudflare > Web Analytics > Manage site** for
+`incetekhenergy.com`, including automatic setup and hostname rules. Decide whether
+to disable injection to match the current approved disabled policy, or separately
+approve analytics and align privacy copy, preview exclusion and collection checks.
+Do not add a second beacon or a production analytics token merely to hide the
+mismatch. No dashboard setting or public privacy copy changed in this audit.
+[Cloudflare automatic setup](https://developers.cloudflare.com/web-analytics/get-started/)
+describes the available automatic/manual/disabled modes. Raw observations:
+`.astro/seo-activation/live-analytics-discrepancy.json` and `live-browser-final.json`.
+
 ## Email and external services
 
 | Service                            | State / ownership boundary                                                                                                               |
@@ -313,9 +367,9 @@ Actual recipient delivery was not tested.
 | Current public address             | `incetekhenergy@gmail.com`, explicitly owner-confirmed for enquiries; live links verified, actual receipt not tested                     |
 | Future branded mail                | `info@incetekhenergy.com` / possible support mailbox are proposals, not active mailboxes; provider, owners, aliases and budget undecided |
 | Mail DNS                           | No MX/SPF/DMARC observed for `incetekhenergy.com`; DKIM selectors/provider not known, so DKIM cannot be exhaustively checked             |
-| Cloudflare Web Analytics           | Optional repository support; beacon absent and live privacy copy says disabled; account configuration/ingestion unknown                  |
+| Cloudflare Web Analytics           | Live Chrome beacon conflicts with disabled privacy copy; likely edge injection, dashboard mechanism/ingestion unverified                 |
 | Google Analytics / Tag Manager     | No implementation found in source or sampled live HTML                                                                                   |
-| Search Console / Business Profile  | Readiness work pending; dashboard ownership and status unknown                                                                           |
+| Search Console / Business Profile  | Technical readiness verified; dashboard ownership/submission and actual indexing unknown                                                 |
 | Maps, payments, CRM, form provider | No integration found in repo; no such bindings declared                                                                                  |
 | Manufacturer/government references | Outbound resource links and local logos, not API dependencies or proof of service accounts                                               |
 | WhatsApp Cloud API, AI, VM/backend | Not implemented in this repository and excluded by current scope                                                                         |
@@ -365,9 +419,13 @@ installed by this audit. PageSpeed/mobile/real-user checks remain launch tasks.
 
 ## Rollback and recovery
 
-**No verified last-known-good Worker version or artifact is recorded yet.** The
-successful main build is a source candidate, not an accepted release: the live
-site still has the gaps above. Capture a real rollback target before the next release.
+**Accepted SEO source/build:** `5051254`, build
+`c955fe18-92b5-43e8-a7f9-fa6fb84a3543`, with production build flag true. The same
+source was verified with indexing off in build
+`310432eb-a0d7-4527-a4b9-14d2162355cd`. A source SHA alone therefore does not
+identify indexing behavior: preserve the build flag too. Dashboard Worker version
+IDs and a retained rollback target are still unverified. Record those before the
+next release; neither build ID is a substitute for a Worker version ID.
 
 For an approved release, record SHA, active Worker version/deployment ID, build
 log, Node/Wrangler versions, public build settings, previous version and acceptance
@@ -420,18 +478,18 @@ configuration exists in the repository. Keep all spend changes separately approv
 
 Record date, verifier and non-secret evidence for each completed item.
 
-| Where                     | What to verify / record                                                                             | Current status                                                                                                              |
-| ------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Cloudflare account        | Owner/recovery/MFA, members, plan, billing alerts                                                   | Unknown                                                                                                                     |
-| Zone overview + DNS       | Active zone, exact apex/`www` records/proxy state, complete record export, DNSSEC                   | Public NS verified; internal configuration unknown                                                                          |
-| Rules + SSL/TLS           | Actual expressions/order, minimum TLS, certificate renewal and HSTS policy                          | All four redirect variants verified; Always Use HTTPS owner-reported enabled; dashboard not inspected                       |
-| Worker domains/routes     | Apex association, active status, alias enablement, other routes                                     | Owner reported; live alias reachable                                                                                        |
-| Worker Builds             | Repo/main, commands/root/runtime, preview filters, watch paths, public variables, token permissions | Owner verified main, commands/root, enabled builds and empty variable lists; runtime/watch paths/token scope remain unknown |
-| Worker Deployments        | Active SHA/version, previous accepted version, rollback availability                                | Unknown                                                                                                                     |
-| Worker previews + Access  | Current preview URLs, noindex and authentication, variable isolation                                | Historical preview check only; protection unknown                                                                           |
-| Worker runtime + security | Bindings/secret names only, metrics/log retention, security events, build alerts                    | No source bindings; account state unknown                                                                                   |
-| Hostinger                 | Ownership/MFA/recovery, contacts, renewal date/price/payment, purchased mail plans                  | Registrar/registry expiry verified; account state unknown                                                                   |
-| Google                    | Gmail recovery/MFA, Search Console property/access/submission, Business Profile                     | Administrative address owner-confirmed; settings unknown                                                                    |
+| Where                     | What to verify / record                                                                             | Current status                                                                                                                       |
+| ------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Cloudflare account        | Owner/recovery/MFA, members, plan, billing alerts                                                   | Unknown                                                                                                                              |
+| Zone overview + DNS       | Active zone, exact apex/`www` records/proxy state, complete record export, DNSSEC                   | Public NS verified; internal configuration unknown                                                                                   |
+| Rules + SSL/TLS           | Actual expressions/order, minimum TLS, certificate renewal and HSTS policy                          | All four redirect variants verified; Always Use HTTPS owner-reported enabled; dashboard not inspected                                |
+| Worker domains/routes     | Apex association, active status, alias enablement, other routes                                     | Owner reported; live alias reachable                                                                                                 |
+| Worker Builds             | Repo/main, commands/root/runtime, preview filters, watch paths, public variables, token permissions | Owner verified commands/root and production-only true flag; runtime/watch paths/token scope remain unknown                           |
+| Worker Deployments        | Active SHA/version, previous accepted version, rollback availability                                | Owner reports `5051254`; matching build success and live output verified; version ID/retention unknown                               |
+| Worker previews + Access  | Current preview URLs, noindex and authentication, variable isolation                                | PR #26 preview noindex verified before retirement; fresh documentation-preview result in follow-up PR; Access/authentication unknown |
+| Worker runtime + security | Bindings/secret names only, metrics/log retention, security events, build alerts                    | No source bindings; account state unknown                                                                                            |
+| Hostinger                 | Ownership/MFA/recovery, contacts, renewal date/price/payment, purchased mail plans                  | Registrar/registry expiry verified; account state unknown                                                                            |
+| Google                    | Gmail recovery/MFA, Search Console property/access/submission, Business Profile                     | Administrative address owner-confirmed; settings unknown                                                                             |
 
 ## Remaining launch work in execution order
 
@@ -448,10 +506,11 @@ Each implementation below is a separate authorized component; no stacked PRs.
    build/preview separation and recovery target; agree PR protection. Check
    desktop/mobile, translated copy, assets, call/WhatsApp destinations, contact,
    404 and accessibility. Use a real-device owner check for actual contact receipt.
-5. **Enable search and measurement deliberately.** After content approval,
-   configure only production indexing, address the public host alias/previews,
-   rebuild/deploy under approval; verify 138 sitemap entries and live metadata.
-   Verify Search Console and submit sitemap. Select one analytics path, validate
+5. **SEO activation closed; finish search and measurement separately.** First
+   reconcile the observed browser beacon with the disabled privacy copy. Production
+   indexing, 138 sitemap entries, live metadata and alias safeguards are verified.
+   After content approval, verify Search Console ownership and submit sitemap.
+   Select one analytics path, validate
    ingestion/privacy, and check Business Profile details and page performance.
 6. **Complete business email as its own component.** Approve provider, budget,
    mailbox owners and public address; configure Cloudflare mail DNS and verify
@@ -516,7 +575,7 @@ The focused branch is `fix/public-contact-correctness`. Its release PR records
 independent review, the exact head and Cloudflare checks, and post-merge live
 verification. The source validation above must not be read as a deployment claim.
 PR #25 is merged and live contact acceptance passed. The owner subsequently
-resolved HTTP redirects. SEO activation is the current separately gated component.
+resolved HTTP redirects. Production SEO activation is now verified; see the release acceptance above.
 
 ## Maintaining and rechecking this document
 

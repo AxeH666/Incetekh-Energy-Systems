@@ -95,7 +95,8 @@ Earlier homepage/WhatsApp design: [HOMEPAGE-REFRESH.md](docs/HOMEPAGE-REFRESH.md
 
 Publish only `dist/` after approval. Cloudflare Git integration can deploy on pushes
 and merges, including branch previews; documentation-only changes are not assumed
-exempt. Contacts and HTTP redirects are now verified; follow the approval-gated
-[SEO release procedure](docs/VISIBILITY.md#approved-release-procedure) before
-production indexing. Search/analytics acceptance and professional email remain
-pending. No Phase 2 work is included.
+exempt. Contacts, HTTP redirects and production SEO are now verified: 138 indexable
+URLs, a populated sitemap and protected workers.dev aliases. Preserve the build
+settings documented in the [SEO release procedure](docs/VISIBILITY.md#approved-release-procedure).
+Search Console ownership/submission, analytics acceptance, content approval and
+professional email remain pending. No Phase 2 work is included.
