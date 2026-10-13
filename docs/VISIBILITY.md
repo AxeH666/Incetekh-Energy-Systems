@@ -1,9 +1,14 @@
 # Search, analytics and production safeguards
 
-The website is deployed on Cloudflare Workers. Before SEO activation on 13 October 2026, checks found
-live `noindex, follow`, an empty sitemap, no Search Console HTML verification tag
-and no analytics beacon in sampled HTML. Search/analytics account state remains
-unverified. See [INFRASTRUCTURE.md](INFRASTRUCTURE.md) for evidence and launch order.
+Production SEO is verified on 13 October 2026: all 138 eligible pages are
+indexable, the sitemap lists exactly those URLs, and robots announces it.
+PR #26 merged as `5051254`; production rebuild
+`c955fe18-92b5-43e8-a7f9-fa6fb84a3543` succeeded with the owner-confirmed
+Production build flag true and Previews Base unchanged. The production
+workers.dev alias remains noindex through its response header. See
+[INFRASTRUCTURE.md](INFRASTRUCTURE.md#seo-release-acceptance) for current evidence,
+preview limits and remaining manual checks. Search Console ownership/submission
+and analytics remain separate; technical readiness does not prove Google indexing.
 
 ## Build configuration
 
@@ -25,6 +30,12 @@ Rebuild after any change.
   token from Cloudflare Web Analytics, not a Cloudflare API token. Analytics
   renders only when indexing is enabled AND this token is supplied. Preview
   traffic stays out of the analytics property. The privacy page changes with it.
+
+**Current discrepancy:** live Chrome receives a Cloudflare beacon although the
+privacy page says analytics is disabled; curl/local artifacts omit it. See the
+[analytics investigation](INFRASTRUCTURE.md#analytics-discrepancy-found-during-browser-acceptance).
+Dashboard automatic injection is inferred, not directly verified. Resolve this
+separately; the indexing release did not configure an analytics token.
 
 Use either this manual beacon configuration or the host's automatic injection,
 never both. Prefer manual configuration so preview/privacy behavior stays
@@ -74,12 +85,14 @@ from an existing search index. Custom preview domains would need their own revie
 **Owner-verified dashboard settings, 13 October 2026:** Production builds are
 enabled for `main`, using `npm run build`, `npx wrangler deploy`, root `/`.
 Previews Base builds are enabled with `npm run build`, `npx wrangler preview`,
-root `/`. Both Build variables and secrets lists are empty: no indexing flag or
-overrides for `WORKERS_CI` / `WORKERS_CI_BRANCH`. This confirms the current
-configuration through the owner's inspection, not direct agent dashboard access.
-Indexing has not been enabled. Cloudflare documents per-trigger build variables;
+root `/`. The owner initially confirmed empty variable lists and no overrides for
+`WORKERS_CI` / `WORKERS_CI_BRANCH`, then added `PUBLIC_SITE_INDEXABLE=true` only
+to Production and rebuilt `5051254`. Previews Base remains unchanged/unset. These
+are owner-inspected settings, corroborated by production HTTP behavior rather
+than direct agent dashboard access. Cloudflare documents per-trigger build variables;
 preview runtime bindings are a different setting. The source guard also protects
-against an accidentally shared true value. No account settings changed in this PR.
+against an accidentally shared true value. The agent changed no account settings;
+the owner performed the production build-variable change.
 
 Reviews are unchanged by explicit instruction. Technical SEO checks do not
 establish review/photo permission or native-speaker approval. Existing content
@@ -88,10 +101,11 @@ limitations remain recorded in [TESTIMONIALS.md](TESTIMONIALS.md) and
 
 ## Approved release procedure
 
-**Hold merge and production configuration until owner approval.** A feature push
-may deploy a preview. Merging main may deploy production. Keep the flag false
-until the guard and workers.dev header have reached main; then activate indexing
-in a new build of that same reviewed commit.
+**The initial activation below was approved and completed for PR #26.** Retain
+this procedure for controlled reactivation/recovery; do not turn indexing off for
+routine releases. Future changes require the applicable release approval. A
+feature push may deploy a preview; merging main may deploy production. Preserve
+the existing true production flag and unset preview flag during ordinary releases.
 
 1. In **Workers & Pages > incetekh-energy-systems > Settings > Build**, record
    repository, production branch (`main`), root (repository root), build command
@@ -99,7 +113,7 @@ in a new build of that same reviewed commit.
    (`npx wrangler preview`). Confirm preview branches do not run production deploy.
    Record current active SHA/version and prior version for recovery.
 2. Inspect **Build variables and secrets** under both **Production** and
-   **Previews Base**. Before the first merge, preserve the currently empty lists
+   **Previews Base**. For a first activation on an unconfigured environment, preserve empty lists
    (`PUBLIC_SITE_INDEXABLE` defaults to false). Confirm no user-defined `WORKERS_CI` or `WORKERS_CI_BRANCH`
    overrides. Keep analytics and Google verification values blank for this release
    unless independently approved; otherwise turning indexing on could enable the
@@ -194,7 +208,10 @@ SEO-preparation validation on 13 October 2026 (local, not production activation)
   ignored `.astro/seo-activation/`.
 
 Cloudflare preview verification, independent final-head review and release
-approval are recorded in the PR. Local checks cannot prove production activation.
+approval are recorded in [PR #26](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/26).
+Subsequent live production acceptance is recorded in
+[INFRASTRUCTURE.md](INFRASTRUCTURE.md#seo-release-acceptance). Local checks alone
+cannot prove production activation.
 
 `npm run verify` checks the default preview build. For a launch-mode check set
 the public indexing flag and build, then run `npm test -- tests/seo.spec.ts` with

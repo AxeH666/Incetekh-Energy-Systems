@@ -4,7 +4,13 @@ The website is deployed on **Cloudflare Workers Static Assets** at
 <https://incetekhenergy.com/>. HTTPS `www` redirects to the apex. Hosting selection
 and domain connection are no longer pending. The owner enabled Always Use HTTPS;
 all four host/scheme variants now reach HTTPS apex with paths/queries preserved.
-Phase 1 remains incomplete.
+Production SEO activation is verified: PR #26 (`5051254`), successful rebuild
+`c955fe18-92b5-43e8-a7f9-fa6fb84a3543`, all 138 content URLs indexable and present
+in the sitemap, robots declaration, apex canonicals, multilingual metadata and
+workers.dev noindex response headers. See the
+[release evidence](INFRASTRUCTURE.md#seo-release-acceptance). Phase 1 remains
+incomplete: technical SEO does not close content, search-account, email or
+operational acceptance.
 
 The dated [INFRASTRUCTURE.md](INFRASTRUCTURE.md) is authoritative for observed
 infrastructure, discrepancies, costs, dashboard gaps, rollback and execution order.
@@ -13,27 +19,27 @@ as instructions for the existing Workers deployment.
 
 ## Release settings
 
-| Setting                      | Repository contract / verification limit                                           |
-| ---------------------------- | ---------------------------------------------------------------------------------- |
-| Source                       | Reviewed commit on `main`; owner verified production branch is main on 13 October  |
-| Node                         | 22.23.3 in `.nvmrc`, minimum 22.19; verify the cloud build log                     |
-| Install                      | `npm ci` for reproducible local validation; confirm cloud install behavior         |
-| Build                        | `npm run build`                                                                    |
-| Deploy                       | Owner verified `npx wrangler deploy` in Production Builds                          |
-| Preview                      | Owner verified `npx wrangler preview` in Previews Base; `previews: {}` in Wrangler |
-| Assets                       | `dist/` only; no Worker script, database or server adapter                         |
-| Missing paths                | Wrangler `404-page`; live missing-path test returned 404                           |
-| Preview indexing             | `PUBLIC_SITE_INDEXABLE=false`                                                      |
-| Approved production indexing | `PUBLIC_SITE_INDEXABLE=true`, only after readiness gaps close                      |
-| Public options               | Search Console HTML token and optional Cloudflare beacon in `.env.example`         |
+| Setting                      | Repository contract / verification limit                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------- |
+| Source                       | Reviewed commit on `main`; owner verified production branch is main on 13 October           |
+| Node                         | 22.23.3 in `.nvmrc`, minimum 22.19; verify the cloud build log                              |
+| Install                      | `npm ci` for reproducible local validation; confirm cloud install behavior                  |
+| Build                        | `npm run build`                                                                             |
+| Deploy                       | Owner verified `npx wrangler deploy` in Production Builds                                   |
+| Preview                      | Owner verified `npx wrangler preview` in Previews Base; `previews: {}` in Wrangler          |
+| Assets                       | `dist/` only; no Worker script, database or server adapter                                  |
+| Missing paths                | Wrangler `404-page`; live missing-path test returned 404                                    |
+| Preview indexing             | `PUBLIC_SITE_INDEXABLE=false`                                                               |
+| Approved production indexing | `PUBLIC_SITE_INDEXABLE=true` in Production build variables, owner enabled and live verified |
+| Public options               | Search Console HTML token and optional Cloudflare beacon in `.env.example`                  |
 
 Cloudflare Workers Builds has successful GitHub checks on main and a feature
 branch. **A push can publish a preview; a merge can deploy production.** Check
 current triggers, watch paths, variables and approvals before pushing. The
 initial documentation audit did not push or merge because deployment was
 prohibited. The owner subsequently authorized publication, merge and branch
-cleanup for the audit/contact releases. **The SEO activation PR requires fresh
-approval before merge or production configuration changes.** Follow the staged
+cleanup for the audit/contact releases. **PR #26 received explicit release approval and production activation is verified.**
+Future changes still require applicable release authorization. Retain the staged
 [SEO release procedure](VISIBILITY.md#approved-release-procedure), including the
 build-variable and alias-header checks. Branch protection is currently absent; propose a focused release
 safeguard separately rather than claiming review is enforced.
@@ -85,7 +91,7 @@ automation remains excluded by `SCOPE.md`.
   Require a permanent, loop-free redirect to HTTPS apex for noncanonical URLs.
 - Verify content `index, follow`, apex canonical/social tags, language alternates,
   homepage structured data, **138 sitemap URLs** and the robots sitemap declaration.
-  Current live output is noindex with an empty sitemap; this is a pending gate.
+  Passed after production activation on 13 October 2026; repeat after future releases.
 - Check `/reviews/` navigates to `/#reviews`. Current static output is HTTP 200
   with meta refresh, not an HTTP 301. Keep it out of the sitemap and noindex.
 - Require a real 404 and noindex for a nonexistent path, no canonical, no SPA fallback.
@@ -97,7 +103,9 @@ automation remains excluded by `SCOPE.md`.
   remain non-indexable even if its build flag is mistakenly true.
 - After this milestone, separately configure Search Console ownership and submit sitemap; inspect representative URLs
   and structured data. Search visibility is not guaranteed by successful submission.
-- If analytics is enabled, verify one beacon, correct privacy copy and actual
+- Reconcile the live Chrome beacon with the privacy page's disabled-analytics claim;
+  dashboard injection/ingestion remains unverified. See the infrastructure discrepancy.
+  If analytics is approved, verify one beacon, correct privacy copy and actual
   dashboard ingestion. Run deployed performance checks; local builds are not
   real-user Core Web Vitals evidence.
 - Follow the documented rollback procedure if acceptance fails; rollback is itself
