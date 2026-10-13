@@ -9,14 +9,10 @@ const sources = new Set([
 ]);
 
 export function isAllowedExternal(href: string) {
+  if (href === 'tel:+919441259786' || sources.has(href)) return true;
   if (
-    ['tel:+919441259786', 'tel:+919440168111'].includes(href) ||
-    sources.has(href)
-  )
-    return true;
-  if (
-    href === 'mailto:support@incetekh.com' ||
-    href === 'mailto:support@incetekh.com?subject=Service%20complaint'
+    href === 'mailto:incetekhenergy@gmail.com' ||
+    href === 'mailto:incetekhenergy@gmail.com?subject=Service%20complaint'
   )
     return true;
   const url = new URL(href);

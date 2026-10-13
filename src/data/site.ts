@@ -6,12 +6,10 @@ export const site = {
   name: 'Incetekh Energy',
   description:
     'Solar engineering, procurement and construction, with more than 13 years of experience and 500+ projects completed.',
-  phone: '+919440168111',
-  phoneDisplay: '+91 94401 68111',
-  secondaryPhone: '+919441259786',
-  secondaryPhoneDisplay: '+91 94412 59786',
+  phone: '+919441259786',
+  phoneDisplay: '+91 94412 59786',
   whatsapp: 'https://wa.me/919441259786',
-  email: 'support@incetekh.com',
+  email: 'incetekhenergy@gmail.com',
   businessName: 'INCETEKH ENERGY SOLUTIONS',
   address: [
     '7/1195-5, Block No.7, Shop No.2,',

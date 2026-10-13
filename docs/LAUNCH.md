@@ -44,9 +44,10 @@ Worker version.
 1. Confirm dashboard ownership/recovery, active SHA/version, previous accepted
    version, commands, public variables, preview isolation and deployment triggers.
    Export current DNS/rules securely before proposing any infrastructure changes.
-2. Fix the public `support@incetekh.com` contact path after confirming the intended
-   address. The audit found NXDOMAIN for that domain. Administrative Gmail is
-   `incetekhenergy@gmail.com`; do not substitute it publicly without owner approval.
+2. Verify the contact-correctness release live: the owner-confirmed public email
+   is `incetekhenergy@gmail.com` and the sole public phone/WhatsApp number is
+   `+91 9441259786`. Check all six languages; the former invalid address and
+   inactive future `info@incetekhenergy.com` must not appear in public output.
 3. Replace the ten temporary comments with verified, permissioned feedback or
    remove them. Verify selected photograph publication rights independently. These
    comments are already live without visible sample labels; noindex is not privacy.
@@ -54,6 +55,7 @@ Worker version.
    and legal terms. See [LANGUAGES.md](LANGUAGES.md).
 5. Correct HTTP routing through a separately approved Cloudflare change. HTTPS
    `www` preserves path/query, but HTTP apex serves 200 and HTTP `www` returned 522.
+   Exact dashboard steps and rollback are in [INFRASTRUCTURE.md](INFRASTRUCTURE.md#manual-cloudflare-correction-approval-required).
 6. Use pinned Node, `npm ci`, then `npm run verify` for the default preview build.
    Build the approved production artifact with matching public values and run
    `npm test -- tests/seo.spec.ts` with those values. No test tokens in production.

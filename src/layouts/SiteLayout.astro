@@ -35,7 +35,7 @@ const schema = {
       '@id': new URL('/#organization', Astro.site).href,
       name: site.name,
       url: Astro.site?.href,
-      telephone: [site.phone, site.secondaryPhone],
+      telephone: site.phone,
       description: site.description,
       logo: socialImageUrl.href,
     },
