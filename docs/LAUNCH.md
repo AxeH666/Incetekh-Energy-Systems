@@ -2,7 +2,9 @@
 
 The website is deployed on **Cloudflare Workers Static Assets** at
 <https://incetekhenergy.com/>. HTTPS `www` redirects to the apex. Hosting selection
-and domain connection are no longer pending. Phase 1 remains incomplete.
+and domain connection are no longer pending. The owner enabled Always Use HTTPS;
+all four host/scheme variants now reach HTTPS apex with paths/queries preserved.
+Phase 1 remains incomplete.
 
 The dated [INFRASTRUCTURE.md](INFRASTRUCTURE.md) is authoritative for observed
 infrastructure, discrepancies, costs, dashboard gaps, rollback and execution order.
@@ -11,26 +13,29 @@ as instructions for the existing Workers deployment.
 
 ## Release settings
 
-| Setting                      | Repository contract / verification limit                                                |
-| ---------------------------- | --------------------------------------------------------------------------------------- |
-| Source                       | Reviewed commit on `main`; current cloud production branch needs dashboard confirmation |
-| Node                         | 22.23.3 in `.nvmrc`, minimum 22.19; verify the cloud build log                          |
-| Install                      | `npm ci` for reproducible local validation; confirm cloud install behavior              |
-| Build                        | `npm run build`                                                                         |
-| Deploy                       | Owner reports `npx wrangler deploy`; verify Cloudflare Builds settings                  |
-| Preview                      | Historical integration uses `npx wrangler preview`; `previews: {}` exists in Wrangler   |
-| Assets                       | `dist/` only; no Worker script, database or server adapter                              |
-| Missing paths                | Wrangler `404-page`; live missing-path test returned 404                                |
-| Preview indexing             | `PUBLIC_SITE_INDEXABLE=false`                                                           |
-| Approved production indexing | `PUBLIC_SITE_INDEXABLE=true`, only after readiness gaps close                           |
-| Public options               | Search Console HTML token and optional Cloudflare beacon in `.env.example`              |
+| Setting                      | Repository contract / verification limit                                           |
+| ---------------------------- | ---------------------------------------------------------------------------------- |
+| Source                       | Reviewed commit on `main`; owner verified production branch is main on 13 October  |
+| Node                         | 22.23.3 in `.nvmrc`, minimum 22.19; verify the cloud build log                     |
+| Install                      | `npm ci` for reproducible local validation; confirm cloud install behavior         |
+| Build                        | `npm run build`                                                                    |
+| Deploy                       | Owner verified `npx wrangler deploy` in Production Builds                          |
+| Preview                      | Owner verified `npx wrangler preview` in Previews Base; `previews: {}` in Wrangler |
+| Assets                       | `dist/` only; no Worker script, database or server adapter                         |
+| Missing paths                | Wrangler `404-page`; live missing-path test returned 404                           |
+| Preview indexing             | `PUBLIC_SITE_INDEXABLE=false`                                                      |
+| Approved production indexing | `PUBLIC_SITE_INDEXABLE=true`, only after readiness gaps close                      |
+| Public options               | Search Console HTML token and optional Cloudflare beacon in `.env.example`         |
 
 Cloudflare Workers Builds has successful GitHub checks on main and a feature
 branch. **A push can publish a preview; a merge can deploy production.** Check
 current triggers, watch paths, variables and approvals before pushing. The
 initial documentation audit did not push or merge because deployment was
 prohibited. The owner subsequently authorized publication, merge and branch
-cleanup; the existing Git integration can therefore run for this release. Branch protection is currently absent; propose a focused release
+cleanup for the audit/contact releases. **The SEO activation PR requires fresh
+approval before merge or production configuration changes.** Follow the staged
+[SEO release procedure](VISIBILITY.md#approved-release-procedure), including the
+build-variable and alias-header checks. Branch protection is currently absent; propose a focused release
 safeguard separately rather than claiming review is enforced.
 
 The 30 September preview fix added the empty `previews` block after a build succeeded
@@ -44,21 +49,22 @@ Worker version.
 1. Confirm dashboard ownership/recovery, active SHA/version, previous accepted
    version, commands, public variables, preview isolation and deployment triggers.
    Export current DNS/rules securely before proposing any infrastructure changes.
-2. Verify the contact-correctness release live: the owner-confirmed public email
+2. Preserve PR #25's verified live contacts: the owner-confirmed public email
    is `incetekhenergy@gmail.com` and the sole public phone/WhatsApp number is
    `+91 9441259786`. Check all six languages; the former invalid address and
    inactive future `info@incetekhenergy.com` must not appear in public output.
-3. Replace the ten temporary comments with verified, permissioned feedback or
-   remove them. Verify selected photograph publication rights independently. These
-   comments are already live without visible sample labels; noindex is not privacy.
+3. Keep customer reviews unchanged in this SEO component as explicitly requested.
+   Record the existing review/photo evidence and permission limitations separately;
+   technical SEO acceptance is not a claim of verified endorsements.
 4. Complete native-speaker review of regional copy, especially subsidy, financing
    and legal terms. See [LANGUAGES.md](LANGUAGES.md).
-5. Correct HTTP routing through a separately approved Cloudflare change. HTTPS
-   `www` preserves path/query, but HTTP apex serves 200 and HTTP `www` returned 522.
-   Exact dashboard steps and rollback are in [INFRASTRUCTURE.md](INFRASTRUCTURE.md#manual-cloudflare-correction-approval-required).
+5. Preserve the working HTTP and www redirects. Recheck them after release;
+   the former HTTP 200/522 defect is resolved and needs no new redirect rule.
 6. Use pinned Node, `npm ci`, then `npm run verify` for the default preview build.
    Build the approved production artifact with matching public values and run
-   `npm test -- tests/seo.spec.ts` with those values. No test tokens in production.
+   `npm test -- tests/seo.spec.ts tests/seo-artifacts.spec.ts` with the expected
+   mode. Check main, preview with an accidental true flag, missing branch context,
+   and development mode. No test tokens in production.
 7. Set only approved analytics/verification options, avoid duplicate beacon
    injection, and handle the public `workers.dev` alias before indexing. Confirm
    previews stay non-indexable; they are not automatically private.
@@ -86,7 +92,10 @@ automation remains excluded by `SCOPE.md`.
 - Recheck Workers `_headers`, CSP meta policy, HTML revalidation and hashed asset
   immutable caching; inspect browser resource failures. Local preview cannot prove
   edge headers. See [Workers headers](https://developers.cloudflare.com/workers/static-assets/headers/).
-- Verify Search Console ownership and submit sitemap; inspect representative URLs
+- Verify workers.dev alias/preview responses carry `X-Robots-Tag: noindex`, while
+  production custom-domain content has no noindex header. Preview HTML and sitemap
+  remain non-indexable even if its build flag is mistakenly true.
+- After this milestone, separately configure Search Console ownership and submit sitemap; inspect representative URLs
   and structured data. Search visibility is not guaranteed by successful submission.
 - If analytics is enabled, verify one beacon, correct privacy copy and actual
   dashboard ingestion. Run deployed performance checks; local builds are not
