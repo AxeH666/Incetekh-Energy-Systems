@@ -37,7 +37,8 @@ test('every city opens a complete local guide with working actions and unique me
     );
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
       'content',
-      process.env.PUBLIC_SITE_INDEXABLE === 'true'
+      (process.env.SEO_EXPECT_INDEXABLE ??
+        process.env.PUBLIC_SITE_INDEXABLE) === 'true'
         ? 'index, follow'
         : 'noindex, follow',
     );

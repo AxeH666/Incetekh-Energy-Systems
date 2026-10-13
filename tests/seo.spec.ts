@@ -15,7 +15,11 @@ const routes = [
   '/terms/',
   '/privacy/',
 ];
-const launch = process.env.PUBLIC_SITE_INDEXABLE === 'true';
+// Explicit expected output lets the build matrix test a mistakenly shared true
+// flag on a preview branch without mirroring the implementation's branch logic.
+const launch =
+  (process.env.SEO_EXPECT_INDEXABLE ?? process.env.PUBLIC_SITE_INDEXABLE) ===
+  'true';
 const token = launch ? process.env.PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN : '';
 
 test('every public page has unique metadata, working local resources and safe configuration', async ({
@@ -166,4 +170,8 @@ test('deployment header file sets bounded security and hashed-asset caching', as
   expect(headers).toContain(
     '/_astro/*\n  Cache-Control: public, max-age=31536000, immutable',
   );
+  expect(headers).toContain(
+    'https://:version.:subdomain.workers.dev/*\n  X-Robots-Tag: noindex',
+  );
+  expect(headers.match(/X-Robots-Tag:/g)).toHaveLength(1);
 });

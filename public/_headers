@@ -6,3 +6,7 @@
 
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Covers the production alias and branch/version previews, not the custom domain.
+https://:version.:subdomain.workers.dev/*
+  X-Robots-Tag: noindex
