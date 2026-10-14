@@ -23,7 +23,7 @@ npm run dev
 Open the address printed by Astro. No credentials or external APIs are required.
 Optional public build settings are documented in [.env.example](.env.example).
 Local builds are non-indexable by default and embed no analytics script.
-Production uses Cloudflare Automatic Setup; see [analytics/privacy](docs/ANALYTICS.md).
+Production uses Cloudflare Automatic Setup with EU visitor exclusion; see [analytics/privacy](docs/ANALYTICS.md).
 
 ```sh
 npm run lint       # Prettier formatting lint
@@ -66,7 +66,7 @@ business facts, warranty qualifiers and feedback status aligned across pages.
 Warm paper, charcoal, restrained rust accents, large type and real installation
 photographs. Self-hosted Manrope, no remote fonts, no client app runtime. The
 navigation remains visible on narrow screens and FAQs use native HTML controls.
-Small inline scripts control the homepage gallery, review scrolling and bill-slider estimator and unconnected visit-form validation. Cloudflare automatically injects its analytics beacon on production; the
+Small inline scripts control the homepage gallery, review scrolling and bill-slider estimator and unconnected visit-form validation. Cloudflare automatically injects its analytics beacon for eligible non-EU production visitors; the
 application does not embed a second tracking script.
 
 The founder confirmed the phone, more than 13 years of experience and 500+ completed projects, solar EPC,

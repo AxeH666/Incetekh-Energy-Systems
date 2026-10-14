@@ -29,15 +29,17 @@ Rebuild after any change.
   verification method. Omit it until a real Search Console property exists.
 
 Cloudflare Web Analytics uses **Automatic Setup**, confirmed enabled and collecting
-by the owner on 14 October 2026. Preserve edge injection; do not set a build token
+by the owner on 14 October 2026, on Free with **Enable, excluding visitor data in
+the EU** selected. Preserve edge injection; do not set a build token
 or add a manual script. This PR removes the unused manual injection path and
 corrects privacy copy in all six languages. Disclosure text describes production
 and no longer depends on indexing or an application token. Local output has no
-beacon; the production edge adds it. Noindex does not prevent edge analytics.
-Preview/alias exclusion is a dashboard hostname/rules check, not a build-flag
-invariant. See [ANALYTICS.md](ANALYTICS.md) for official evidence, validation and
-unresolved privacy questions. Deployment and account changes are not authorized
-in this component; live copy remains unchanged until an approved release.
+beacon; the production edge adds it for eligible visitors. Noindex does not prevent
+edge analytics. Free has no advanced Web Analytics rules. Zone subdomain previews
+can be measured; `workers.dev` isolation is expected from hostname scope but needs
+live verification, not a build-flag assumption. See [ANALYTICS.md](ANALYTICS.md)
+for evidence, owner checks and region/hostname acceptance. Automatic branch previews
+are authorized for PR #28; merge, production release and account changes are not.
 
 ## Search behavior
 

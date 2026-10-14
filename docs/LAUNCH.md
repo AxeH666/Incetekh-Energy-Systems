@@ -72,8 +72,9 @@ Worker version.
    mode. Check main, preview with an accidental true flag, missing branch context,
    and development mode. No test tokens in production.
 7. Preserve Cloudflare Analytics Automatic Setup; do not add a manual beacon or
-   application token. Confirm preview/alias analytics exclusions separately from
-   their noindex settings. Set Google verification only when approved.
+   application token. Preserve the owner-confirmed EU exclusion on Free; advanced
+   analytics rules are unavailable. Verify preview/alias collection separately
+   from noindex using [ANALYTICS.md](ANALYTICS.md). Set Google verification only when approved.
 8. Record SHA, Node/Wrangler versions, build configuration, artifact/version and
    recovery target. Deploy only under release authorization.
 
@@ -103,10 +104,11 @@ automation remains excluded by `SCOPE.md`.
   remain non-indexable even if its build flag is mistakenly true.
 - After this milestone, separately configure Search Console ownership and submit sitemap; inspect representative URLs
   and structured data. Search visibility is not guaranteed by successful submission.
-- The owner confirms Analytics Automatic Setup and collection on 14 October.
-  The privacy correction is prepared but not deployed; review [ANALYTICS.md](ANALYTICS.md)
-  before merge. After an approved release verify one edge beacon and corrected
-  copy in all six languages, preserving existing collection settings. Local
+- The owner confirms Analytics Automatic Setup and collection on Free, excluding
+  EU visitors, on 14 October. The privacy correction is prepared but not deployed
+  to production; review [ANALYTICS.md](ANALYTICS.md) before merge. After an approved
+  release verify one edge beacon for eligible non-EU visitors, none for EU visitors,
+  and corrected copy in all six languages, preserving collection settings. Local
   builds are not evidence of edge injection or real-user Core Web Vitals.
 - Follow the documented rollback procedure if acceptance fails; rollback is itself
   a deployment requiring authorization. Preserve evidence and avoid improvised DNS.

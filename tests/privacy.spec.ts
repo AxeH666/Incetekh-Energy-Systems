@@ -44,12 +44,17 @@ for (const width of [390, 1440]) {
       await expect(analytics).toContainText('Cloudflare Web Analytics');
       await expect(analytics).toContainText('incetekhenergy.com');
       await expect(analytics).toContainText('IP');
+      await expect(analytics.locator('p').first()).toContainText('(EU)');
       await expect(page.locator('html')).toHaveAttribute('lang', code);
       await expect(page.locator('meta[name="description"]')).toHaveAttribute(
         'content',
         /Cloudflare Web Analytics/,
       );
       if (code === 'en') {
+        await expect(analytics).toContainText(
+          'not to add the analytics script for visitors in the European Union (EU)',
+        );
+        await expect(analytics).toContainText('Where analytics is enabled');
         await expect(analytics).toContainText(
           'pages viewed, referring websites',
         );
@@ -67,6 +72,7 @@ for (const width of [390, 1440]) {
         await expect(analytics).not.toContainText(
           'We use Cloudflare Web Analytics',
         );
+        await expect(analytics).not.toContainText('Where analytics is enabled');
         const text = await analytics.innerText();
         expect(text).toMatch(/[\u0900-\u0d7f]/);
       }
