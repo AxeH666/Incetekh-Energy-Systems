@@ -71,9 +71,9 @@ Worker version.
    `npm test -- tests/seo.spec.ts tests/seo-artifacts.spec.ts` with the expected
    mode. Check main, preview with an accidental true flag, missing branch context,
    and development mode. No test tokens in production.
-7. Set only approved analytics/verification options, avoid duplicate beacon
-   injection, and handle the public `workers.dev` alias before indexing. Confirm
-   previews stay non-indexable; they are not automatically private.
+7. Preserve Cloudflare Analytics Automatic Setup; do not add a manual beacon or
+   application token. Confirm preview/alias analytics exclusions separately from
+   their noindex settings. Set Google verification only when approved.
 8. Record SHA, Node/Wrangler versions, build configuration, artifact/version and
    recovery target. Deploy only under release authorization.
 
@@ -103,11 +103,11 @@ automation remains excluded by `SCOPE.md`.
   remain non-indexable even if its build flag is mistakenly true.
 - After this milestone, separately configure Search Console ownership and submit sitemap; inspect representative URLs
   and structured data. Search visibility is not guaranteed by successful submission.
-- Reconcile the live Chrome beacon with the privacy page's disabled-analytics claim;
-  dashboard injection/ingestion remains unverified. See the infrastructure discrepancy.
-  If analytics is approved, verify one beacon, correct privacy copy and actual
-  dashboard ingestion. Run deployed performance checks; local builds are not
-  real-user Core Web Vitals evidence.
+- The owner confirms Analytics Automatic Setup and collection on 14 October.
+  The privacy correction is prepared but not deployed; review [ANALYTICS.md](ANALYTICS.md)
+  before merge. After an approved release verify one edge beacon and corrected
+  copy in all six languages, preserving existing collection settings. Local
+  builds are not evidence of edge injection or real-user Core Web Vitals.
 - Follow the documented rollback procedure if acceptance fails; rollback is itself
   a deployment requiring authorization. Preserve evidence and avoid improvised DNS.
 

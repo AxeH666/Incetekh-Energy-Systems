@@ -20,7 +20,6 @@ const routes = [
 const launch =
   (process.env.SEO_EXPECT_INDEXABLE ?? process.env.PUBLIC_SITE_INDEXABLE) ===
   'true';
-const token = launch ? process.env.PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN : '';
 
 test('every public page has unique metadata, working local resources and safe configuration', async ({
   page,
@@ -41,6 +40,7 @@ test('every public page has unique metadata, working local resources and safe co
   await page.route('https://cloudflareinsights.com/**', (route) =>
     route.abort(),
   );
+  await page.route('**/cdn-cgi/rum**', (route) => route.abort());
   const titles = new Set<string>();
   const descriptions = new Set<string>();
   const errors: string[] = [];
@@ -67,15 +67,11 @@ test('every public page has unique metadata, working local resources and safe co
     ).toHaveAttribute('content', /object-src 'none'/);
     await expect(
       page.locator('script[src]:not([src^="/_astro/"])'),
-    ).toHaveCount(token ? 1 : 0);
+    ).toHaveCount(0);
     await expect(page.locator('script[type="module"]')).toHaveCount(
       path === '/' ? 4 : 1,
     );
-    if (token)
-      await expect(page.locator('script[data-cf-beacon]')).toHaveAttribute(
-        'data-cf-beacon',
-        JSON.stringify({ token }),
-      );
+    await expect(page.locator('script[data-cf-beacon]')).toHaveCount(0);
     if (process.env.PUBLIC_GOOGLE_SITE_VERIFICATION)
       await expect(
         page.locator('meta[name="google-site-verification"]'),
@@ -88,12 +84,10 @@ test('every public page has unique metadata, working local resources and safe co
   }
   expect(titles.size).toBe(routes.length);
   expect(descriptions.size).toBe(routes.length);
-  expect(beaconRequests).toBe(token ? routes.length : 0);
+  expect(beaconRequests).toBe(0);
   expect(errors).toEqual([]);
   await expect(page.getByRole('main')).toContainText(
-    token
-      ? 'Cloudflare Web Analytics is enabled'
-      : 'Website analytics is currently disabled',
+    'We use Cloudflare Web Analytics on incetekhenergy.com',
   );
 });
 

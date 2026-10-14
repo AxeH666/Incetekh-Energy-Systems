@@ -299,7 +299,6 @@
   "Request free site visit": "ఉచిత సైట్ సందర్శనను అభ్యర్థించండి",
   "Online requests are not available yet. Please use WhatsApp to arrange your visit. Details entered here are not sent or saved.": "ఆన్‌లైన్ అభ్యర్థనలు ఇంకా అందుబాటులో లేవు. దయచేసి మీ సందర్శనను ఏర్పాటు చేయడానికి WhatsAppని ఉపయోగించండి. ఇక్కడ నమోదు చేసిన వివరాలు పంపబడవు లేదా సేవ్ చేయబడవు.",
   "Website Privacy | Incetekh Energy": "వెబ్‌సైట్ గోప్యత | Incetekh Energy",
-  "How the Incetekh Energy website handles browsing, optional site analytics and telephone enquiries.": "Incetekh Energy వెబ్‌సైట్ బ్రౌజింగ్, ఐచ్ఛిక సైట్ విశ్లేషణలు మరియు టెలిఫోన్ విచారణలను ఎలా నిర్వహిస్తుంది.",
   "Hi Incetekh Energy, I have a question about your privacy policy and how my enquiry details are handled.": "హాయ్ Incetekh Energy, మీ గోప్యతా విధానం మరియు నా విచారణ వివరాలు ఎలా నిర్వహించబడుతున్నాయి అనే దాని గురించి నాకు ఒక ప్రశ్న ఉంది.",
   "Website information": "వెబ్‌సైట్ సమాచారం",
   "Privacy, plainly.": "గోప్యత, స్పష్టంగా.",
@@ -310,7 +309,6 @@
   "Solar planning calculator": "సోలార్ ప్లానింగ్ కాలిక్యులేటర్",
   "The calculator runs in your browser. We do not save or submit your bill inputs to a server. The site-visit form is not connected to a delivery service yet: its fields stay in the current page and are not sent, logged or saved by this website. It does not submit a booking.": "కాలిక్యులేటర్ మీ బ్రౌజర్‌లో రన్ అవుతుంది. మేము మీ బిల్లు ఇన్‌పుట్‌లను సర్వర్‌లో సేవ్ చేయము లేదా సమర్పించము. సైట్-విజిట్ ఫారమ్ ఇంకా డెలివరీ సేవకు కనెక్ట్ చేయబడలేదు: దీని ఫీల్డ్‌లు ప్రస్తుత పేజీలోనే ఉంటాయి మరియు ఈ వెబ్‌సైట్ ద్వారా పంపబడవు, లాగిన్ చేయబడవు లేదా సేవ్ చేయబడవు. ఇది బుకింగ్‌ను సమర్పించదు.",
   "Website analytics": "వెబ్‌సైట్ విశ్లేషణలు",
-  "Website analytics is currently disabled. This site does not set analytics or advertising cookies.": "వెబ్‌సైట్ విశ్లేషణలు ప్రస్తుతం నిలిపివేయబడ్డాయి. ఈ సైట్ విశ్లేషణలు లేదా ప్రకటన కుక్కీలను సెట్ చేయలేదు.",
   "Calls, email and WhatsApp enquiries": "కాల్‌లు, ఇమెయిల్ మరియు WhatsApp విచారణలు",
   "Call links open your device’s calling app. They do not submit an online enquiry. Share only the details needed to discuss your site and requirements.": "కాల్ లింక్‌లు మీ పరికరం కాలింగ్ యాప్‌ను తెరుస్తాయి. వారు ఆన్‌లైన్ విచారణను సమర్పించరు. మీ సైట్ మరియు అవసరాల గురించి చర్చించడానికి అవసరమైన వివరాలను మాత్రమే భాగస్వామ్యం చేయండి.",
   "WhatsApp links open WhatsApp's website or app. Nothing is sent until you choose to send a message. Your use of WhatsApp is subject to its own privacy policy; this site does not embed its chat widget or tracking code.": "WhatsApp లింక్‌లు WhatsApp యొక్క వెబ్‌సైట్ లేదా యాప్‌ను తెరుస్తాయి. మీరు సందేశాన్ని పంపాలని ఎంచుకునే వరకు ఏమీ పంపబడదు. మీ WhatsApp వినియోగం దాని స్వంత గోప్యతా విధానానికి లోబడి ఉంటుంది; ఈ సైట్ దాని చాట్ విడ్జెట్ లేదా ట్రాకింగ్ కోడ్‌ను పొందుపరచదు.",
@@ -599,5 +597,12 @@
   "NREDCAP": "NREDCAP",
   "IOCL": "IOCL",
   "BPCL": "BPCL",
-  "HPCL": "HPCL"
+  "HPCL": "HPCL",
+  "How Incetekh Energy handles website browsing, Cloudflare Web Analytics and enquiries.": "వెబ్‌సైట్ బ్రౌజింగ్, Cloudflare Web Analytics మరియు విచారణల సమాచారాన్ని Incetekh Energy ఎలా నిర్వహిస్తుంది.",
+  "We use Cloudflare Web Analytics on incetekhenergy.com to understand visits and improve website performance. Your browser sends usage and performance information to Cloudflare.": "సందర్శనలను అర్థం చేసుకోవడానికి, వెబ్‌సైట్ పనితీరును మెరుగుపరచడానికి incetekhenergy.comలో Cloudflare Web Analytics ఉపయోగిస్తాము. మీ బ్రౌజర్ వినియోగం, పనితీరు సమాచారాన్ని Cloudflareకు పంపుతుంది.",
+  "This includes pages viewed, referring websites, browser and device type, operating system, country, and page-load and interaction timings.": "ఇందులో చూసిన పేజీలు, మీరు ఇక్కడికి వచ్చిన వెబ్‌సైట్‌లు, బ్రౌజర్ మరియు పరికరం రకం, ఆపరేటింగ్ సిస్టమ్, దేశం, పేజీ లోడ్ కావడానికి మరియు వినియోగదారు చర్యలకు స్పందించడానికి పట్టే సమయం ఉంటాయి.",
+  "Cloudflare says its analytics uses no cookies or browser storage to track visitors and does not track individuals across websites.": "Cloudflare ప్రకారం, సందర్శకులను ట్రాక్ చేయడానికి దాని అనలిటిక్స్ కుకీలు లేదా బ్రౌజర్ స్టోరేజ్‌ను ఉపయోగించదు; వేర్వేరు వెబ్‌సైట్‌లలో వ్యక్తులను ట్రాక్ చేయదు.",
+  "Cloudflare receives IP addresses when handling analytics requests but discards them without storing them in its analytics databases or logs. This is separate from hosting and security processing described above.": "అనలిటిక్స్ అభ్యర్థనలను నిర్వహించేటప్పుడు Cloudflareకు IP చిరునామాలు అందుతాయి. అయితే వాటిని తన అనలిటిక్స్ డేటాబేస్‌లు లేదా లాగ్‌లలో నిల్వ చేయకుండా తొలగిస్తుంది. ఇది పైన వివరించిన హోస్టింగ్ మరియు భద్రతా ప్రాసెసింగ్‌కు వేరు.",
+  "Analytics information collected": "సేకరించే అనలిటిక్స్ సమాచారం",
+  "Cloudflare analytics privacy information": "Cloudflare అనలిటిక్స్ గోప్యతా సమాచారం"
 }

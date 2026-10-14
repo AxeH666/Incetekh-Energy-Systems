@@ -5,11 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
 import logo from '../../incetekh_logo.png';
-import {
-  indexable,
-  analyticsToken,
-  googleVerification,
-} from '../data/visibility';
+import { indexable, googleVerification } from '../data/visibility';
 
 interface Props {
   title: string;
@@ -94,13 +90,5 @@ const schema = {
       <slot />
     </main>
     <Footer />
-    {analyticsToken && !noindex && (
-      <script
-        is:inline
-        defer
-        src="https://static.cloudflareinsights.com/beacon.min.js"
-        data-cf-beacon={JSON.stringify({ token: analyticsToken })}
-      ></script>
-    )}
   </body>
 </html>
