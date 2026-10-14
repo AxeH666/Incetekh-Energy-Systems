@@ -1,6 +1,7 @@
 # Infrastructure and operations
 
-Last audited: **13 October 2026 (Asia/Kolkata)**. Maintainer: founder, with the
+Infrastructure audited: **13 October 2026 (Asia/Kolkata)**. Analytics configuration
+clarified by the owner on **14 October 2026**; unrelated dashboard facts were not re-audited. Maintainer: founder, with the
 engineer responsible for each approved infrastructure change.
 
 This is the current infrastructure reference. [SCOPE.md](../SCOPE.md) still controls
@@ -271,15 +272,16 @@ alias response header remain in place. Previews Base stays unset.
 
 ### Public build variables
 
-| Variable                            | Repository behavior                                                   | Live evidence / remaining check                                                                                       |
-| ----------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `PUBLIC_SITE_INDEXABLE`             | Defaults false; dev/non-main Workers builds stay noindex even if true | Owner confirms true in Production only; all 138 live content URLs indexable                                           |
-| `PUBLIC_GOOGLE_SITE_VERIFICATION`   | Optional HTML meta token                                              | No tag observed. Search Console ownership can use other methods; account state unknown                                |
-| `PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` | Optional 32-hex public beacon ID; emitted only in indexable builds    | Beacon present in Chrome but absent in curl/local artifacts; privacy says disabled; dashboard reconciliation required |
+| Variable                          | Repository behavior                                                   | Live evidence / remaining check                                                        |
+| --------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `PUBLIC_SITE_INDEXABLE`           | Defaults false; dev/non-main Workers builds stay noindex even if true | Owner confirms true in Production only; all 138 live content URLs indexable            |
+| `PUBLIC_GOOGLE_SITE_VERIFICATION` | Optional HTML meta token                                              | No tag observed. Search Console ownership can use other methods; account state unknown |
 
 These values are baked into static HTML; changing runtime variables cannot repair
 the deployed output. An approved rebuild/deployment is required. Never put API
-keys in `PUBLIC_*`. Keep preview builds non-indexable and analytics-free. The
+keys in `PUBLIC_*`. Keep preview builds non-indexable. Analytics is edge-injected
+with EU exclusion; preview/alias collection requires live verification. Free has
+no advanced Web Analytics rules; see [ANALYTICS.md](ANALYTICS.md). The
 public `workers.dev` production alias shares the deployment and can inherit an
 indexable build. PR #26 deployed host-specific `X-Robots-Tag: noindex` through
 `public/_headers` for `https://:version.:subdomain.workers.dev/*`. This header is
@@ -333,46 +335,50 @@ Actual recipient delivery was not tested.
 
 ### Analytics discrepancy found during browser acceptance
 
-**Confirmed:** fresh Chrome contexts received a script from
-`https://static.cloudflareinsights.com/beacon.min.js/...` with `data-cf-beacon`.
-The live English privacy page still says website analytics is disabled. Ordinary
-curl responses and both retained local build modes contain no beacon. The first
-browser check expecting no beacon failed; subsequent checks record its presence
-and block `cloudflareinsights.com` requests during verification rather than hiding
-this discrepancy. This interception does not prove that every possible collection
-endpoint was blocked. All 12 browser checks (six language homepages at 390px and
-1440px) observed one beacon; navigation, contact links, social images and layout
-checks passed. No token values are recorded here.
+**Owner-confirmed, 14 October 2026:** Cloudflare Web Analytics is enabled,
+Automatic Setup is active on Free, with **Enable, excluding visitor data in the EU**
+selected. Cloudflare injects the script for eligible visitors and data is collected.
+The owner verified that EU visitors do not receive the snippet under this setting;
+this is dashboard/provider evidence, not an agent test from an EU network.
+Advanced Web Analytics rules require Pro or higher; no upgrade or setting change
+was made.
+This resolves the earlier uncertainty about the browser beacon's source and
+account ingestion. No agent inspected or changed dashboard settings.
 
-**Inferred:** Cloudflare edge automatic injection is the likely source, rather
-than the repository's optional build-token path. Cloudflare documents automatic
-injection for proxied sites, but this account setting and ingestion have not been
-inspected. This is a privacy/measurement consistency issue, not an indexing block.
+**Historical observation, 13 October:** all twelve Chrome homepage checks
+observed a beacon, while curl/local artifacts omitted it and privacy copy said
+analytics was disabled. The privacy condition depended on an absent build token,
+which did not represent Cloudflare's independent Automatic Setup.
 
-**Next action:** owner inspects **Cloudflare > Web Analytics > Manage site** for
-`incetekhenergy.com`, including automatic setup and hostname rules. Decide whether
-to disable injection to match the current approved disabled policy, or separately
-approve analytics and align privacy copy, preview exclusion and collection checks.
-Do not add a second beacon or a production analytics token merely to hide the
-mismatch. No dashboard setting or public privacy copy changed in this audit.
-[Cloudflare automatic setup](https://developers.cloudflare.com/web-analytics/get-started/)
-describes the available automatic/manual/disabled modes. Raw observations:
-`.astro/seo-activation/live-analytics-discrepancy.json` and `live-browser-final.json`.
+The focused privacy PR removes the stale disabled disclosure, adds the provider's
+collection/privacy details in all six languages, and removes unused manual beacon
+injection to prevent duplicates. **It is not deployed to production:** production retains its
+old disclosure until an approved release. Automatic injection, CSP, indexing,
+contacts, forms and reviews are preserved. No Cloudflare changes are needed for
+this implementation. See [ANALYTICS.md](ANALYTICS.md) for official sources,
+validation, the confirmed EU exclusion and Free-plan limits, and remaining checks
+for hostname isolation, access, terms, exports, translations and applicable consent
+requirements. Automatic branch previews are authorized for PR #28.
+
+Historical captures remain in `.astro/seo-activation/live-analytics-discrepancy.json`
+and `live-browser-final.json`. These are dated observations, not current account
+configuration authority. The unused `PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` setting is
+retired in the privacy PR; do not add it to either build configuration.
 
 ## Email and external services
 
-| Service                            | State / ownership boundary                                                                                                               |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Administrative Gmail               | `incetekhenergy@gmail.com`, confirmed by owner; actual logins, recovery and MFA not inspected                                            |
-| Current public address             | `incetekhenergy@gmail.com`, explicitly owner-confirmed for enquiries; live links verified, actual receipt not tested                     |
-| Future branded mail                | `info@incetekhenergy.com` / possible support mailbox are proposals, not active mailboxes; provider, owners, aliases and budget undecided |
-| Mail DNS                           | No MX/SPF/DMARC observed for `incetekhenergy.com`; DKIM selectors/provider not known, so DKIM cannot be exhaustively checked             |
-| Cloudflare Web Analytics           | Live Chrome beacon conflicts with disabled privacy copy; likely edge injection, dashboard mechanism/ingestion unverified                 |
-| Google Analytics / Tag Manager     | No implementation found in source or sampled live HTML                                                                                   |
-| Search Console / Business Profile  | Technical readiness verified; dashboard ownership/submission and actual indexing unknown                                                 |
-| Maps, payments, CRM, form provider | No integration found in repo; no such bindings declared                                                                                  |
-| Manufacturer/government references | Outbound resource links and local logos, not API dependencies or proof of service accounts                                               |
-| WhatsApp Cloud API, AI, VM/backend | Not implemented in this repository and excluded by current scope                                                                         |
+| Service                            | State / ownership boundary                                                                                                                 |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Administrative Gmail               | `incetekhenergy@gmail.com`, confirmed by owner; actual logins, recovery and MFA not inspected                                              |
+| Current public address             | `incetekhenergy@gmail.com`, explicitly owner-confirmed for enquiries; live links verified, actual receipt not tested                       |
+| Future branded mail                | `info@incetekhenergy.com` / possible support mailbox are proposals, not active mailboxes; provider, owners, aliases and budget undecided   |
+| Mail DNS                           | No MX/SPF/DMARC observed for `incetekhenergy.com`; DKIM selectors/provider not known, so DKIM cannot be exhaustively checked               |
+| Cloudflare Web Analytics           | Owner confirms Free, Automatic Setup and collection excluding EU visitors; privacy correction not deployed to production; see ANALYTICS.md |
+| Google Analytics / Tag Manager     | No implementation found in source or sampled live HTML                                                                                     |
+| Search Console / Business Profile  | Technical readiness verified; dashboard ownership/submission and actual indexing unknown                                                   |
+| Maps, payments, CRM, form provider | No integration found in repo; no such bindings declared                                                                                    |
+| Manufacturer/government references | Outbound resource links and local logos, not API dependencies or proof of service accounts                                                 |
+| WhatsApp Cloud API, AI, VM/backend | Not implemented in this repository and excluded by current scope                                                                           |
 
 Missing MX is evidence that normal domain-mail setup is incomplete, not proof
 that no provider subscription was bought. No mailbox operation was tested.
@@ -455,18 +461,20 @@ been measured; no restoration drill was performed.
 
 ## Costs
 
-Actual account plans, invoices and renewal totals are **unknown**. Do not describe
+The owner confirms the zone/Web Analytics **Free** plan on 14 October. Workers
+subscription, add-ons, invoices and renewal totals remain **unknown**. Do not describe
 the whole setup as free or treat public pricing as an invoice. Reference pricing
 was checked on 13 October 2026; recheck before any purchase or upgrade.
 
-| Item                            | Basis / open item                                                                                                         |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Workers static hosting          | Static asset requests are free/unlimited under the documented standard model; account may still carry a paid plan/add-ons |
-| Workers subscription            | Free tier exists; standard paid subscription starts at US$5/month. Existing subscription unknown                          |
-| Workers Builds                  | Free: 3,000 build minutes/month; paid: 6,000 included, then US$0.005/minute. Usage and account plan unknown               |
-| Domain                          | Hostinger annual renewal due before recorded expiry; price, tax, discounts, auto-renew and payment unknown                |
-| Email                           | Provider/plan/mailbox count not selected in this audit; recurring cost requires owner-approved quote                      |
-| GitHub / analytics / monitoring | No project invoice inspected; no added purchase/integration; confirm existing plans and any optional costs                |
+| Item                   | Basis / open item                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Workers static hosting | Static asset requests are free/unlimited under the documented standard model; account may still carry a paid plan/add-ons          |
+| Workers subscription   | Free tier exists; standard paid subscription starts at US$5/month. Existing subscription unknown                                   |
+| Workers Builds         | Free: 3,000 build minutes/month; paid: 6,000 included, then US$0.005/minute. Usage and account plan unknown                        |
+| Domain                 | Hostinger annual renewal due before recorded expiry; price, tax, discounts, auto-renew and payment unknown                         |
+| Email                  | Provider/plan/mailbox count not selected in this audit; recurring cost requires owner-approved quote                               |
+| Web Analytics          | Owner confirms Cloudflare Free and zero advanced analytics rules; no upgrade or purchase; Workers billing remains a separate check |
+| GitHub / monitoring    | No project invoice inspected; no added purchase/integration; confirm existing plans and any optional costs                         |
 
 Sources: [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/)
 and [Builds pricing](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/).
@@ -480,7 +488,7 @@ Record date, verifier and non-secret evidence for each completed item.
 
 | Where                     | What to verify / record                                                                             | Current status                                                                                                                       |
 | ------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Cloudflare account        | Owner/recovery/MFA, members, plan, billing alerts                                                   | Unknown                                                                                                                              |
+| Cloudflare account        | Owner/recovery/MFA, members, plan, billing alerts                                                   | Free zone/Web Analytics plan owner-confirmed; Workers billing and other account controls unknown                                     |
 | Zone overview + DNS       | Active zone, exact apex/`www` records/proxy state, complete record export, DNSSEC                   | Public NS verified; internal configuration unknown                                                                                   |
 | Rules + SSL/TLS           | Actual expressions/order, minimum TLS, certificate renewal and HSTS policy                          | All four redirect variants verified; Always Use HTTPS owner-reported enabled; dashboard not inspected                                |
 | Worker domains/routes     | Apex association, active status, alias enablement, other routes                                     | Owner reported; live alias reachable                                                                                                 |
@@ -507,11 +515,12 @@ Each implementation below is a separate authorized component; no stacked PRs.
    desktop/mobile, translated copy, assets, call/WhatsApp destinations, contact,
    404 and accessibility. Use a real-device owner check for actual contact receipt.
 5. **SEO activation closed; finish search and measurement separately.** First
-   reconcile the observed browser beacon with the disabled privacy copy. Production
+   review and release the prepared analytics/privacy correction without changing
+   Automatic Setup. Production
    indexing, 138 sitemap entries, live metadata and alias safeguards are verified.
    After content approval, verify Search Console ownership and submit sitemap.
-   Select one analytics path, validate
-   ingestion/privacy, and check Business Profile details and page performance.
+   Preserve the confirmed automatic analytics path; validate released privacy copy
+   and remaining account questions. Check Business Profile details and performance.
 6. **Complete business email as its own component.** Approve provider, budget,
    mailbox owners and public address; configure Cloudflare mail DNS and verify
    send/receive/authentication. Update all contact links only after acceptance.

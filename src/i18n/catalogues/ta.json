@@ -299,7 +299,6 @@
   "Request free site visit": "இலவச தள வருகையைக் கோருங்கள்",
   "Online requests are not available yet. Please use WhatsApp to arrange your visit. Details entered here are not sent or saved.": "ஆன்லைன் கோரிக்கைகள் இன்னும் கிடைக்கவில்லை. உங்கள் வருகையை ஏற்பாடு செய்ய WhatsApp ஐப் பயன்படுத்தவும். இங்கு உள்ளிடப்பட்ட விவரங்கள் அனுப்பப்படவில்லை அல்லது சேமிக்கப்படவில்லை.",
   "Website Privacy | Incetekh Energy": "இணையதள தனியுரிமை | Incetekh Energy",
-  "How the Incetekh Energy website handles browsing, optional site analytics and telephone enquiries.": "Incetekh Energy இணையதளம் உலாவல், விருப்பத் தள பகுப்பாய்வு மற்றும் தொலைபேசி விசாரணைகளை எவ்வாறு கையாளுகிறது.",
   "Hi Incetekh Energy, I have a question about your privacy policy and how my enquiry details are handled.": "வணக்கம் Incetekh Energy, உங்கள் தனியுரிமைக் கொள்கை மற்றும் எனது விசாரணை விவரங்கள் எவ்வாறு கையாளப்படுகின்றன என்பது குறித்து எனக்கு ஒரு கேள்வி உள்ளது.",
   "Website information": "இணையதள தகவல்",
   "Privacy, plainly.": "தனியுரிமை, தெளிவாக.",
@@ -310,7 +309,6 @@
   "Solar planning calculator": "சூரிய திட்டமிடல் கால்குலேட்டர்",
   "The calculator runs in your browser. We do not save or submit your bill inputs to a server. The site-visit form is not connected to a delivery service yet: its fields stay in the current page and are not sent, logged or saved by this website. It does not submit a booking.": "கால்குலேட்டர் உங்கள் உலாவியில் இயங்குகிறது. உங்கள் பில் உள்ளீடுகளை நாங்கள் சேமிக்கவோ அல்லது சேவையகத்தில் சமர்ப்பிக்கவோ மாட்டோம். தள வருகைப் படிவம் இன்னும் டெலிவரி சேவையுடன் இணைக்கப்படவில்லை: அதன் புலங்கள் தற்போதைய பக்கத்தில் இருக்கும் மேலும் இந்த இணையதளத்தால் அனுப்பப்படவோ, உள்நுழையவோ அல்லது சேமிக்கப்படவோ இல்லை. இது முன்பதிவைச் சமர்ப்பிக்காது.",
   "Website analytics": "இணையதள பகுப்பாய்வு",
-  "Website analytics is currently disabled. This site does not set analytics or advertising cookies.": "இணையதள பகுப்பாய்வு தற்போது முடக்கப்பட்டுள்ளது. இந்தத் தளம் பகுப்பாய்வு அல்லது விளம்பர குக்கீகளை அமைக்கவில்லை.",
   "Calls, email and WhatsApp enquiries": "அழைப்புகள், மின்னஞ்சல் மற்றும் WhatsApp விசாரணைகள்",
   "Call links open your device’s calling app. They do not submit an online enquiry. Share only the details needed to discuss your site and requirements.": "அழைப்பு இணைப்புகள் உங்கள் சாதனத்தின் அழைப்பு பயன்பாட்டைத் திறக்கும். அவர்கள் ஆன்லைன் விசாரணையை சமர்ப்பிக்கவில்லை. உங்கள் தளம் மற்றும் தேவைகளைப் பற்றி விவாதிக்க தேவையான விவரங்களை மட்டும் பகிரவும்.",
   "WhatsApp links open WhatsApp's website or app. Nothing is sent until you choose to send a message. Your use of WhatsApp is subject to its own privacy policy; this site does not embed its chat widget or tracking code.": "WhatsApp இணைப்புகள் WhatsApp இன் இணையதளம் அல்லது பயன்பாட்டைத் திறக்கும். நீங்கள் செய்தியை அனுப்பும் வரை எதுவும் அனுப்பப்படாது. உங்கள் WhatsApp பயன்பாடு அதன் சொந்த தனியுரிமைக் கொள்கைக்கு உட்பட்டது; இந்த தளம் அதன் அரட்டை விட்ஜெட் அல்லது கண்காணிப்பு குறியீட்டை உட்பொதிக்கவில்லை.",
@@ -599,5 +597,12 @@
   "NREDCAP": "NREDCAP",
   "IOCL": "IOCL",
   "BPCL": "BPCL",
-  "HPCL": "HPCL"
+  "HPCL": "HPCL",
+  "How Incetekh Energy handles website browsing, Cloudflare Web Analytics and enquiries.": "இணையதள உலாவல், Cloudflare Web Analytics மற்றும் விசாரணைகள் தொடர்பான தகவல்களை Incetekh Energy எவ்வாறு கையாளுகிறது.",
+  "We use Cloudflare Web Analytics on incetekhenergy.com to understand visits and improve website performance. Cloudflare is configured not to add the analytics script for visitors in the European Union (EU). Where analytics is enabled, your browser sends usage and performance information to Cloudflare.": "வருகைகளைப் புரிந்துகொள்ளவும் இணையதளத்தின் செயல்திறனை மேம்படுத்தவும் incetekhenergy.com தளத்தில் Cloudflare Web Analytics பயன்படுத்துகிறோம். ஐரோப்பிய ஒன்றியத்தில் (EU) உள்ள பார்வையாளர்களுக்கு அனலிட்டிக்ஸ் ஸ்கிரிப்டைச் சேர்க்காதபடி Cloudflare அமைக்கப்பட்டுள்ளது. அனலிட்டிக்ஸ் இயக்கப்பட்டுள்ள இடங்களில், உங்கள் உலாவி பயன்பாடு மற்றும் செயல்திறன் தொடர்பான தகவல்களை Cloudflare-க்கு அனுப்புகிறது.",
+  "This includes pages viewed, referring websites, browser and device type, operating system, country, and page-load and interaction timings.": "பார்வையிட்ட பக்கங்கள், நீங்கள் இங்கு வர வழிவகுத்த இணையதளங்கள், உலாவி மற்றும் சாதன வகை, இயங்குதளம், நாடு, பக்கம் ஏற்றப்படும் நேரம் மற்றும் பயனர் செயல்களுக்கு எதிர்வினையாற்றும் நேரம் ஆகியவை இதில் அடங்கும்.",
+  "Cloudflare says its analytics uses no cookies or browser storage to track visitors and does not track individuals across websites.": "பார்வையாளர்களைக் கண்காணிக்க தனது அனலிட்டிக்ஸ் குக்கீகள் அல்லது உலாவிச் சேமிப்பகத்தைப் பயன்படுத்துவதில்லை என்றும் வெவ்வேறு இணையதளங்களில் தனிநபர்களைக் கண்காணிப்பதில்லை என்றும் Cloudflare கூறுகிறது.",
+  "Cloudflare receives IP addresses when handling analytics requests but discards them without storing them in its analytics databases or logs. This is separate from hosting and security processing described above.": "அனலிட்டிக்ஸ் கோரிக்கைகளைக் கையாளும்போது Cloudflare-க்கு IP முகவரிகள் கிடைக்கின்றன. ஆனால் அவற்றைத் தனது அனலிட்டிக்ஸ் தரவுத்தளங்கள் அல்லது பதிவுகளில் சேமிக்காமல் நீக்குகிறது. இது மேலே விவரிக்கப்பட்ட ஹோஸ்டிங் மற்றும் பாதுகாப்புச் செயலாக்கத்திலிருந்து வேறுபட்டது.",
+  "Analytics information collected": "சேகரிக்கப்படும் அனலிட்டிக்ஸ் தகவல்கள்",
+  "Cloudflare analytics privacy information": "Cloudflare அனலிட்டிக்ஸ் தனியுரிமைத் தகவல்கள்"
 }

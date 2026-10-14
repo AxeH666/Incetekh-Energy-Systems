@@ -299,7 +299,6 @@
   "Request free site visit": "निःशुल्क साइट विज़िट का अनुरोध करें",
   "Online requests are not available yet. Please use WhatsApp to arrange your visit. Details entered here are not sent or saved.": "ऑनलाइन अनुरोध अभी उपलब्ध नहीं हैं। कृपया अपनी यात्रा की व्यवस्था करने के लिए WhatsApp का उपयोग करें। यहां दर्ज किए गए विवरण भेजे या सहेजे नहीं जाते हैं।",
   "Website Privacy | Incetekh Energy": "वेबसाइट गोपनीयता | Incetekh Energy",
-  "How the Incetekh Energy website handles browsing, optional site analytics and telephone enquiries.": "Incetekh Energy वेबसाइट ब्राउज़िंग, वैकल्पिक साइट विश्लेषण और टेलीफोन पूछताछ को कैसे संभालती है।",
   "Hi Incetekh Energy, I have a question about your privacy policy and how my enquiry details are handled.": "नमस्ते Incetekh Energy, मेरे पास आपकी गोपनीयता नीति के बारे में एक प्रश्न है और मेरे पूछताछ विवरण कैसे संभाले जाते हैं।",
   "Website information": "वेबसाइट की जानकारी",
   "Privacy, plainly.": "गोपनीयता, स्पष्ट रूप से।",
@@ -310,7 +309,6 @@
   "Solar planning calculator": "सौर योजना कैलकुलेटर",
   "The calculator runs in your browser. We do not save or submit your bill inputs to a server. The site-visit form is not connected to a delivery service yet: its fields stay in the current page and are not sent, logged or saved by this website. It does not submit a booking.": "कैलकुलेटर आपके ब्राउज़र में चलता है। हम आपके बिल इनपुट को सर्वर पर सहेजते या सबमिट नहीं करते हैं। साइट-विज़िट फ़ॉर्म अभी तक डिलीवरी सेवा से कनेक्ट नहीं है: इसके फ़ील्ड वर्तमान पृष्ठ में रहते हैं और इस वेबसाइट द्वारा भेजे, लॉग या सहेजे नहीं जाते हैं। यह बुकिंग सबमिट नहीं करता है.",
   "Website analytics": "वेबसाइट विश्लेषण",
-  "Website analytics is currently disabled. This site does not set analytics or advertising cookies.": "वेबसाइट विश्लेषण वर्तमान में अक्षम है। यह साइट एनालिटिक्स या विज्ञापन कुकीज़ सेट नहीं करती है।",
   "Calls, email and WhatsApp enquiries": "कॉल, ईमेल और WhatsApp पूछताछ",
   "Call links open your device’s calling app. They do not submit an online enquiry. Share only the details needed to discuss your site and requirements.": "कॉल लिंक आपके डिवाइस का कॉलिंग ऐप खोलते हैं। वे ऑनलाइन पूछताछ सबमिट नहीं करते हैं. अपनी साइट और आवश्यकताओं पर चर्चा करने के लिए केवल आवश्यक विवरण साझा करें।",
   "WhatsApp links open WhatsApp's website or app. Nothing is sent until you choose to send a message. Your use of WhatsApp is subject to its own privacy policy; this site does not embed its chat widget or tracking code.": "WhatsApp लिंक WhatsApp की वेबसाइट या ऐप खोलते हैं। जब तक आप संदेश भेजना नहीं चुनते तब तक कुछ भी नहीं भेजा जाता है। आपके द्वारा WhatsApp का उपयोग इसकी अपनी गोपनीयता नीति के अधीन है; यह साइट अपना चैट विजेट या ट्रैकिंग कोड एम्बेड नहीं करती है।",
@@ -599,5 +597,12 @@
   "NREDCAP": "NREDCAP",
   "IOCL": "IOCL",
   "BPCL": "BPCL",
-  "HPCL": "HPCL"
+  "HPCL": "HPCL",
+  "How Incetekh Energy handles website browsing, Cloudflare Web Analytics and enquiries.": "Incetekh Energy वेबसाइट ब्राउज़िंग, Cloudflare Web Analytics और पूछताछ से जुड़ी जानकारी कैसे संभालता है।",
+  "We use Cloudflare Web Analytics on incetekhenergy.com to understand visits and improve website performance. Cloudflare is configured not to add the analytics script for visitors in the European Union (EU). Where analytics is enabled, your browser sends usage and performance information to Cloudflare.": "हम वेबसाइट पर आने वाले लोगों की गतिविधि समझने और वेबसाइट का प्रदर्शन बेहतर बनाने के लिए incetekhenergy.com पर Cloudflare Web Analytics का उपयोग करते हैं। Cloudflare की सेटिंग ऐसी है कि यूरोपीय संघ (EU) के आगंतुकों के लिए एनालिटिक्स स्क्रिप्ट नहीं जोड़ी जाती। जहाँ एनालिटिक्स सक्षम है, वहाँ आपका ब्राउज़र उपयोग और प्रदर्शन संबंधी जानकारी Cloudflare को भेजता है।",
+  "This includes pages viewed, referring websites, browser and device type, operating system, country, and page-load and interaction timings.": "इसमें देखे गए पृष्ठ, वे वेबसाइटें जिनसे आप यहाँ आए, ब्राउज़र और डिवाइस का प्रकार, ऑपरेटिंग सिस्टम, देश, और पृष्ठ लोड होने तथा उपयोगकर्ता की गतिविधियों पर प्रतिक्रिया देने का समय शामिल है।",
+  "Cloudflare says its analytics uses no cookies or browser storage to track visitors and does not track individuals across websites.": "Cloudflare के अनुसार, उसका एनालिटिक्स आगंतुकों को ट्रैक करने के लिए कुकीज़ या ब्राउज़र स्टोरेज का उपयोग नहीं करता और अलग-अलग वेबसाइटों पर व्यक्तियों को ट्रैक नहीं करता।",
+  "Cloudflare receives IP addresses when handling analytics requests but discards them without storing them in its analytics databases or logs. This is separate from hosting and security processing described above.": "एनालिटिक्स अनुरोधों को संभालते समय Cloudflare को IP पते मिलते हैं, लेकिन वह उन्हें अपने एनालिटिक्स डेटाबेस या लॉग में सहेजे बिना हटा देता है। यह ऊपर बताई गई होस्टिंग और सुरक्षा संबंधी प्रोसेसिंग से अलग है।",
+  "Analytics information collected": "एकत्र की जाने वाली एनालिटिक्स जानकारी",
+  "Cloudflare analytics privacy information": "Cloudflare एनालिटिक्स की गोपनीयता संबंधी जानकारी"
 }

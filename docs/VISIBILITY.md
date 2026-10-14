@@ -8,7 +8,8 @@ Production build flag true and Previews Base unchanged. The production
 workers.dev alias remains noindex through its response header. See
 [INFRASTRUCTURE.md](INFRASTRUCTURE.md#seo-release-acceptance) for current evidence,
 preview limits and remaining manual checks. Search Console ownership/submission
-and analytics remain separate; technical readiness does not prove Google indexing.
+remains separate; analytics Automatic Setup and collection are now owner-confirmed.
+Technical readiness does not prove Google indexing.
 
 ## Build configuration
 
@@ -26,21 +27,19 @@ Rebuild after any change.
   build may use true for validation; do not deploy that artifact as a preview.
 - `PUBLIC_GOOGLE_SITE_VERIFICATION` accepts the value from Google's HTML-tag
   verification method. Omit it until a real Search Console property exists.
-- `PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` accepts the public 32-character beacon
-  token from Cloudflare Web Analytics, not a Cloudflare API token. Analytics
-  renders only when indexing is enabled AND this token is supplied. Preview
-  traffic stays out of the analytics property. The privacy page changes with it.
 
-**Current discrepancy:** live Chrome receives a Cloudflare beacon although the
-privacy page says analytics is disabled; curl/local artifacts omit it. See the
-[analytics investigation](INFRASTRUCTURE.md#analytics-discrepancy-found-during-browser-acceptance).
-Dashboard automatic injection is inferred, not directly verified. Resolve this
-separately; the indexing release did not configure an analytics token.
-
-Use either this manual beacon configuration or the host's automatic injection,
-never both. Prefer manual configuration so preview/privacy behavior stays
-consistent. Disable automatic host injection before launch. No custom visitor
-IDs, call-event tracking, advertising pixels or cookies are implemented.
+Cloudflare Web Analytics uses **Automatic Setup**, confirmed enabled and collecting
+by the owner on 14 October 2026, on Free with **Enable, excluding visitor data in
+the EU** selected. Preserve edge injection; do not set a build token
+or add a manual script. This PR removes the unused manual injection path and
+corrects privacy copy in all six languages. Disclosure text describes production
+and no longer depends on indexing or an application token. Local output has no
+beacon; the production edge adds it for eligible visitors. Noindex does not prevent
+edge analytics. Free has no advanced Web Analytics rules. Zone subdomain previews
+can be measured; `workers.dev` isolation is expected from hostname scope but needs
+live verification, not a build-flag assumption. See [ANALYTICS.md](ANALYTICS.md)
+for evidence, owner checks and region/hostname acceptance. Automatic branch previews
+are authorized for PR #28; merge, production release and account changes are not.
 
 ## Search behavior
 
@@ -59,7 +58,7 @@ previews. Search indexing and rich results are not guaranteed.
 ## Production safeguards
 
 Astro's built-in CSP emits a policy in each HTML document. Scripts/styles remain
-local apart from the optional allowed Cloudflare beacon; objects and form posts
+local apart from the allowed Cloudflare edge beacon; objects and form posts
 are disallowed. `_headers` configures no-sniff, frame denial, referrer/permissions
 policies and immutable caching only for hashed Astro assets on compatible hosts
 including Cloudflare Workers Static Assets. Live checks on 13 October confirmed
@@ -97,7 +96,8 @@ the owner performed the production build-variable change.
 Reviews are unchanged by explicit instruction. Technical SEO checks do not
 establish review/photo permission or native-speaker approval. Existing content
 limitations remain recorded in [TESTIMONIALS.md](TESTIMONIALS.md) and
-[LANGUAGES.md](LANGUAGES.md). No Search Console property or analytics was created.
+[LANGUAGES.md](LANGUAGES.md). No Search Console property or analytics service was created by the SEO work.
+The owner subsequently confirmed the existing automatic analytics setup.
 
 ## Approved release procedure
 
@@ -115,9 +115,9 @@ the existing true production flag and unset preview flag during ordinary release
 2. Inspect **Build variables and secrets** under both **Production** and
    **Previews Base**. For a first activation on an unconfigured environment, preserve empty lists
    (`PUBLIC_SITE_INDEXABLE` defaults to false). Confirm no user-defined `WORKERS_CI` or `WORKERS_CI_BRANCH`
-   overrides. Keep analytics and Google verification values blank for this release
-   unless independently approved; otherwise turning indexing on could enable the
-   existing optional beacon. Do not change credentials or runtime bindings.
+   overrides. Keep Google verification values blank unless independently approved.
+   Analytics uses existing Automatic Setup; no application token is needed.
+   Do not change credentials, runtime bindings or analytics settings.
 3. After explicit approval of this procedure and the reviewed head, merge the PR.
    Wait for its exact main SHA to build successfully. Verify noindex on apex and
    `X-Robots-Tag: noindex` on the workers.dev alias and feature preview. If the
@@ -215,9 +215,9 @@ cannot prove production activation.
 
 `npm run verify` checks the default preview build. For a launch-mode check set
 the public indexing flag and build, then run `npm test -- tests/seo.spec.ts` with
-the same environment values. This test substitutes the optional beacon locally;
-it never contacts the analytics service. An enabled local test does not verify
-dashboard ingestion. Check that separately after an approved deployment.
+the same environment values. Local tests reject application-injected beacons and block collection endpoints.
+Local tests do not verify edge injection or dashboard ingestion; those require
+separate live acceptance after an approved deployment.
 
 ## Official references checked during implementation
 

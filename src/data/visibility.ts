@@ -13,14 +13,7 @@ const productionBuild =
   (!workersCI && !branch) || (workersCI === '1' && branch === 'main');
 export const indexable =
   import.meta.env.PROD && indexing === 'true' && productionBuild;
-const token = import.meta.env.PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN?.trim() ?? '';
-if (token && !/^[a-f0-9]{32}$/i.test(token)) {
-  throw new Error(
-    'Use the 32-character public Cloudflare Web Analytics token.',
-  );
-}
-// Preview traffic must never enter the production analytics property.
-export const analyticsToken = indexable ? token : '';
+// Cloudflare Automatic Setup injects analytics at the edge; do not embed a beacon.
 export const googleVerification =
   import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() ?? '';
 if (googleVerification && !/^[a-zA-Z0-9_-]+$/.test(googleVerification)) {
