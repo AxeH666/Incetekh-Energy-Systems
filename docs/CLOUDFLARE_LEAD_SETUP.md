@@ -162,6 +162,23 @@ API responses. Keep the latest build/deployment result in PR #29's acceptance
 record. Never compensate for a missing build value by copying a production key or
 moving a secret into a public variable.
 
+The owner supplied the log for the later build `d6cd2a0f` (`5d6baf1`, preview
+deployment `bf5a1559`). It confirms Node 22.23.3, `npm run build`, regeneration of
+144 pages in `dist`, and `npx wrangler preview` targeting the correct branch URL.
+The log does not report the environment received by Astro. The supplied screenshot
+shows Builds / Previews Base, root `/`, the expected commands and public values;
+the full Turnstile variable name is clipped in the image. The owner subsequently
+copied the full name as `PUBLIC_TURNSTILE_SITE_KEY`, matching the source code.
+
+Local builds of the same commit with and without the public sitekey produced the
+expected results in all six languages. Live HTML matched the missing-key artifacts
+byte for byte. A further local rebuild into the same output directory, retaining
+the existing cache, correctly replaced empty keys when the variable was supplied.
+The cache-restoration log alone therefore does not establish a cache defect.
+The effective remote build environment remains unverified; pause further preview
+deployment builds until environment delivery is resolved. No runtime secret change
+is needed to diagnose this build-time value.
+
 For this existing preview, select **Workers & Pages → incetekh-energy-systems →
 Preview selector → feat/site-visit-lead-capture → Settings → Variables and secrets**.
 Manually enter `TURNSTILE_SECRET_KEY` for the preview widget and a new independent
