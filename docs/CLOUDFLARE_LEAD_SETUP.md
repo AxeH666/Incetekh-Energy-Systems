@@ -153,6 +153,15 @@ The owner confirmed these two preview build variables were saved. The deployment
 above used a local build with those same public values; subsequent branch builds
 must retain them.
 
+Git build `65fd35fc` for `8d17f1c` passed but emitted an empty sitekey in all six
+homepage variants. The owner rechecked the exact **Builds → Previews Base** values
+above on 15 October 2026, leaving production and runtime secrets unchanged. Treat
+build success and runtime binding checks as insufficient: after a Git-driven
+rebuild, verify the preview public key in each generated form, noindex, and disabled
+API responses. Keep the latest build/deployment result in PR #29's acceptance
+record. Never compensate for a missing build value by copying a production key or
+moving a secret into a public variable.
+
 For this existing preview, select **Workers & Pages → incetekh-energy-systems →
 Preview selector → feat/site-visit-lead-capture → Settings → Variables and secrets**.
 Manually enter `TURNSTILE_SECRET_KEY` for the preview widget and a new independent
