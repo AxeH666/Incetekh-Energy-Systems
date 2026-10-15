@@ -14,8 +14,8 @@ the earlier scope exclusion has an explicit owner-authorized exception.
 - `site_visit_leads.notification_status` has a CHECK allowing only
   `not_configured`. Preserve that legacy column; new notification tables will
   hold the authoritative delivery state. Do not rebuild the accepted-lead table.
-- There is no scheduler, outbound Meta integration or status webhook in the
-  current Worker. Existing Miniflare tests run real local D1 with mocked outbound
+- At the planning baseline there was no scheduler, outbound Meta integration or
+  status webhook. Existing Miniflare tests run real local D1 with mocked outbound
   requests, which is suitable for this component.
 - Unknown: Incetekh-owned Meta portfolio/app/WABA, registered sender, staff
   recipient and opt-in, billing currency/payment method, approved template and
@@ -57,7 +57,8 @@ the earlier scope exclusion has an explicit owner-authorized exception.
    `X-Hub-Signature-256` validation using the app secret. Validate WABA, sender
    ID and recipient against configuration. Correlate by message ID and a random
    attempt ID in `biz_opaque_callback_data` (not customer data). Persist bounded
-   status facts idempotently, tolerate out-of-order events and an event arriving
+   status facts in a durable inbox before acknowledging the complete batch.
+   Process five facts per invocation, tolerate out-of-order events and an event arriving
    before the send response, and never downgrade delivered/read on a late
    failure. Ignore inbound message content and send no automated replies.
    Return non-200 on persistence failure so Meta can retry the webhook.
@@ -103,10 +104,14 @@ languages to explain internal notifications through Meta/WhatsApp, and document
 staff-device access/retention. Keep full payloads, webhook bodies, tokens and
 message content out of logs. Template samples must contain synthetic data only.
 
-Proposed Cloudflare runtime secrets: `WHATSAPP_ACCESS_TOKEN`, `META_APP_SECRET`,
+Cloudflare runtime secrets: `WHATSAPP_ACCESS_TOKEN`, `META_APP_SECRET`,
 `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, `WHATSAPP_STAFF_NUMBER`. Non-secret runtime
-configuration: sender phone-number ID, WABA ID, approved template name/language,
-pinned Graph version, explicit activation timestamp and `WHATSAPP_NOTIFY_ENABLED`.
+configuration: sender phone-number ID, WABA ID, approved template ID/name/language/
+category, pinned Graph version, fixed activation timestamp, daily attempt limit,
+`WHATSAPP_NOTIFY_ENABLED` and `WHATSAPP_WEBHOOK_ENABLED`. The implementation checks
+template approval/category before each send, so the runtime token needs both
+`whatsapp_business_messaging` and `whatsapp_business_management` for the assigned
+Incetekh assets. It does not need portfolio administration for this send path.
 Preview sending remains disabled, without production Meta credentials.
 
 ## Costs verified on 15 October 2026
@@ -159,6 +164,9 @@ customer data were used in research.
 - [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/) and [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/)
 - [Workers preview builds](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/)
 
-Planning checkpoint: source and provider research complete; implementation and
-local fault tests next. No PR has been pushed, no account setup performed, no
-message sent and no deployment/production change made by this component.
+Implementation checkpoint, 16 October 2026: source/provider research, additive
+migration, local sender/status handling, disabled configuration and six-language
+privacy disclosure implemented. See the [operations guide](WHATSAPP_LEAD_NOTIFICATIONS.md)
+for validation and remaining release gates. No PR has been pushed, no account
+setup performed, no message sent and no deployment/production change made by
+this component.

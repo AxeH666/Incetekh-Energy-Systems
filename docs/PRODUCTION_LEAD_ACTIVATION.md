@@ -79,6 +79,12 @@ binding and capture `false`. No production secret is copied into Previews Base.
   is still needed, and use bound parameters. No age-only mass delete or resource
   deletion is authorized by this release. The earlier synthetic preview row is
   preserved.
+- If the later WhatsApp migration `0002` is applied, approved deletion must remove
+  linked status events, attempts, outbox and then the lead in that order within
+  one transaction. A lead-only delete will fail on foreign keys. The
+  [notification operations guide](WHATSAPP_LEAD_NOTIFICATIONS.md) also covers
+  staff-device copies, which a D1 deletion cannot erase. Migration `0002` is not
+  part of this original activation or evidence of a deployed messaging service.
 
 These periods are the chosen operating policy, not a universal industry standard
 or a legal compliance certification. The 90-day contact window limits unnecessary

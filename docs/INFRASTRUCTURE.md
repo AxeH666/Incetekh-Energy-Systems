@@ -1,11 +1,14 @@
 # Infrastructure and operations
 
-**Next component, planning only (15 October 2026):** internal WhatsApp enquiry
-notifications are now explicitly in scope. See
+**Next component, local implementation (16 October 2026):** internal WhatsApp
+enquiry notifications are explicitly in scope. See
 [WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md](WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md) for the
-proposed Worker/D1 design, Meta setup, verified pricing and approval boundaries.
-No notification integration, migration, schedule, Meta asset or secret has been
-deployed/configured by this planning step. Production notifications remain manual.
+Worker/D1 design, Meta setup, verified pricing and approval boundaries, and
+[WHATSAPP_LEAD_NOTIFICATIONS.md](WHATSAPP_LEAD_NOTIFICATIONS.md) for configuration,
+failure handling and the controlled release procedure. Local implementation and
+fault tests exist; sending and webhooks default off, with no Cron Trigger.
+No notification code, migration, schedule, Meta asset or secret has been deployed
+or configured remotely. Production enquiry checks remain manual.
 
 **Production lead activation:** PR #29 merged after independent review as
 `78acb87`. Production build `c56fb610` passed, all 138 sitemap pages were healthy,
@@ -51,7 +54,8 @@ This is the current infrastructure reference. [SCOPE.md](../SCOPE.md) still cont
 Phase 1. Earlier delivery reports describe historical tasks, not today's hosting.
 The supplied `INCETEKH_INFRASTRUCTURE_HANDOFF.md` is preserved unchanged in the
 local recovery archive described below;
-its proposed WhatsApp Cloud API/backend work is **outside the locked scope**.
+its broader proposed backend work remains **outside the locked scope**. Only the
+limited internal staff notification exception above has since been authorized.
 The initial audit changed documentation only. The owner subsequently authorized
 commit, push, PR merge, synchronization and stale-branch cleanup. Existing
 Cloudflare Git integration may publish this documentation release; no manual
