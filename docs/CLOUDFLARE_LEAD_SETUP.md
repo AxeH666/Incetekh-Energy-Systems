@@ -7,6 +7,72 @@ The resource IDs and public keys below are owner-verified. Authenticated D1 read
 confirmed both database identities; the preview migration is applied. Secret values
 belong only in Cloudflare runtime Secrets and the owner's credential store.
 
+## Current preview build status — 15 October 2026
+
+The build-variable incident is resolved. Authenticated API inspection found that
+this existing branch preview has its **own Worker ID and build trigger**, separate
+from the production Worker trigger and the displayed Previews Base settings:
+
+| Resource                         | Verified identifier                    |
+| -------------------------------- | -------------------------------------- |
+| Preview Worker ID                | `27ac7a5974ef428f9a45b2cc4a937704`     |
+| Preview build trigger            | `03b4d965-bef0-4329-9bae-cf80d74e09f5` |
+| Production Worker ID (read only) | `fb7deae1c1fa4810970f11cadac3f529`     |
+| Production trigger (read only)   | `f803f1c6-4df8-48eb-ad3a-fc5409868a35` |
+
+The preview trigger selects only `feat/site-visit-lead-capture`, runs
+`npm run build`, and deploys with `npx wrangler preview`. Its variable map was
+empty, matching build `0e5643c4`'s recorded effective environment. The production
+trigger selects `main` and uses `npx wrangler deploy`; it was not changed.
+
+Only the preview trigger's environment variables were patched:
+`PUBLIC_TURNSTILE_SITE_KEY` to the inventoried preview public key and
+`PUBLIC_SITE_INDEXABLE` to string `false`, both non-secret. Read-back confirmed
+them. Build `bfa78669-6d74-429d-b033-5f90fb7b6ff2` of `0a863ff` recorded both
+values, succeeded, and published `bd539c06-4a23-4aea-9cd5-f9738d37b74e`.
+All six live language homepages then contained the correct preview key and
+noindex metadata/headers. This establishes the missing effective variables as
+the cause; the dashboard's save/copy behavior itself was not established.
+
+The existing Windows User-scoped API token verified as active. It was absent
+from the inherited shell environment; explicitly loading it into the process
+and using Node **22.23.3** allowed Wrangler 4.151.0 `whoami` and remote migration
+listing to succeed. Direct authenticated API requests also succeeded. The earlier
+`fetch failed` did not reproduce; no TLS bypass, token rotation or proxy change
+was needed, and its original network cause is unknown. Do not print the token:
+
+```powershell
+$env:CLOUDFLARE_API_TOKEN = [Environment]::GetEnvironmentVariable('CLOUDFLARE_API_TOKEN', 'User')
+node --version # use .nvmrc: 22.23.3
+npx wrangler whoami
+npx wrangler d1 migrations list PREVIEW_DB --remote --config wrangler.preview-migrations.jsonc
+```
+
+For future authorized preview diagnostics, use the [Builds API](https://developers.cloudflare.com/workers/ci-cd/builds/api-reference/):
+
+1. Read the existing preview at
+   `/accounts/{account}/workers/workers/incetekh-energy-systems/previews/feat%2Fsite-visit-lead-capture`.
+2. Use its returned `id` in `/accounts/{account}/builds/workers/{id}/triggers`.
+   Verify branch filters and `wrangler preview` before any write. Listing only
+   the production script tag's triggers missed this branch-specific trigger.
+3. Read `/accounts/{account}/builds/triggers/{trigger_uuid}/environment_variables`.
+   Compare it with the selected build's `trigger.trigger_uuid` and
+   `build_trigger_metadata.environment_variables`; show only public values or
+   secret names/presence. PATCH only the two public preview values when needed.
+4. After an authorized build, inspect the live HTML in all six languages, exact
+   runtime binding identities and the disabled API response. A green build alone
+   does not establish correct generated configuration.
+
+The account API also confirmed the preview widget is Managed, has only the exact
+preview hostname, and uses `no_clearance`. Both runtime secret names remain
+`secret_text`; secret values are neither logged nor included in evidence. D1 has
+the applied migration, lead table and created-at index, with no pending migration.
+The retained genuine acceptance receipt is still present. See
+[the final acceptance record](LEAD_CAPTURE.md#final-preview-recheck--15-october-2026)
+for live runtime and regression results and remaining release gates.
+
+## Earlier preview investigation (historical)
+
 The first preview is live at
 <https://feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev>.
 The owner verified deployment `4559a3ae` as Ready. Live checks matched the tested
@@ -175,9 +241,42 @@ expected results in all six languages. Live HTML matched the missing-key artifac
 byte for byte. A further local rebuild into the same output directory, retaining
 the existing cache, correctly replaced empty keys when the variable was supplied.
 The cache-restoration log alone therefore does not establish a cache defect.
-The effective remote build environment remains unverified; pause further preview
-deployment builds until environment delivery is resolved. No runtime secret change
-is needed to diagnose this build-time value.
+At that checkpoint the effective remote build environment was unverified, so
+further speculative builds were paused. The authenticated trigger correction
+above subsequently resolved delivery without changing runtime secrets.
+
+After the owner approved one diagnostic run and confirmed the temporary command
+was saved, documentation commit `0a863ff` triggered build `0e5643c4`. Unexpectedly,
+Cloudflare reported success and created preview deployment `7a5d8e75` at
+11:30:13 UTC on 15 October 2026. The owner inspected this build and confirmed its
+build command was `npm run build`, its build variables were listed as `None`, and
+no diagnostic output ran. This confirms a mismatch between the displayed Previews
+Base settings before that build and the build's effective configuration. After a
+fresh dashboard reload, the owner saw `npm run build`, `npx wrangler preview` and
+both expected public variables. Thus the diagnostic command was not retained;
+the public variables are visible after reload, but their presence in the earlier
+build remains unverified. The preview still has empty public sitekeys in
+all six languages, noindex, disabled capture (503), and its separate D1 and secret
+bindings. Production settings, deployment metadata and checked public-page hashes
+remain unchanged. Do not treat this run as a successful diagnostic or retry it.
+
+Cloudflare's [Builds API reference](https://developers.cloudflare.com/workers/ci-cd/builds/api-reference/)
+documents separate production and preview triggers, with commands, branch filters
+and build variables belonging to each trigger. Its
+[preview configuration documentation](https://developers.cloudflare.com/workers/previews/configuration/)
+describes creation-time copying for runtime Base secrets; that does not establish
+creation-time copying of build commands or build variables. No documented
+branch-specific build override was found to explain this result. Compare the saved
+preview trigger ID, command, branch filters and public-variable entries with the
+build's `trigger.trigger_uuid` and `build_trigger_metadata`. This can distinguish
+the current saved configuration from the earlier build configuration without
+another run. At that checkpoint the cause of the variable mismatch was unknown;
+screenshots alone did not establish a Cloudflare defect or user save error. Wrangler OAuth
+access to the trigger-list endpoint was rechecked and denied (HTTP 403, code 10000;
+earlier Builds reads returned 12004). The existing API token subsequently provided
+the required access, as documented above; no further owner dashboard steps or new
+credentials were needed. Production build values and runtime secrets were not
+used as a workaround.
 
 For this existing preview, select **Workers & Pages → incetekh-energy-systems →
 Preview selector → feat/site-visit-lead-capture → Settings → Variables and secrets**.

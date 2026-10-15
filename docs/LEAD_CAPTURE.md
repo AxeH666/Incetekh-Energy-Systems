@@ -1,6 +1,12 @@
 # Site-visit lead capture
 
 **15 October 2026 — preview configuration and synthetic tests approved; production is not.**
+PR #29's preview build-variable incident is resolved through the existing
+branch-specific build trigger. All six live homepage variants now have the
+preview key and noindex. See [the final recheck](#final-preview-recheck--15-october-2026)
+and [the trigger diagnosis](CLOUDFLARE_LEAD_SETUP.md#current-preview-build-status--15-october-2026).
+The earlier checkpoints below remain historical evidence.
+
 The first preview for `feat/site-visit-lead-capture` is live at
 <https://feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev>.
 The owner verified deployment `4559a3ae` as Ready; live checks matched the tested
@@ -17,7 +23,7 @@ The preview migration was applied at 10:21:28 UTC on 15 October 2026. Remote rea
 verified its migration record, lead table and created-at index, zero rows and no
 pending migrations. A controlled preview acceptance window is documented below.
 See [the setup worksheet](CLOUDFLARE_LEAD_SETUP.md) for exact non-secret values and
-manual secret-entry steps. No production migration, deployment or paid resource is
+secret configuration reference. No production migration, deployment or paid resource is
 authorized. `sensitive info/` is excluded from Git and must never be force-added.
 
 At that pre-acceptance checkpoint, authenticated deployment metadata confirmed the
@@ -81,6 +87,77 @@ test row with the intended access role, approve retention and six-language wordi
 complete the privacy/provider-terms and logging checks below, and verify quotas.
 Production bindings, secrets, migration and activation require their own approved
 release step; the production D1 ID remains absent from deployable configuration.
+
+## Final preview recheck — 15 October 2026
+
+The existing API token provided direct Builds, Workers, Turnstile and D1 access.
+The branch-specific preview trigger had an empty build-variable map. Setting
+only its two public preview variables fixed the Git-driven build; no application
+code, production setting, secret value or database schema needed changing.
+Build `bfa78669` of `0a863ff` succeeded, and deployment `bd539c06` served the
+correct key and noindex in English, Telugu, Hindi, Tamil, Malayalam and Kannada.
+
+Authenticated runtime reads confirmed the preview-only D1 ID, exact origin,
+`index.js` entrypoint, `/api/*` Worker-first routing, rate namespace `2026101501`
+at 5 requests/60 seconds, and both secret binding names/types. Widget API reads
+confirmed Managed mode, the exact preview hostname and disabled pre-clearance.
+Wrangler's remote migration listing found no pending migrations; SQL reads
+confirmed the migration record, table and created-at index. Existing data was
+preserved, not deleted or recreated.
+
+The controlled recheck used the Git-built Worker/assets and temporarily changed
+only the preview capture flag. It verified unchanged receipt retry (200), changed
+details (409), missing/invalid tokens (422), malformed JSON (400), origin rejection
+(403), unsupported content type (415), oversized input (413), method rejection
+(405), native throttling (429 with `Retry-After: 60`) and recovery after 65 seconds.
+Full-row comparison confirmed the original accepted receipt remained unchanged;
+the database still contained one row, with no retry duplicates or rejected inserts.
+Responses remained non-cacheable. The native limiter is regional/approximate;
+the test bounds the request burst instead of requiring an exact sixth denial.
+The final settled run used deployment `bbbcfc96`, passed at 12:24:40 UTC
+(17:54:40 IST), and closed capture with deployment `a030ef3c`. Throttling occurred
+on the seventh additional burst request across KIX/SIN after the five functional
+checks; cooldown recovery returned 200 from HKG. These are observed regional
+results, not a global capacity measurement.
+
+The real widget loaded once and was visually inspected. The automated browser
+did not receive a token within 45 seconds and displayed an interactive checkbox.
+No test key or verification bypass was introduced. The earlier owner-completed
+normal-browser submission and its durable receipt remain the genuine end-to-end
+acceptance evidence; this recheck does not claim a second successful challenge.
+Provider outages, token expiry/reuse and database write failures are covered by
+local tests, not deliberately induced against the remote preview.
+
+Capture was restored to `false`, retaining all bindings and both secrets. The
+first immediate post-patch request returned 400 while metadata already showed
+disabled capture; subsequent live checks returned 503 `unavailable`. This is
+consistent with deployment propagation. A separate run starting only ten seconds
+after enable observed one 503 for a new receipt with a missing token, after three
+expected responses. Its exact cause was not established, and the failed run is
+retained as `pr29-live-transient-503.json`. The response made no success claim and
+stored no row. The final recheck waits 65 seconds after enable and verifies live
+denial after disable instead of relying on API metadata alone. Treat a disable
+operation as complete only once live denial is verified.
+
+Final local regression on Node 22.23.3 passed `npm run verify`: formatting,
+Astro checks (87 files; zero errors/warnings/hints), Worker TypeScript, production
+build, 36 Worker/configuration tests and all 127 browser/model/artifact tests
+against local Wrangler using Chrome. The live form screenshot was also inspected.
+No new test was needed for this cloud-configuration/documentation correction;
+the existing suite and live generated-HTML checks cover the affected behavior.
+
+Production settings, deployment metadata, production build trigger/variables,
+D1 schema and homepage/privacy/robots hashes were compared before and after and
+were unchanged. The production D1 database still has no lead table. No production
+write, merge, resource deletion, subscription change or paid resource creation
+was performed. Billing/subscription reads are outside this token's permissions;
+this is not a full account billing audit. All work used the existing resources.
+
+Local evidence is retained under ignored `.wrangler/pr29-*`: the public-variable
+read-back, production baseline, regression log, live API results and form image.
+The PR records the final commit/build check. Production deployment and capture
+activation still need separate approval; owner-role operations, retention,
+translation and privacy/provider checks above remain release gates.
 
 ## Implementation
 
