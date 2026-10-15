@@ -7,3 +7,6 @@ dist/
 test-results/
 playwright-report/
 .DS_Store
+.wrangler/
+.dev.vars*
+/sensitive info/

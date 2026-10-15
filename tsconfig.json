@@ -1,4 +1,5 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "compilerOptions": { "types": ["node"] }
+  "compilerOptions": { "types": ["node"] },
+  "exclude": ["worker", "node_modules", "dist", ".wrangler"]
 }

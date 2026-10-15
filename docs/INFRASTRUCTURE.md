@@ -1,5 +1,16 @@
 # Infrastructure and operations
 
+**Local implementation update, 15 October 2026:** the next focused component adds
+a disabled-by-default Worker enquiry API, D1 migration, Turnstile support and
+six-language disclosures. The owner approved its first disabled branch preview and
+reports creating separate D1 databases and a production Turnstile widget; runtime
+bindings and capture remain unconfigured. Production release is not approved.
+See [LEAD_CAPTURE.md](LEAD_CAPTURE.md) for the
+implementation, owner operations and separate setup/release gates. Historical
+static-only/form observations below describe the deployed baseline, not this
+feature branch. Wrangler is now pinned to 4.151.0. Existing analytics
+Automatic Setup and the EU exclusion remain unchanged.
+
 Infrastructure audited: **13 October 2026 (Asia/Kolkata)**. Analytics configuration
 clarified by the owner on **14 October 2026**; unrelated dashboard facts were not re-audited. Maintainer: founder, with the
 engineer responsible for each approved infrastructure change.
