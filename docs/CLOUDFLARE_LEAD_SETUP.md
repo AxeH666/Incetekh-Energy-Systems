@@ -1,5 +1,10 @@
 # D1 and Turnstile setup worksheet
 
+**Production follow-up:** see [PRODUCTION_LEAD_ACTIVATION.md](PRODUCTION_LEAD_ACTIVATION.md)
+for the separately authorized production release, existing-resource configuration
+and operating policy. The preview inventory and incident resolution below remain
+valid; statements that production is unauthorized/unbound describe earlier stages.
+
 Updated 15 October 2026. The owner has approved configuring the existing preview,
 applying its migration and running controlled synthetic acceptance tests. Production
 release, production migrations and paid resource creation remain unauthorized.

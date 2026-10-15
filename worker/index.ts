@@ -10,7 +10,7 @@ interface Env {
 }
 
 const endpoint = '/api/site-visits';
-const privacyVersion = '2026-10-15';
+const privacyVersion = '2026-10-15.1';
 const encoder = new TextEncoder();
 const fields = [
   'id',

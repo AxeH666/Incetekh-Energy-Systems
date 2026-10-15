@@ -32,12 +32,29 @@ test('preview application and migration target the same approved non-production 
   assert.equal(migration.build, undefined);
 });
 
-test('preview setup does not activate or bind production and has no stored secrets', async () => {
+test('production activation keeps preview disabled and separates data and rate namespaces', async () => {
   const app = await readConfig('wrangler.jsonc');
-  assert.equal(app.vars.LEAD_CAPTURE_ENABLED, 'false');
+  assert.equal(app.vars.LEAD_CAPTURE_ENABLED, 'true');
+  assert.equal(app.vars.LEAD_CAPTURE_ENV, 'production');
+  assert.equal(app.vars.LEAD_ALLOWED_ORIGIN, 'https://incetekhenergy.com');
   assert.equal(app.previews.vars.LEAD_CAPTURE_ENABLED, 'false');
-  assert.equal(app.d1_databases, undefined);
-  assert.equal(app.ratelimits, undefined);
+  assert.equal(app.d1_databases.length, 1);
+  assert.equal(app.d1_databases[0].binding, 'LEADS_DB');
+  assert.equal(
+    app.d1_databases[0].database_id,
+    'e5db446c-699e-4e19-8db0-816a3b83f3ad',
+  );
+  assert.notEqual(
+    app.d1_databases[0].database_id,
+    app.previews.d1_databases[0].database_id,
+  );
+  assert.equal(app.ratelimits.length, 1);
+  assert.equal(app.ratelimits[0].name, 'LEAD_RATE_LIMIT');
+  assert.notEqual(
+    app.ratelimits[0].namespace_id,
+    app.previews.ratelimits[0].namespace_id,
+  );
+  assert.deepEqual(app.ratelimits[0].simple, { limit: 5, period: 60 });
   assert.equal(app.previews.vars.LEAD_CAPTURE_ENV, 'preview');
   assert.equal(
     app.previews.vars.LEAD_ALLOWED_ORIGIN,

@@ -20,6 +20,8 @@ const routes = [
 const launch =
   (process.env.SEO_EXPECT_INDEXABLE ?? process.env.PUBLIC_SITE_INDEXABLE) ===
   'true';
+const turnstileScript =
+  'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
 test('every public page has unique metadata, working local resources and safe configuration', async ({
   page,
@@ -41,6 +43,14 @@ test('every public page has unique metadata, working local resources and safe co
     route.abort(),
   );
   await page.route('**/cdn-cgi/rum**', (route) => route.abort());
+  // A configured form legitimately loads this one security script. Keep the
+  // local SEO check offline while rejecting any other third-party script.
+  await page.route(turnstileScript, (route) =>
+    route.fulfill({
+      contentType: 'application/javascript',
+      body: 'window.turnstile = { render: () => "local-widget", reset: () => {} };',
+    }),
+  );
   const titles = new Set<string>();
   const descriptions = new Set<string>();
   const errors: string[] = [];
@@ -66,8 +76,13 @@ test('every public page has unique metadata, working local resources and safe co
       page.locator('meta[http-equiv="content-security-policy"]'),
     ).toHaveAttribute('content', /object-src 'none'/);
     await expect(
-      page.locator('script[src]:not([src^="/_astro/"])'),
+      page.locator(
+        `script[src]:not([src^="/_astro/"]):not([src="${turnstileScript}"])`,
+      ),
     ).toHaveCount(0);
+    await expect(page.locator(`script[src="${turnstileScript}"]`)).toHaveCount(
+      path === '/' && process.env.PUBLIC_TURNSTILE_SITE_KEY ? 1 : 0,
+    );
     await expect(page.locator('script[type="module"]')).toHaveCount(
       path === '/' ? 4 : 1,
     );

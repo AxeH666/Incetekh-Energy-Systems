@@ -139,7 +139,7 @@ test('receipt follows durable insert; native text, optional email and metadata s
   assert.equal(saved.phone, '+919876543210');
   assert.equal(saved.email, null);
   assert.equal(saved.notification_status, 'not_configured');
-  assert.equal(saved.privacy_notice_version, '2026-10-15');
+  assert.equal(saved.privacy_notice_version, '2026-10-15.1');
   assert.ok(Date.now() - Date.parse(saved.created_at) < 10000);
   assert.equal('token' in saved || 'ip' in saved, false);
   await mf.dispose();

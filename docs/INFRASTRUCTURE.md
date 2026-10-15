@@ -1,5 +1,12 @@
 # Infrastructure and operations
 
+**Production lead activation:** PR #29 merged after independent review as
+`78acb87`. Production build `c56fb610` passed, all 138 sitemap pages were healthy,
+and capture was verified disabled before the separately authorized activation
+component. See [PRODUCTION_LEAD_ACTIVATION.md](PRODUCTION_LEAD_ACTIVATION.md) for
+the production resource inventory, retention/operations policy and rollback.
+The following preview-only statements are historical checkpoints.
+
 **Preview acceptance update, 15 October 2026:** the next focused component adds
 a disabled-by-default Worker enquiry API, D1 migration, Turnstile support and
 six-language disclosures. Separate preview D1, runtime secrets, Turnstile and rate
