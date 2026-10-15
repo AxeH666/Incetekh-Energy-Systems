@@ -2,6 +2,7 @@ import { solarSources } from '../../src/data/solar';
 import { productGroups } from '../../src/data/products';
 
 const sources = new Set([
+  'https://www.cloudflare.com/turnstile-privacy-policy/',
   'https://developers.cloudflare.com/web-analytics/data-metrics/dimensions/',
   'https://developers.cloudflare.com/speed/observatory/rum-beacon/',
   ...Object.values(solarSources),

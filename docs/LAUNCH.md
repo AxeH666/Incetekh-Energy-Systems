@@ -19,19 +19,19 @@ as instructions for the existing Workers deployment.
 
 ## Release settings
 
-| Setting                      | Repository contract / verification limit                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------- |
-| Source                       | Reviewed commit on `main`; owner verified production branch is main on 13 October           |
-| Node                         | 22.23.3 in `.nvmrc`, minimum 22.19; verify the cloud build log                              |
-| Install                      | `npm ci` for reproducible local validation; confirm cloud install behavior                  |
-| Build                        | `npm run build`                                                                             |
-| Deploy                       | Owner verified `npx wrangler deploy` in Production Builds                                   |
-| Preview                      | Owner verified `npx wrangler preview` in Previews Base; `previews: {}` in Wrangler          |
-| Assets                       | `dist/` only; no Worker script, database or server adapter                                  |
-| Missing paths                | Wrangler `404-page`; live missing-path test returned 404                                    |
-| Preview indexing             | `PUBLIC_SITE_INDEXABLE=false`                                                               |
-| Approved production indexing | `PUBLIC_SITE_INDEXABLE=true` in Production build variables, owner enabled and live verified |
-| Public options               | Search Console HTML token and optional Cloudflare beacon in `.env.example`                  |
+| Setting                      | Repository contract / verification limit                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Source                       | Reviewed commit on `main`; owner verified production branch is main on 13 October                          |
+| Node                         | 22.23.3 in `.nvmrc`, minimum 22.19; verify the cloud build log                                             |
+| Install                      | `npm ci` for reproducible local validation; confirm cloud install behavior                                 |
+| Build                        | `npm run build`                                                                                            |
+| Deploy                       | Owner verified `npx wrangler deploy` in Production Builds                                                  |
+| Preview                      | Owner verified `npx wrangler preview` in Previews Base; local capture config explicitly disabled           |
+| Assets                       | `dist/` with a local Worker handler for `/api/*`; cloud capture not provisioned or enabled; no SSR adapter |
+| Missing paths                | Wrangler `404-page`; live missing-path test returned 404                                                   |
+| Preview indexing             | `PUBLIC_SITE_INDEXABLE=false`                                                                              |
+| Approved production indexing | `PUBLIC_SITE_INDEXABLE=true` in Production build variables, owner enabled and live verified                |
+| Public options               | Search Console HTML token and optional Turnstile public key; analytics stays automatically injected        |
 
 Cloudflare Workers Builds has successful GitHub checks on main and a feature
 branch. **A push can publish a preview; a merge can deploy production.** Check
@@ -46,7 +46,7 @@ safeguard separately rather than claiming review is enforced.
 
 The 30 September preview fix added the empty `previews` block after a build succeeded
 but `wrangler preview` failed. Wrangler 4.144.0 dry-run acceptance was historical;
-Wrangler is not pinned in current package dependencies. See GitHub PR #22/#23 and
+Wrangler is now pinned locally to 4.151.0 for lead-capture development. See GitHub PR #22/#23 and
 the audit for build IDs; a past successful build does not identify today's active
 Worker version.
 
@@ -78,10 +78,13 @@ Worker version.
 8. Record SHA, Node/Wrangler versions, build configuration, artifact/version and
    recovery target. Deploy only under release authorization.
 
-The site-visit form is deliberately unconnected. It explicitly says no request
-is sent; call/WhatsApp links are the available route. Do not imply booking receipt.
-Any delivery integration needs separate scope and approval; WhatsApp Cloud API
-automation remains excluded by `SCOPE.md`.
+Site-visit capture is implemented on the feature branch and disabled by default.
+Only a first disabled preview is approved; resource creation reported by the owner
+does not establish configured runtime bindings. Follow [LEAD_CAPTURE.md](LEAD_CAPTURE.md): separate D1
+databases/widgets/rate namespaces, real preview acceptance, owner access and
+retention/translation approval, then explicit production release authorization.
+Call/WhatsApp links remain the deployed contact route. A saved enquiry does not
+confirm a booking. WhatsApp Cloud API automation remains excluded by `SCOPE.md`.
 
 ## Post-deployment acceptance
 
@@ -105,9 +108,10 @@ automation remains excluded by `SCOPE.md`.
 - After this milestone, separately configure Search Console ownership and submit sitemap; inspect representative URLs
   and structured data. Search visibility is not guaranteed by successful submission.
 - The owner confirms Analytics Automatic Setup and collection on Free, excluding
-  EU visitors, on 14 October. The privacy correction is prepared but not deployed
-  to production; review [ANALYTICS.md](ANALYTICS.md) before merge. After an approved
-  release verify one edge beacon for eligible non-EU visitors, none for EU visitors,
+  EU visitors, on 14 October. PR #28 was subsequently merged at `4bb9f7b`, with a
+  successful GitHub production build check at the lead-capture planning baseline.
+  Complete [ANALYTICS.md](ANALYTICS.md) live acceptance: verify one edge beacon
+  for eligible non-EU visitors, none for EU visitors,
   and corrected copy in all six languages, preserving collection settings. Local
   builds are not evidence of edge injection or real-user Core Web Vitals.
 - Follow the documented rollback procedure if acceptance fails; rollback is itself

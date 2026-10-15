@@ -1,5 +1,10 @@
 # Solar planning and equipment selection
 
+**15 October 2026:** form implementation is now tracked in
+[LEAD_CAPTURE.md](LEAD_CAPTURE.md), on the feature branch and disabled. Only the
+first disabled preview is approved. Form descriptions below are the historical
+30 September baseline; calculator behavior is unchanged.
+
 This component adds a homepage estimator and capacity choices, plus a Products page. It preserves the photo slideshow, reviews, free services and existing visual direction. No deployment, remote calculator service, lead database, WhatsApp automation or dependency was added.
 
 ## Scope and user confirmation

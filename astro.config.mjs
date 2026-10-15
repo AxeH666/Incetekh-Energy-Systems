@@ -17,9 +17,14 @@ export default defineConfig({
         "object-src 'none'",
         "form-action 'none'",
         "connect-src 'self' https://cloudflareinsights.com",
+        'frame-src https://challenges.cloudflare.com',
       ],
       scriptDirective: {
-        resources: ["'self'", 'https://static.cloudflareinsights.com'],
+        resources: [
+          "'self'",
+          'https://static.cloudflareinsights.com',
+          'https://challenges.cloudflare.com',
+        ],
       },
     },
   },

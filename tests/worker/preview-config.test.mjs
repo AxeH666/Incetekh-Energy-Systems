@@ -1,0 +1,55 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import ts from 'typescript';
+
+async function readConfig(file) {
+  const { config, error } = ts.parseConfigFileTextToJson(
+    file,
+    await readFile(file, 'utf8'),
+  );
+  assert.equal(error, undefined, `${file} must parse as JSONC`);
+  return config;
+}
+
+test('preview application and migration target the same approved non-production DB', async () => {
+  const app = await readConfig('wrangler.jsonc');
+  const migration = await readConfig('wrangler.preview-migrations.jsonc');
+  const previewId = 'e38a341f-de7f-48be-9195-917c9695b13a';
+  const productionId = 'e5db446c-699e-4e19-8db0-816a3b83f3ad';
+  assert.notEqual(previewId, productionId);
+  assert.equal(app.previews.d1_databases.length, 1);
+  assert.equal(migration.d1_databases.length, 1);
+  assert.equal(app.previews.d1_databases[0].binding, 'LEADS_DB');
+  assert.equal(migration.d1_databases[0].binding, 'PREVIEW_DB');
+  for (const db of [app.previews.d1_databases[0], migration.d1_databases[0]]) {
+    assert.equal(db.database_id, previewId);
+    assert.equal(db.database_name, 'incetekh-site-visits-preview');
+    assert.equal(db.migrations_dir, 'migrations');
+  }
+  assert.equal(JSON.stringify(migration).includes(productionId), false);
+  assert.equal(migration.main, undefined);
+  assert.equal(migration.build, undefined);
+});
+
+test('preview setup does not activate or bind production and has no stored secrets', async () => {
+  const app = await readConfig('wrangler.jsonc');
+  assert.equal(app.vars.LEAD_CAPTURE_ENABLED, 'false');
+  assert.equal(app.previews.vars.LEAD_CAPTURE_ENABLED, 'false');
+  assert.equal(app.d1_databases, undefined);
+  assert.equal(app.ratelimits, undefined);
+  assert.equal(app.previews.vars.LEAD_CAPTURE_ENV, 'preview');
+  assert.equal(
+    app.previews.vars.LEAD_ALLOWED_ORIGIN,
+    'https://feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev',
+  );
+  const limiter = app.previews.ratelimits;
+  assert.equal(limiter.length, 1);
+  assert.equal(limiter[0].name, 'LEAD_RATE_LIMIT');
+  assert.match(limiter[0].namespace_id, /^[1-9][0-9]*$/);
+  assert.deepEqual(limiter[0].simple, { limit: 5, period: 60 });
+  for (const vars of [app.vars, app.previews.vars]) {
+    assert.equal(vars.TURNSTILE_SECRET_KEY, undefined);
+    assert.equal(vars.RATE_LIMIT_KEY_SECRET, undefined);
+  }
+});

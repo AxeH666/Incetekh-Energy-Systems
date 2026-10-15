@@ -1,9 +1,19 @@
 # Cloudflare Web Analytics and privacy disclosures
 
-Reviewed **14 October 2026**. This component corrects disclosures for the existing
-service; it does not enable analytics or change Cloudflare settings. Work stays
-in PR #28. The owner permits automatic branch previews, but not merge or
-production deployment.
+**Preview follow-up, 15 October 2026:** [lead capture](LEAD_CAPTURE.md) adds separate
+Turnstile and D1 disclosures while preserving these analytics paragraphs and
+Automatic Setup. Its separately approved preview setup and controlled acceptance
+are complete; preview capture is disabled again. Production release and activation
+remain unapproved.
+Earlier statements below about the unconnected form describe PR #28's baseline.
+EU analytics exclusion does not disable Turnstile security processing.
+
+Reviewed **14 October 2026**. PR #28 corrected disclosures for the existing
+service without changing Cloudflare settings. The owner subsequently approved
+merge: the lead-capture planning baseline is main `4bb9f7b`, with a successful
+GitHub production build check. That check does not establish the regional/hostname
+browser acceptance below. Earlier preview-only approval applied to PR #28;
+lead-capture publication has separate, disabled-preview-only approval.
 
 ## Confirmed configuration and implementation
 
@@ -146,7 +156,8 @@ never paste API tokens, credentials or visitor exports into this public reposito
 
 The EU setting and Free-plan rule limit are resolved facts, not pending owner
 decisions. Live verification of hostname isolation is still outstanding. The
-owner should acknowledge that boundary before authorizing merge/release.
+owner should record the outstanding acceptance evidence; the approved PR #28
+merge/build alone does not resolve it.
 
 ## Acceptance after an approved production release
 
@@ -168,4 +179,6 @@ owner should acknowledge that boundary before authorizing merge/release.
    search indexing, not analytics collection. Curl-only absence is insufficient
    evidence that browser injection is absent.
 
-Production will keep its older privacy copy until the owner approves a release.
+PR #28's merge/build is recorded above; verify the actual live copy and regional
+collection as described here. The newer lead-capture disclosure belongs to the
+feature branch and is not released to production.

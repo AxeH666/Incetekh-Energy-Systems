@@ -16,7 +16,11 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: `npm run preview -- --port ${port}`,
+    command:
+      process.env.PLAYWRIGHT_WORKER === 'true'
+        ? `node node_modules/wrangler/bin/wrangler.js dev --local --ip 127.0.0.1 --port ${port} --log-level error`
+        : `npm run preview -- --port ${port}`,
+    env: { WRANGLER_SEND_METRICS: 'false', CLOUDFLARE_SEND_METRICS: 'false' },
     url: `http://127.0.0.1:${port}`,
     reuseExistingServer: false,
   },

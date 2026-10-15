@@ -10,11 +10,12 @@
     "dev": "astro dev --host 127.0.0.1",
     "build": "astro build",
     "preview": "astro preview --host 127.0.0.1",
-    "check": "astro check",
+    "check": "astro check && tsc -p worker/tsconfig.json --noEmit",
+    "test:worker": "tsc -p worker/tsconfig.json && node --test tests/worker/*.test.mjs",
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "test": "playwright test",
-    "verify": "npm run lint && npm run check && npm run build && npm test"
+    "verify": "npm run lint && npm run check && npm run build && npm run test:worker && npm test"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "5.3.0",
@@ -23,11 +24,14 @@
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "@axe-core/playwright": "4.13.0",
+    "@cloudflare/workers-types": "5.20261015.1",
     "@playwright/test": "1.63.0",
     "@types/node": "22.20.4",
+    "miniflare": "5.20261012.0-beta",
     "parse5": "8.0.0",
     "prettier": "3.9.9",
     "prettier-plugin-astro": "1.1.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "wrangler": "4.151.0"
   }
 }

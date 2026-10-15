@@ -1,5 +1,34 @@
 # Infrastructure and operations
 
+**Preview acceptance update, 15 October 2026:** the next focused component adds
+a disabled-by-default Worker enquiry API, D1 migration, Turnstile support and
+six-language disclosures. Separate preview D1, runtime secrets, Turnstile and rate
+bindings were configured and tested under owner approval. A real owner-submitted
+test lead was retrieved from preview D1; retries, rejection paths and rate limiting
+were verified. Preview capture is disabled again after testing. Production remains
+unchanged, with no production feature release or migration approved.
+See [LEAD_CAPTURE.md](LEAD_CAPTURE.md) for the
+implementation, owner operations and separate setup/release gates. Historical
+static-only/form observations below describe the deployed baseline, not this
+feature branch. Wrangler is now pinned to 4.151.0. Existing analytics
+Automatic Setup and the EU exclusion remain unchanged.
+
+**PR #29 closeout, 15 October 2026:** the existing branch preview's build trigger
+had no environment variables despite the displayed Previews Base values. Direct
+API access with the existing active token identified and corrected only that
+preview trigger. A Git-driven rebuild now serves the correct public Turnstile key
+and noindex in all six languages. Wrangler works with Node 22.23.3 and the existing
+User-scoped token loaded into the process; the earlier `fetch failed` did not
+reproduce. Preview migration/schema, runtime secret binding names, widget settings,
+retry safety, rejection paths, native rate limiting and cooldown were rechecked.
+The original real acceptance row is retained, with no duplicates or rejected rows.
+The automated browser still required a real challenge interaction; the earlier
+owner-completed submission remains the genuine challenge/insert evidence.
+See [the exact trigger IDs and safe diagnostic procedure](CLOUDFLARE_LEAD_SETUP.md#current-preview-build-status--15-october-2026)
+and [final validation and limits](LEAD_CAPTURE.md#final-preview-recheck--15-october-2026).
+Preview capture is disabled at handoff. Production configuration, deployment,
+build settings, D1 schema and checked public-page hashes remain unchanged.
+
 Infrastructure audited: **13 October 2026 (Asia/Kolkata)**. Analytics configuration
 clarified by the owner on **14 October 2026**; unrelated dashboard facts were not re-audited. Maintainer: founder, with the
 engineer responsible for each approved infrastructure change.

@@ -27,11 +27,12 @@ Production uses Cloudflare Automatic Setup with EU visitor exclusion; see [analy
 
 ```sh
 npm run lint       # Prettier formatting lint
-npm run check      # Astro and strict TypeScript checks
+npm run check      # Astro and Worker TypeScript checks
 npm run build      # Static output in dist/
 npx playwright install chromium
 npm test           # Starts its own production preview on port 4321
-npm run verify     # Lint, types, build and browser tests
+npm run test:worker # Local workerd/D1 API and persistence tests
+npm run verify     # Lint, types, build, API and browser tests
 npm run preview    # Manual inspection of the current build
 ```
 
@@ -66,7 +67,7 @@ business facts, warranty qualifiers and feedback status aligned across pages.
 Warm paper, charcoal, restrained rust accents, large type and real installation
 photographs. Self-hosted Manrope, no remote fonts, no client app runtime. The
 navigation remains visible on narrow screens and FAQs use native HTML controls.
-Small inline scripts control the homepage gallery, review scrolling and bill-slider estimator and unconnected visit-form validation. Cloudflare automatically injects its analytics beacon for eligible non-EU production visitors; the
+Small scripts control the homepage gallery, review scrolling, bill-slider estimator and site-visit form. Lead capture is implemented on the feature branch and disabled; only its first disabled preview is approved. See [LEAD_CAPTURE.md](docs/LEAD_CAPTURE.md). Cloudflare automatically injects its analytics beacon for eligible non-EU production visitors; the
 application does not embed a second tracking script.
 
 The founder confirmed the phone, more than 13 years of experience and 500+ completed projects, solar EPC,
@@ -78,7 +79,8 @@ Photos accompany the temporary comments for prelaunch design; authorship is unve
 
 ## Handoff
 
-Solar sizing, the deferred visit-form delivery connection, subsidy research and equipment options: [SOLAR-PLANNING.md](docs/SOLAR-PLANNING.md).
+Site-visit capture, owner retrieval, privacy and release gates: [LEAD_CAPTURE.md](docs/LEAD_CAPTURE.md).
+Solar sizing, subsidy research and equipment options: [SOLAR-PLANNING.md](docs/SOLAR-PLANNING.md).
 
 Current gallery, hover and footer polish: [GALLERY-POLISH.md](docs/GALLERY-POLISH.md).
 Earlier homepage/WhatsApp design: [HOMEPAGE-REFRESH.md](docs/HOMEPAGE-REFRESH.md).
