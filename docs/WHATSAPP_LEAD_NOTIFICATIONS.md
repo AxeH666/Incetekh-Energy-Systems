@@ -1,7 +1,8 @@
 # Internal staff WhatsApp enquiry notifications
 
-Status: local implementation only, 16 October 2026. No remote migration,
-deployment, Meta setup or real message has been performed for this component.
+Status: preview publication approved on 16 October 2026 after local validation
+and independent review. The PR records the resulting build/deployment evidence.
+No remote migration, Meta setup or real message is included in this approval.
 Both notification flags are `false` in production and preview configuration;
 there is no Cron Trigger. Production lead capture continues independently.
 
@@ -144,12 +145,12 @@ before activation. All six public privacy notices now conditionally explain the
 data shared with Meta for these internal alerts; no customer marketing consent
 is inferred from a site-visit submission.
 
-## Controlled release, still pending approval
+## Controlled release gates
 
-1. Complete local validation and independent review. Publishing this branch
-   automatically creates a Cloudflare preview, so obtain deployment permission
-   before pushing/opening the PR. Keep preview sending/webhooks disabled and
-   exclude production Meta credentials. Merge/production release is a later gate.
+1. Local validation and independent review passed. The owner approved publishing
+   the PR and its automatic Cloudflare preview on 16 October 2026. Keep preview
+   sending/webhooks disabled and exclude production Meta credentials.
+   Merge/production release remains a later gate.
 2. Verify the Incetekh-owned Meta assets, staff opt-in, sender/recipient separation,
    exact approved template/category, currency, price and explicit attempt budget.
    Approve costs before any actual message, including synthetic messages.

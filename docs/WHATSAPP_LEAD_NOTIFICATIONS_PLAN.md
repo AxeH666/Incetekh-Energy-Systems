@@ -21,10 +21,10 @@ the earlier scope exclusion has an explicit owner-authorized exception.
   recipient and opt-in, billing currency/payment method, approved template and
   account-specific access restrictions. Do not borrow another project's assets
   or assume the public customer-contact number is the sender or recipient.
-- Deployment, messages (including test messages), paid resources and production
-  changes are not approved. Git pushes currently create Cloudflare previews;
-  keep work local until a verified no-deploy publishing route or deployment
-  approval exists. Do not assume Pages' skip-CI flags apply to Workers Builds.
+- The owner approved PR publication and its automatic disabled Cloudflare preview
+  on 16 October 2026 after local validation and review. Production deployment,
+  messages (including test messages), paid resources and production changes
+  remain unapproved. Do not assume Pages' skip-CI flags apply to Workers Builds.
 
 ## Small implementation plan
 
@@ -167,6 +167,6 @@ customer data were used in research.
 Implementation checkpoint, 16 October 2026: source/provider research, additive
 migration, local sender/status handling, disabled configuration and six-language
 privacy disclosure implemented. See the [operations guide](WHATSAPP_LEAD_NOTIFICATIONS.md)
-for validation and remaining release gates. No PR has been pushed, no account
-setup performed, no message sent and no deployment/production change made by
-this component.
+for validation and remaining release gates. Preview publication is now approved;
+the PR records its build evidence. No account setup, message or production change
+is included in this approval.
