@@ -46,6 +46,18 @@ for (const width of [390, 1440]) {
       await expect(analytics).toContainText('IP');
       await expect(analytics.locator('p').first()).toContainText('(EU)');
       await expect(page.locator('html')).toHaveAttribute('lang', code);
+      const retention = page.locator('[data-enquiry-retention]');
+      await expect(retention).toBeVisible();
+      await expect(retention).toContainText('12');
+      await expect(retention).toContainText('90');
+      if (code === 'en') {
+        await expect(retention).toContainText(
+          'subject to legal retention requirements',
+        );
+      } else {
+        await expect(retention).not.toContainText('We normally keep');
+        expect(await retention.innerText()).toMatch(/[\u0900-\u0d7f]/);
+      }
       await expect(page.locator('meta[name="description"]')).toHaveAttribute(
         'content',
         /Cloudflare Web Analytics/,

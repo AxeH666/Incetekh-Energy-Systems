@@ -1,5 +1,11 @@
 # Site-visit lead capture
 
+**Production follow-up:** the owner subsequently authorized production release
+after the independently reviewed PR #29 merge and disabled-production health
+check. [PRODUCTION_LEAD_ACTIVATION.md](PRODUCTION_LEAD_ACTIVATION.md) is the current
+production configuration, operating/retention policy and rollback reference.
+Earlier preview-only authorization statements below describe their checkpoints.
+
 **15 October 2026 — preview configuration and synthetic tests approved; production is not.**
 PR #29's preview build-variable incident is resolved through the existing
 branch-specific build trigger. All six live homepage variants now have the

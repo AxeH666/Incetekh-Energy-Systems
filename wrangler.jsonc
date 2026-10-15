@@ -8,8 +8,27 @@
     "run_worker_first": ["/api/*"],
     "not_found_handling": "404-page",
   },
-  // Capture stays closed until separately approved resources and secrets exist.
-  "vars": { "LEAD_CAPTURE_ENABLED": "false" },
+  // Production activation is a separate owner-authorized release after PR #29.
+  "vars": {
+    "LEAD_CAPTURE_ENABLED": "true",
+    "LEAD_CAPTURE_ENV": "production",
+    "LEAD_ALLOWED_ORIGIN": "https://incetekhenergy.com",
+  },
+  "d1_databases": [
+    {
+      "binding": "LEADS_DB",
+      "database_name": "incetekh-site-visits-prod",
+      "database_id": "e5db446c-699e-4e19-8db0-816a3b83f3ad",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "ratelimits": [
+    {
+      "name": "LEAD_RATE_LIMIT",
+      "namespace_id": "2026101502",
+      "simple": { "limit": 5, "period": 60 },
+    },
+  ],
   "previews": {
     // Enable only after preview migration and runtime secrets are verified.
     "vars": {
