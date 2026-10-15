@@ -3,8 +3,10 @@
 **Status: local implementation approved on 15 October 2026.** This document records
 the reviewed design and its original baseline. Implementation and operations are
 tracked in [LEAD_CAPTURE.md](LEAD_CAPTURE.md). The owner subsequently approved the
-first disabled branch preview to obtain its hostname, with no production release,
-capture activation or remote migrations. PR #29 is the intended next component;
+first disabled branch preview to obtain its hostname, then separate preview setup,
+migration and controlled acceptance. That acceptance is recorded in the linked
+operations document; capture is disabled again. Production release and migration
+remain unapproved. PR #29 is the intended next component;
 GitHub assigns the actual number
 when it is opened. Local branch: `feat/site-visit-lead-capture`.
 

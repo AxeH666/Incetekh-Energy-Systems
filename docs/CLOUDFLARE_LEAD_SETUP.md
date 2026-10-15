@@ -1,12 +1,42 @@
 # D1 and Turnstile setup worksheet
 
-Prepared 15 October 2026 for the local lead-capture component. **Instructions only:
-this worksheet itself creates no resources, secrets, migrations, deployments or
-paid plans.** The owner subsequently reported creating the two D1 databases and
-production Turnstile widget and approved only a first disabled branch preview.
-Work
-through this with the owner after setup authorization. Keep capture disabled until
-the controlled preview test is approved; production needs separate release approval.
+Updated 15 October 2026. The owner has approved configuring the existing preview,
+applying its migration and running controlled synthetic acceptance tests. Production
+release, production migrations and paid resource creation remain unauthorized.
+The resource IDs and public keys below are owner-verified. Authenticated D1 reads
+confirmed both database identities; the preview migration is applied. Secret values
+belong only in Cloudflare runtime Secrets and the owner's credential store.
+
+The first preview is live at
+<https://feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev>.
+The owner verified deployment `4559a3ae` as Ready. Live checks matched the tested
+`b8dc874` homepage, confirmed noindex, an empty widget key and rejected API requests.
+Production homepage/privacy/robots snapshots remained identical. GitHub's build
+check for `cdfd759b` still reported in progress during that acceptance check.
+
+The initial configured preview was `f2b9e23b-7598-41e0-8bf3-97014d9620d7`, published
+with the pinned Wrangler preview command on 15 October 2026. Authenticated API reads
+confirmed `main_module: index.js`, `/api/*` Worker-first routing, the preview-only
+`LEADS_DB`, rate namespace `2026101501`, exact origin and capture flag `false`.
+At that pre-acceptance checkpoint, all six language homepages served the preview
+public key and noindex. A same-origin empty POST returned 503 `unavailable`; a
+production-origin POST returned 403. The preview table had zero rows. Production settings/deployment metadata and
+homepage/privacy/robots hashes were unchanged across this publication.
+
+The owner reported a dashboard warning that this preview was static-assets-only.
+API metadata and the live JSON handler proved that the earlier deployment already
+had the Worker. The warning's cause is unconfirmed; a dashboard classification
+issue is inferred. No Worker code or production changes were needed. Use the
+preview-specific CLI secret commands below if the dashboard remains blocked.
+
+The subsequent controlled acceptance window used deployment `19e1c40e`. The owner
+completed a real Turnstile submission in a normal browser; remote D1 reads verified
+one stored test row. Unchanged retries, conflicting retries, missing/invalid tokens,
+input/origin failures, rate limiting and cooldown recovery were checked remotely.
+See [the acceptance record](LEAD_CAPTURE.md#controlled-preview-acceptance--15-october-2026)
+for results and limits. Deployment `f88f115a` closed the window: capture is disabled
+again, while both preview secrets and preview-only bindings are retained. Production
+configuration, deployment metadata and checked public pages remain unchanged.
 
 ## Values and access needed first
 
@@ -22,27 +52,24 @@ the controlled preview test is approved; production needs separate release appro
   session or scoped CLI access; the Worker needs no database password or API token.
 - Nominate a lead reviewer and backup, approve retention/export handling and
   six-language privacy/terms. Do not enable public capture before those decisions.
-- Obtain the **actual stable branch-preview hostname** from Cloudflare. It is not
-  yet verified at preview preparation. Do not substitute an old PR URL, the
-  production Workers alias, a wildcard or a guessed branch slug. If it is not yet
-  allocated, a separately approved disabled preview publication is needed first;
-  that publication is not authorized by this worksheet.
+- Use the verified branch hostname in the inventory below. Do not substitute an
+  old PR URL, the production Workers alias, a wildcard or a deployment-specific URL.
 
 ## Resource inventory
 
-| Setting                  | Production                            | Controlled preview                                      |
-| ------------------------ | ------------------------------------- | ------------------------------------------------------- |
-| D1 database name         | `incetekh-site-visits-prod`           | `incetekh-site-visits-preview`                          |
-| D1 database ID           | Record the actual UUID after creation | Record a **different** actual UUID                      |
-| Runtime D1 binding       | `LEADS_DB`                            | `LEADS_DB`                                              |
-| Wrangler location        | Top-level `d1_databases`              | `previews.d1_databases`                                 |
-| Migration directory      | `migrations`                          | `migrations`                                            |
-| Turnstile widget name    | `Incetekh site visits — production`   | `Incetekh site visits — preview`                        |
-| Turnstile mode           | Managed                               | Managed                                                 |
-| Turnstile hostname entry | `incetekhenergy.com`                  | Exact verified preview hostname, without scheme or path |
-| Pre-clearance            | No / disabled                         | No / disabled                                           |
-| Public key               | Production widget sitekey             | Separate preview widget sitekey                         |
-| Secret key               | Production widget secret              | Separate preview widget secret                          |
+| Setting                  | Production                                                                                        | Controlled preview                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| D1 database name         | `incetekh-site-visits-prod`                                                                       | `incetekh-site-visits-preview`                                                    |
+| D1 database ID           | `e5db446c-699e-4e19-8db0-816a3b83f3ad`                                                            | `e38a341f-de7f-48be-9195-917c9695b13a`                                            |
+| Runtime D1 binding       | `LEADS_DB`                                                                                        | `LEADS_DB`                                                                        |
+| Wrangler location        | Not bound in this preview-only change; top-level binding deferred until production setup approval | `previews.d1_databases`                                                           |
+| Migration directory      | `migrations`                                                                                      | `migrations`                                                                      |
+| Turnstile widget name    | `Incetekh site visits — production`                                                               | `Incetekh site visits — preview`                                                  |
+| Turnstile mode           | Managed                                                                                           | Managed                                                                           |
+| Turnstile hostname entry | `incetekhenergy.com`                                                                              | `feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev` |
+| Pre-clearance            | No / disabled                                                                                     | No / disabled                                                                     |
+| Public key               | `0x4AAAAAAFXYexC6_XbQNo8g`                                                                        | `0x4AAAAAAFXbDu-BFz8OltPQ`                                                        |
+| Secret key               | Production widget secret                                                                          | Separate preview widget secret                                                    |
 
 Turnstile hostname entries also authorize their subdomains; they are not an
 exact-host firewall. The Worker independently checks the exact URL origin,
@@ -52,36 +79,34 @@ widgets. No new DNS record, custom hostname or manual tracking script is needed.
 
 ## D1 dashboard and migration steps
 
-1. In Cloudflare, open **Storage & databases → D1 → Create database**. Create the
-   two named databases above in the existing account and record both actual IDs.
-   Check existing inventory first to avoid duplicates.
+1. Both databases have already been created by the owner. In **Storage & databases
+   → D1**, verify their names and IDs against this inventory. Do not create duplicates.
 2. Decide data location before creation if there is a jurisdiction requirement.
    Otherwise use automatic/default placement. A regional placement hint is not
    an India-only residency guarantee; do not make that claim in the privacy notice.
    D1 jurisdiction and location controls have different guarantees.
-3. Add each binding to the corresponding Wrangler section after approval, with
+3. Add the preview binding to the corresponding Wrangler section, with
    `binding: "LEADS_DB"`, its `database_name`, actual `database_id`, and
    `migrations_dir: "migrations"`. Keep the current entrypoint, assets configuration
    and disabled flags. Do not replace the whole Wrangler file with a dashboard
-   snippet. Git-backed configuration must match dashboard bindings.
+   snippet. Git-backed configuration must match dashboard bindings. The production
+   database is deliberately unbound in this preview-only configuration.
 4. Prepare `wrangler.preview-migrations.jsonc` with the preview database under
    **top-level** `d1_databases`, binding `PREVIEW_DB`, and the same name/ID as
    `previews.d1_databases` in the application configuration. Do not use a production
-   ID in that file. The file does not yet exist because no real ID is available.
-5. Once that target is approved, apply the checked-in migration using the pinned
-   Wrangler from the repository. These commands are for later execution, not a
-   build hook:
+   ID in that file. This file now exists and targets only the approved preview ID.
+5. Preview migration `0001_site_visit_leads.sql` was applied on 15 October 2026 at
+   10:21:28 UTC to `e38a341f-de7f-48be-9195-917c9695b13a`. Remote verification found
+   the table, created-at index and migration record; there were zero lead rows and
+   no pending migrations. The command below is the repeatable migration procedure,
+   never a build hook:
 
    ```sh
    npx wrangler d1 migrations apply PREVIEW_DB --remote --config wrangler.preview-migrations.jsonc
    ```
 
-   Production schema application is a separate approved step, using its top-level
-   binding in the main config:
-
-   ```sh
-   npx wrangler d1 migrations apply LEADS_DB --remote --config wrangler.jsonc
-   ```
+   Do not run a production migration. A production binding and separate approval
+   are prerequisites for any later production schema application.
 
    Apply [0001_site_visit_leads.sql](../migrations/0001_site_visit_leads.sql) through
    migrations, not by also pasting it into the console. Verify the migration list,
@@ -97,11 +122,12 @@ widgets. No new DNS record, custom hostname or manual tracking script is needed.
 
 ## Turnstile dashboard steps
 
-1. Open **Turnstile → Add widget**. Create the two widgets in the inventory table.
-2. Select **Managed**. Add only the listed hostname for each environment, without
-   `https://`, port, path or `*`. Select **No** for pre-clearance and save.
-3. Record each public **sitekey** with its widget and environment. Store each
-   **secret key** directly in that environment's Worker runtime Secrets field.
+1. Both widgets have already been created by the owner; do not create duplicates.
+2. The preview widget is owner-verified as **Managed**, with pre-clearance disabled
+   and only the exact listed preview hostname. Keep that configuration.
+3. Record each public **sitekey** with its widget and environment. For this task,
+   store only the **preview secret key** in the existing preview's runtime Secrets.
+   Leave production secrets and settings untouched.
    Do not put secrets in chat, build variables, `.env.example`, source files or Git.
 4. No custom action is configured in the dashboard: the browser already sends
    `action: "site_visit"`, and the Worker verifies that response action and host.
@@ -113,27 +139,55 @@ widgets. No new DNS record, custom hostname or manual tracking script is needed.
 On **Workers & Pages → incetekh-energy-systems → Settings → Builds**, select
 Production or Previews Base for **build variables**:
 
-| Build variable              | Production                        | Preview                                |
-| --------------------------- | --------------------------------- | -------------------------------------- |
-| `PUBLIC_TURNSTILE_SITE_KEY` | Production public sitekey         | Preview public sitekey                 |
-| `PUBLIC_SITE_INDEXABLE`     | Keep the existing approved `true` | `false` (unset also defaults to false) |
+| Build variable              | Production                            | Preview                                |
+| --------------------------- | ------------------------------------- | -------------------------------------- |
+| `PUBLIC_TURNSTILE_SITE_KEY` | Do not change production in this task | `0x4AAAAAAFXbDu-BFz8OltPQ`             |
+| `PUBLIC_SITE_INDEXABLE`     | Keep the existing approved `true`     | `false` (unset also defaults to false) |
 
 Keep existing build commands and root directory. Never manually override
 `WORKERS_CI` or `WORKERS_CI_BRANCH`. A public key change needs a future approved
 rebuild to change the generated HTML; a runtime variable with that name cannot
 update the static form.
 
-On the Worker's **Settings → Variables and secrets**, choose the correct
-Production/Previews Base toggle for runtime secrets. Keep non-secret runtime
-variables in the matching Wrangler `vars` / `previews.vars` blocks as well:
+The owner confirmed these two preview build variables were saved. The deployment
+above used a local build with those same public values; subsequent branch builds
+must retain them.
 
-| Runtime setting                  | Production                                  | Preview                                                                  |
-| -------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------ |
-| `LEAD_CAPTURE_ENABLED`           | String `false` until release approval       | String `false` until controlled preview testing is approved, then `true` |
-| `LEAD_CAPTURE_ENV`               | `production`                                | `preview`                                                                |
-| `LEAD_ALLOWED_ORIGIN`            | `https://incetekhenergy.com`                | `https://` plus the exact preview hostname, no trailing slash            |
-| `TURNSTILE_SECRET_KEY` (Secret)  | Production widget secret                    | Preview widget secret                                                    |
-| `RATE_LIMIT_KEY_SECRET` (Secret) | Unique random value, at least 32 characters | Different unique random value, at least 32 characters                    |
+For this existing preview, select **Workers & Pages → incetekh-energy-systems →
+Preview selector → feat/site-visit-lead-capture → Settings → Variables and secrets**.
+Manually enter `TURNSTILE_SECRET_KEY` for the preview widget and a new independent
+`RATE_LIMIT_KEY_SECRET`, each with type **Secret**. Do not enter them in Production,
+build variables or chat. Updating Previews Base alone does not update this existing
+preview. Keep non-secret runtime variables in `previews.vars` as well.
+
+If the dashboard refuses secret entry, run each command separately from this
+repository in an authenticated terminal using Node 22.19 or newer. Enter the value
+only at Wrangler's hidden prompt, never as a command argument or in chat:
+
+```sh
+npx wrangler preview secret put TURNSTILE_SECRET_KEY --name feat/site-visit-lead-capture --worker-name incetekh-energy-systems
+npx wrangler preview secret put RATE_LIMIT_KEY_SECRET --name feat/site-visit-lead-capture --worker-name incetekh-energy-systems
+```
+
+Use the secret belonging to preview sitekey `0x4AAAAAAFXbDu-BFz8OltPQ`, and a new,
+independent random rate-limit secret. Each command creates a new deployment of
+this existing preview while retaining its other configuration. Keep capture false;
+verify both secret **names** and the disabled flag remotely before enabling tests.
+The owner entered both secrets on 15 October 2026; authenticated deployment reads
+confirmed both names with type `secret_text`. Values were not read or reported.
+Do not substitute ordinary `wrangler secret put`, which does not select this branch
+preview.
+
+The production column below is a future setup reference, not a statement that
+those variables or secrets are currently installed. Production remains untouched.
+
+| Runtime setting                  | Production                                  | Preview                                                                                          |
+| -------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `LEAD_CAPTURE_ENABLED`           | String `false` until release approval       | Currently `false`; controlled acceptance completed, enable only for another approved test window |
+| `LEAD_CAPTURE_ENV`               | `production`                                | `preview`                                                                                        |
+| `LEAD_ALLOWED_ORIGIN`            | `https://incetekhenergy.com`                | `https://` plus the exact preview hostname, no trailing slash                                    |
+| `TURNSTILE_SECRET_KEY` (Secret)  | Production widget secret                    | Preview widget secret                                                                            |
+| `RATE_LIMIT_KEY_SECRET` (Secret) | Unique random value, at least 32 characters | Different unique random value, at least 32 characters                                            |
 
 Use a secure random generator/password manager for each rate-limit secret; for
 example 32 random bytes encoded as 64 hexadecimal characters. Do not reuse a
@@ -156,10 +210,14 @@ in top-level `ratelimits` and `previews.ratelimits`:
 }
 ```
 
-Select two different account-unique namespace IDs after checking existing usage.
+The deployed preview namespace is `2026101501`, with five attempts per 60 seconds.
+Before publication, authenticated account inventory on 15 October 2026 found no rate-limit
+bindings in production, Previews Base or the existing preview using this namespace.
+No production rate binding is added by this task. A future production namespace
+must be different. Select account-unique namespace IDs after checking existing usage.
 These are identifiers chosen in config, not D1 IDs. The binding is not created by
 making a dashboard WAF rule. It is a regional, approximate limiter, not a global
-cap; its absence makes the API fail closed. No configuration is activated here.
+cap; its absence makes the API fail closed. Capture remains disabled during setup.
 
 ## Cost and acceptance boundary
 
@@ -170,9 +228,10 @@ widget and unlimited challenges. This design uses two widgets and two databases;
 it does not request a paid upgrade. Native rate-binding documentation does not
 provide a separate price here; verify account plan/billing before activation.
 
-Before enabling production: real preview Turnstile validation and D1 retrieval,
-duplicate retry, exact-host denial, owner access, retention/privacy/translation
-approval, current quotas and explicit release approval must all be recorded.
+Real preview Turnstile validation, D1 retrieval by the engineering session, duplicate
+retry, exact-host denial and rate enforcement are recorded. Before enabling
+production, owner-role retrieval/export, retention/privacy/translation approval,
+logging checks, current quotas and explicit release approval remain required.
 Local tests cannot prove those dashboard facts. Only public sitekeys, resource
 names/IDs and the preview hostname need to be shared for configuration review;
 secret values must remain in Cloudflare and the owner's credential store.

@@ -1,9 +1,10 @@
 # Cloudflare Web Analytics and privacy disclosures
 
-**Local follow-up, 15 October 2026:** [lead capture](LEAD_CAPTURE.md) adds separate
+**Preview follow-up, 15 October 2026:** [lead capture](LEAD_CAPTURE.md) adds separate
 Turnstile and D1 disclosures while preserving these analytics paragraphs and
-Automatic Setup. Its first disabled branch preview is approved; production
-release and capture activation are not.
+Automatic Setup. Its separately approved preview setup and controlled acceptance
+are complete; preview capture is disabled again. Production release and activation
+remain unapproved.
 Earlier statements below about the unconnected form describe PR #28's baseline.
 EU analytics exclusion does not disable Turnstile security processing.
 

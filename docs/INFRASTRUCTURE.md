@@ -1,10 +1,12 @@
 # Infrastructure and operations
 
-**Local implementation update, 15 October 2026:** the next focused component adds
+**Preview acceptance update, 15 October 2026:** the next focused component adds
 a disabled-by-default Worker enquiry API, D1 migration, Turnstile support and
-six-language disclosures. The owner approved its first disabled branch preview and
-reports creating separate D1 databases and a production Turnstile widget; runtime
-bindings and capture remain unconfigured. Production release is not approved.
+six-language disclosures. Separate preview D1, runtime secrets, Turnstile and rate
+bindings were configured and tested under owner approval. A real owner-submitted
+test lead was retrieved from preview D1; retries, rejection paths and rate limiting
+were verified. Preview capture is disabled again after testing. Production remains
+unchanged, with no production feature release or migration approved.
 See [LEAD_CAPTURE.md](LEAD_CAPTURE.md) for the
 implementation, owner operations and separate setup/release gates. Historical
 static-only/form observations below describe the deployed baseline, not this

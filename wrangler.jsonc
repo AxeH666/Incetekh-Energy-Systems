@@ -10,5 +10,28 @@
   },
   // Capture stays closed until separately approved resources and secrets exist.
   "vars": { "LEAD_CAPTURE_ENABLED": "false" },
-  "previews": { "vars": { "LEAD_CAPTURE_ENABLED": "false" } },
+  "previews": {
+    // Enable only after preview migration and runtime secrets are verified.
+    "vars": {
+      "LEAD_CAPTURE_ENABLED": "false",
+      "LEAD_CAPTURE_ENV": "preview",
+      "LEAD_ALLOWED_ORIGIN": "https://feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev",
+    },
+    "d1_databases": [
+      {
+        "binding": "LEADS_DB",
+        "database_name": "incetekh-site-visits-preview",
+        "database_id": "e38a341f-de7f-48be-9195-917c9695b13a",
+        "migrations_dir": "migrations",
+      },
+    ],
+    // Preview-only; no collision in account inventory checked 15 October 2026.
+    "ratelimits": [
+      {
+        "name": "LEAD_RATE_LIMIT",
+        "namespace_id": "2026101501",
+        "simple": { "limit": 5, "period": 60 },
+      },
+    ],
+  },
 }

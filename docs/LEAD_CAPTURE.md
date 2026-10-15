@@ -1,17 +1,86 @@
 # Site-visit lead capture
 
-**15 October 2026 — disabled branch preview authorized; production release is not.**
-The owner approved local implementation of [the reviewed plan](LEAD_CAPTURE_PLAN.md)
-and then the first preview for `feat/site-visit-lead-capture`, solely to obtain its
-allocated stable hostname. Publication status must be verified against the exact
-commit's Cloudflare build check; authorization alone is not deployment evidence.
-The owner reports creating separate production/preview D1 databases and the
-production Turnstile widget. None is bound by this branch's Wrangler config.
-Both capture flags remain `false`; no secret, database binding, rate binding or
-allowed origin is configured. Do not enable capture, run remote migrations, merge,
-deploy production or create paid resources under this preview approval.
-All enquiry test records so far are synthetic and local. `sensitive info/` is
-excluded from Git and must never be force-added or uploaded.
+**15 October 2026 — preview configuration and synthetic tests approved; production is not.**
+The first preview for `feat/site-visit-lead-capture` is live at
+<https://feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev>.
+The owner verified deployment `4559a3ae` as Ready; live checks matched the tested
+`b8dc874` homepage, noindex headers/metadata, unavailable form fallback and a 403 API
+response. Production homepage/privacy/robots snapshots were unchanged. The GitHub
+build check was still in progress; it was not used as evidence of completion.
+
+The owner has now supplied separate D1 IDs and public widget keys and approved
+preview-only bindings, migration and controlled synthetic testing. Configuration
+was first published in preview deployment `f2b9e23b`; production remains disabled and
+unbound. The owner has entered both preview runtime secrets; deployment metadata
+confirms their names and `secret_text` types without revealing their values.
+The preview migration was applied at 10:21:28 UTC on 15 October 2026. Remote reads
+verified its migration record, lead table and created-at index, zero rows and no
+pending migrations. A controlled preview acceptance window is documented below.
+See [the setup worksheet](CLOUDFLARE_LEAD_SETUP.md) for exact non-secret values and
+manual secret-entry steps. No production migration, deployment or paid resource is
+authorized. `sensitive info/` is excluded from Git and must never be force-added.
+
+At that pre-acceptance checkpoint, authenticated deployment metadata confirmed the
+Worker entrypoint, preview-only D1 binding and rate limiter, exact preview origin
+and disabled flag. Live checks found
+the preview public key and noindex on all six homepages, 503 for a same-origin
+empty POST, 403 for a production-origin POST and zero stored leads. Production
+settings, deployment metadata and homepage/privacy/robots hashes were unchanged.
+The dashboard's static-assets-only warning contradicts the verified Worker runtime;
+its cause is unconfirmed. The setup worksheet includes preview-specific CLI secret
+entry as an alternative. No runtime code change was necessary.
+
+Preview setup validation: all 36 Worker/configuration tests, formatting lint,
+Astro/Worker type checks and the non-indexable preview-key build passed. These
+local checks are supplemented by the remote acceptance evidence below.
+
+## Controlled preview acceptance — 15 October 2026
+
+The owner entered the two preview runtime secrets manually. Deployment `19e1c40e`
+temporarily enabled capture for the approved checks. The owner completed the real
+Managed Turnstile challenge and submitted from a normal browser, then reported the
+form's received message. An authenticated read of preview D1 independently found
+one stored row, created at 10:45:11.679 UTC (16:15:11.679 IST), with privacy notice
+version `2026-10-15` and notification status `not_configured`. Its receipt ID is
+`3e993241-c05d-42b7-8016-93860087c07f`. Contact fields are omitted from this report.
+The row is retained for the owner's access/export check, not deleted automatically.
+
+| Live check                                                 | Result                                                                |
+| ---------------------------------------------------------- | --------------------------------------------------------------------- |
+| Same receipt and unchanged details, no new token           | 200 `received`; no duplicate row                                      |
+| Same receipt with changed details                          | 409 `conflict`                                                        |
+| New receipt with invalid or missing token                  | 422 `security_check`; no new row                                      |
+| Malformed JSON                                             | 400 `invalid_request`                                                 |
+| Missing or production Origin; deployment-specific hostname | 403 `forbidden`                                                       |
+| Unsupported content type / oversized body / GET            | 415 / 413 / 405                                                       |
+| Bounded rate burst                                         | 429 on the seventh request, `Retry-After: 60`                         |
+| Retry after 65-second cooldown                             | 200 `received`                                                        |
+| Final D1 read                                              | One row; stored payload hash unchanged across the rate/recovery check |
+
+The initial rate test assumed that the sixth request would be denied, but requests
+reached HKG and SIN and that assertion failed. A subsequent bounded burst at SIN
+demonstrated enforcement. This matches the documented regional, approximate
+limiter; it is not a strict global five-request ceiling. No production rate or
+application code was changed to force this test to pass.
+
+The automated browser displayed an interactive challenge and the owner's click in
+that browser failed verification. The normal-browser challenge and real submission
+succeeded. The exact reason for the automated-browser failure was not established;
+no challenge bypass, test key or production credential was used. One widget script
+was observed. Genuine token replay/expiry, provider outages and database-write
+failures were not induced remotely; replay/error paths retain local test coverage.
+
+After acceptance, preview deployment `f88f115a` restored capture to `false` while
+preserving its two secrets, D1 and rate bindings. The stable preview again returned
+503 for same-origin submissions. All six homepage variants retained the preview
+public key and noindex. Production settings/deployment metadata and checked public
+page hashes remained unchanged. Production has not been migrated or deployed.
+
+Before requesting production release approval: the owner must retrieve/export this
+test row with the intended access role, approve retention and six-language wording,
+complete the privacy/provider-terms and logging checks below, and verify quotas.
+Production bindings, secrets, migration and activation require their own approved
+release step; the production D1 ID remains absent from deployable configuration.
 
 ## Implementation
 
@@ -58,8 +127,8 @@ A receipt is an enquiry, never a confirmed appointment. No notifications are sen
 
 The dashboard walkthrough and exact per-environment values are in
 [CLOUDFLARE_LEAD_SETUP.md](CLOUDFLARE_LEAD_SETUP.md). Owner-reported resource creation
-does not establish runtime bindings. Remote migrations, secret configuration and
-capture activation remain separate from this disabled preview publication.
+does not establish runtime bindings. The current approval covers preview setup,
+migration and synthetic testing only; production setup/release remains separate.
 
 Do not copy example identifiers into deployment config. No resources are declared
 with placeholder IDs that Wrangler could automatically provision. Before any
@@ -98,8 +167,9 @@ simple: { limit: 5, period: 60 } }]` separately for each environment, using
    the actual deployed environment. Keep production indexing as already approved;
    preview remains non-indexable. Noindex does not disable tracking or isolate data.
 
-The existing commands remain `npm run build`, `npx wrangler deploy` and
-`npx wrangler preview`; none was used to publish this local component. Wrangler is
+The existing commands remain `npm run build`, `npx wrangler deploy` (production) and
+`npx wrangler preview` (branch). The first branch push published the disabled preview;
+no production publication is authorized. Wrangler is
 pinned to 4.151.0. Local D1 tests use the matching Miniflare 5.20261012.0-beta
 version used by that Wrangler release, with its supplied v4 options converter.
 
@@ -215,10 +285,10 @@ the specifically approved test row. No customer message is part of these checks.
 - Independent source/documentation review completed; its test-contract and
   status-documentation findings were fixed. No blocking code finding remained.
 
-Logs and synthetic persistence are ignored under `.wrangler/`; screenshots are
-under ignored `test-results/`. No genuine lead, cloud write, published preview,
-production deployment or notification was involved. Changes remain local and
-uncommitted on `feat/site-visit-lead-capture`.
+This was the initial local validation checkpoint, before the authorized preview
+publication and migration described above. Logs and synthetic persistence are
+ignored under `.wrangler/`; screenshots are under ignored `test-results/`.
+Those local tests involved no genuine lead, cloud write or notification.
 
 ## Dependency audit
 
@@ -257,7 +327,8 @@ Astro checks (86 files, zero diagnostics), Worker TypeScript, production build,
 all 34 API/D1 checks and all 127 browser/model/artifact checks under local Wrangler.
 The full log is `.wrangler/dependency-verify.log`. Independent read-only review
 confirmed the two-entry scope and found no blocking issue in the dependency
-assessment or Cloudflare setup worksheet. No cloud setup or publication occurred.
+assessment or Cloudflare setup worksheet. No cloud setup or publication occurred
+during that earlier dependency-validation checkpoint.
 
 ## Official references
 

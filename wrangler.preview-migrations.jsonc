@@ -1,0 +1,13 @@
+{
+  // D1 commands only. No Worker entrypoint, production binding or deploy hook.
+  "name": "incetekh-site-visits-preview-migrations",
+  "compatibility_date": "2026-09-30",
+  "d1_databases": [
+    {
+      "binding": "PREVIEW_DB",
+      "database_name": "incetekh-site-visits-preview",
+      "database_id": "e38a341f-de7f-48be-9195-917c9695b13a",
+      "migrations_dir": "migrations",
+    },
+  ],
+}
