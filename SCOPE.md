@@ -124,6 +124,18 @@ Generated imagery must not be presented as documentary evidence of a specific In
 
 ## Out of Scope
 
+### Explicit exception: internal enquiry notifications
+
+On 15 October 2026 the owner authorized the next focused component: notify one
+designated staff WhatsApp number when a valid website enquiry has been saved,
+using Meta's official Cloud API and the existing Worker/D1 infrastructure. This
+includes durable attempt tracking, safe retries and authenticated status webhooks.
+It excludes customer replies, marketing, CRM, VPS and unrelated automation.
+Start with inspection, current-provider research and an implementation plan.
+Deployment (including automatic previews), real messages, paid resources and
+production changes require separate approval. See
+[the component plan](docs/WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md).
+
 Do not build any of the following in this milestone unless the scope is explicitly changed:
 
 - WhatsApp automation
