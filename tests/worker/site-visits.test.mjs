@@ -64,8 +64,15 @@ before(async () => {
   await mkdir('.wrangler', { recursive: true });
   const persist = await mkdtemp('.wrangler/lead-test-');
   options = {
-    modules: true,
-    scriptPath: '.wrangler/test-worker/index.js',
+    modules: [
+      'index',
+      'notifications',
+      'notification-config',
+      'whatsapp-webhook',
+    ].map((name) => ({
+      type: 'ESModule',
+      path: `.wrangler/test-worker/${name}.js`,
+    })),
     compatibilityDate: '2026-09-30',
     bindings,
     d1Databases: { LEADS_DB: 'local-leads' },
@@ -139,7 +146,7 @@ test('receipt follows durable insert; native text, optional email and metadata s
   assert.equal(saved.phone, '+919876543210');
   assert.equal(saved.email, null);
   assert.equal(saved.notification_status, 'not_configured');
-  assert.equal(saved.privacy_notice_version, '2026-10-15.1');
+  assert.equal(saved.privacy_notice_version, '2026-10-16');
   assert.ok(Date.now() - Date.parse(saved.created_at) < 10000);
   assert.equal('token' in saved || 'ip' in saved, false);
   await mf.dispose();

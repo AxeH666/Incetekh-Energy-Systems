@@ -1,5 +1,18 @@
 # Infrastructure and operations
 
+**PR #31, disabled production release (16 October 2026):** internal WhatsApp
+enquiry notifications are explicitly in scope. See
+[WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md](WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md) for the
+Worker/D1 design, Meta setup, verified pricing and approval boundaries, and
+[WHATSAPP_LEAD_NOTIFICATIONS.md](WHATSAPP_LEAD_NOTIFICATIONS.md) for configuration,
+failure handling and the controlled release procedure. Local implementation and
+fault tests exist; sending and webhooks default off, with no Cron Trigger.
+The owner approved merging the reviewed implementation and deploying through the
+existing production CI with both WhatsApp flags false. [PR #31](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/31)
+records the final commit, build/deployment and preservation checks. This release
+does not authorize migrations, schedules, Meta credentials/configuration, webhook
+enablement or real messages. Production enquiry checks remain manual.
+
 **Production lead activation:** PR #29 merged after independent review as
 `78acb87`. Production build `c56fb610` passed, all 138 sitemap pages were healthy,
 and capture was verified disabled before the separately authorized activation
@@ -44,7 +57,8 @@ This is the current infrastructure reference. [SCOPE.md](../SCOPE.md) still cont
 Phase 1. Earlier delivery reports describe historical tasks, not today's hosting.
 The supplied `INCETEKH_INFRASTRUCTURE_HANDOFF.md` is preserved unchanged in the
 local recovery archive described below;
-its proposed WhatsApp Cloud API/backend work is **outside the locked scope**.
+its broader proposed backend work remains **outside the locked scope**. Only the
+limited internal staff notification exception above has since been authorized.
 The initial audit changed documentation only. The owner subsequently authorized
 commit, push, PR merge, synchronization and stale-branch cleanup. Existing
 Cloudflare Git integration may publish this documentation release; no manual
