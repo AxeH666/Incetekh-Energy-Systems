@@ -1,16 +1,17 @@
 # Infrastructure and operations
 
-**Next component, approved preview review (16 October 2026):** internal WhatsApp
+**PR #31, disabled production release (16 October 2026):** internal WhatsApp
 enquiry notifications are explicitly in scope. See
 [WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md](WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md) for the
 Worker/D1 design, Meta setup, verified pricing and approval boundaries, and
 [WHATSAPP_LEAD_NOTIFICATIONS.md](WHATSAPP_LEAD_NOTIFICATIONS.md) for configuration,
 failure handling and the controlled release procedure. Local implementation and
 fault tests exist; sending and webhooks default off, with no Cron Trigger.
-The owner approved PR publication and its automatic disabled preview deployment;
-the PR records release evidence. Production notification deployment, migrations,
-schedules, Meta setup and real messages remain unapproved. Production enquiry
-checks remain manual.
+The owner approved merging the reviewed implementation and deploying through the
+existing production CI with both WhatsApp flags false. [PR #31](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/31)
+records the final commit, build/deployment and preservation checks. This release
+does not authorize migrations, schedules, Meta credentials/configuration, webhook
+enablement or real messages. Production enquiry checks remain manual.
 
 **Production lead activation:** PR #29 merged after independent review as
 `78acb87`. Production build `c56fb610` passed, all 138 sitemap pages were healthy,

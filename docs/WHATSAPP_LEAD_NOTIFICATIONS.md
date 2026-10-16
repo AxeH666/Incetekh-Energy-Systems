@@ -1,8 +1,10 @@
 # Internal staff WhatsApp enquiry notifications
 
-Status: preview publication approved on 16 October 2026 after local validation
-and independent review. The PR records the resulting build/deployment evidence.
-No remote migration, Meta setup or real message is included in this approval.
+Release boundary, 16 October 2026: the owner approved PR #31 merge and its normal
+production CI deployment after local validation and independent review, with
+both WhatsApp flags remaining false. [PR #31](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/31)
+records the final commit, deployment and preservation evidence. No remote
+migration, Meta setup, credentials or real message is included in this approval.
 Both notification flags are `false` in production and preview configuration;
 there is no Cron Trigger. Production lead capture continues independently.
 
@@ -150,7 +152,8 @@ is inferred from a site-visit submission.
 1. Local validation and independent review passed. The owner approved publishing
    the PR and its automatic Cloudflare preview on 16 October 2026. Keep preview
    sending/webhooks disabled and exclude production Meta credentials.
-   Merge/production release remains a later gate.
+   The owner subsequently approved merge/production deployment with both flags
+   false. No migration, Meta configuration or outbound send accompanies it.
 2. Verify the Incetekh-owned Meta assets, staff opt-in, sender/recipient separation,
    exact approved template/category, currency, price and explicit attempt budget.
    Approve costs before any actual message, including synthetic messages.
@@ -178,6 +181,30 @@ without affecting the production form. Re-enabling the same configuration does
 not replay delivered/accepted/uncertain jobs.
 
 ## Validation evidence and limits
+
+### Step 2 readiness after the disabled release
+
+The code release makes the production callback route available, but it must return
+503 while `WHATSAPP_WEBHOOK_ENABLED=false`. Meta verification is not expected to
+pass in this state. Later, separately approved webhook configuration requires:
+
+- Exact callback `https://incetekhenergy.com/api/whatsapp/webhook`.
+- `WHATSAPP_WEBHOOK_ENABLED=true` while keeping `WHATSAPP_NOTIFY_ENABLED=false`.
+- The existing production `LEADS_DB` binding and `LEAD_CAPTURE_ENV=production`.
+- Correct Incetekh `WHATSAPP_PHONE_NUMBER_ID` and `WHATSAPP_WABA_ID`.
+- Runtime secrets `META_APP_SECRET`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN` (at least 32
+  characters; **not** `META_WEBHOOK_VERIFY_TOKEN`) and `WHATSAPP_STAFF_NUMBER`
+  (international digits without `+`). Do not print their values.
+- Meta's `messages` webhook field and app subscription to that WABA for delivery
+  statuses. No customer-message/reply flow is implemented.
+
+The GET handshake does not query D1 or need a sending token, template or Cron
+Trigger. Migration `0002` is still separately required before processing status
+POSTs; it is deliberately not applied by this disabled release. No notification
+jobs can be created with the flags off and no scheduler installed. Keep manual
+enquiry review until the later controlled messaging activation is verified.
+
+### Local implementation checks
 
 Local tests use real Miniflare/workerd D1 with synthetic credentials and a fake
 Meta/Turnstile service. They make no real provider request or WhatsApp send.
