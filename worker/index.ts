@@ -1,7 +1,8 @@
 import { dispatchEmails, type EmailEnv } from './email.js';
 import { solarEndpoint, type SolarEnv } from './solar-endpoint.js';
+import { solarPage, solarConfig, type SolarPageEnv } from './solar-page.js';
 
-interface Env extends EmailEnv, SolarEnv {
+interface Env extends EmailEnv, SolarEnv, SolarPageEnv {
   ASSETS: Fetcher;
   LEADS_DB?: D1Database;
   LEAD_RATE_LIMIT?: RateLimit;
@@ -150,6 +151,10 @@ export default {
   },
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === '/solar-preview/' || url.pathname === '/solar-preview')
+      return solarPage(request, env);
+    if (url.pathname === '/api/solar-preview-config')
+      return solarConfig(request, env);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
     if (url.pathname === '/api/solar-assessments')
       return solarEndpoint(request, env);

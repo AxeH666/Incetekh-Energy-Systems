@@ -7,7 +7,7 @@ test('all static artifacts leave analytics injection to Cloudflare', async () =>
   const files = (await readdir('dist', { recursive: true })).filter((file) =>
     file.endsWith('.html'),
   );
-  expect(files).toHaveLength(145);
+  expect(files).toHaveLength(146);
   for (const file of files) {
     const html = await readFile(join('dist', file), 'utf8');
     // CSP must allow the edge script, but the artifact must not include one.

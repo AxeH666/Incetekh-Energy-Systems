@@ -15,8 +15,8 @@ SolarCAD is excluded.
 | Order | Component                                               | Status      |
 | ----- | ------------------------------------------------------- | ----------- |
 | 1     | Server adapter, safeguards and atomic usage allowance   | Merged #35  |
-| 2     | Geographic panel geometry and alignment proof           | In progress |
-| 3     | Property selector and confirmed assessment              | Pending     |
+| 2     | Geographic panel geometry and alignment proof           | Merged #36  |
+| 3     | Property selector and confirmed assessment              | In progress |
 | 4     | Existing calculator handoff and consistent results      | Pending     |
 | 5     | Consented enquiry context and compatible receipts/email | Pending     |
 | 6     | Release readiness and acceptance evidence               | Pending     |
@@ -131,6 +131,12 @@ activation approval. Keep those gates explicit in the final release record.
 
 ## PR 2 local alignment proof
 
+Released as PR #36, merge `ee0ef773b7cdb46b1ef790456558e5b321a9e250`.
+Self-review and independent exact-head review passed, with lint, types, build and
+15 focused tests. Production build `7f7c88c9-83e8-46c7-b3a3-1d3e9fbb568a`
+succeeded. Homepage/contact stayed healthy; enquiry GET remained 405 and Solar
+POST remained disabled. The local harness URL returned 404 in production.
+
 `src/lib/solar-geometry.ts` converts each returned panel centre into four
 geographic corners. The long axis follows the segment azimuth for portrait,
 and crosses it for landscape. Only the slope-axis length is foreshortened by
@@ -188,3 +194,33 @@ Use Google Maps for mapped Google Solar results and keep attribution visible.
 Before activation, update public privacy/terms and verify browser API restrictions,
 CSP, retention and current account-specific licensing. Do not infer permission to
 permanently archive rooftop content from permission to retain a Place ID.
+
+## PR 3 property selector
+
+`/solar-preview/` is an English, noindex route with no translated variants or
+sitemap entry. It remains disabled in production and preview. A runtime config
+endpoint exposes public browser/widget keys only with the enabled flag, approved
+origin and valid server safeguards. Missing keys, limits or bindings fail closed.
+Before each map initialization the client rechecks the runtime shutoff.
+
+The enabled route alone receives a fresh per-response script/style nonce and
+Google-compatible CSP through HTMLRewriter. Other routes retain their existing
+policy. Maps loads only after the visitor sees the privacy notice and explicitly
+opens it. Search requests only location fields. Coordinates and map selection are
+alternatives when search fails; no browser geolocation is requested.
+
+A selected blue marker requires explicit assessment confirmation. The returned
+orange building requires a separate confirmation before any panels are drawn;
+the viewport and text distinguish both locations. Editing coordinates, moving the
+pin or choosing another search result immediately invalidates the old assessment,
+including while Places details are pending. Late responses are discarded. Wrong,
+changed or unclear roofs, quota failures and unavailable maps retain a manual
+visit path. Provider content is held only in browser memory.
+
+Before controlled enablement, supply restricted `SOLAR_MAPS_BROWSER_KEY` and
+`SOLAR_TURNSTILE_SITE_KEY` alongside the server prerequisites above. Browser keys
+are intentionally public; exact referrer/API restrictions and verified quotas are
+mandatory acceptance checks. This PR installs neither keys nor migrations.
+Automated browser checks exercise actual built HTML and Worker CSP with synthetic
+Maps/Places/Turnstile/Solar substitutes; all outbound provider traffic is blocked.
+These checks establish flow/state behavior, not real map or device acceptance.

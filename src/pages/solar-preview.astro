@@ -1,0 +1,187 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="Solar Preview | Incetekh Energy"
+  description="A preliminary rooftop solar concept, followed by a free physical site visit."
+  noindex
+>
+  <section class="section preview-shell">
+    <div class="container">
+      <p class="eyebrow">Preliminary assessment · English preview</p>
+      <h1>See solar on your roof.</h1>
+      <p id="preview-status" role="status" tabindex="-1">
+        Solar Preview is currently unavailable. You can still use our calculator
+        or arrange a free site visit.
+      </p>
+      <div id="preview-intro" hidden>
+        <p>
+          Choose your actual building on Google satellite imagery. Opening the
+          map shares network and location information with Google. Solar data
+          and satellite imagery may have different dates.
+        </p>
+        <p>
+          <a href="https://policies.google.com/privacy">
+            Google Privacy Policy
+          </a>{' '}
+          ·{' '}
+          <a href="https://maps.google.com/help/terms_maps/">
+            Google Maps terms
+          </a>{' '}
+          · <a href="/privacy/">Our privacy notice</a>
+        </p>
+        <button type="button" id="open-map">
+          Open property map
+        </button>
+      </div>
+      <div id="property-controls" hidden>
+        <div
+          id="property-search"
+          aria-label="Search for an address or business"
+        ></div>
+        <p>
+          Search for your property or click the map to place the selection
+          marker. Confirm the actual building before requesting an assessment.
+        </p>
+        <form id="coordinate-form">
+          <label>
+            Latitude{' '}
+            <input
+              name="latitude"
+              type="number"
+              step="any"
+              min="12"
+              max="20"
+              required
+            />
+          </label>
+          <label>
+            Longitude{' '}
+            <input
+              name="longitude"
+              type="number"
+              step="any"
+              min="75"
+              max="85"
+              required
+            />
+          </label>
+          <button type="submit">Move selection</button>
+        </form>
+        <p id="selection-label">No property selected.</p>
+        <div id="solar-security"></div>
+        <button id="assess-property" type="button" disabled>
+          This is my building — assess roof
+        </button>
+        <div id="returned-building" hidden>
+          <p id="returned-location"></p>
+          <p>
+            Google returned the building marked in orange. Its bounds are
+            approximate. Confirm this is the same roof you selected; nearby
+            buildings can be returned instead.
+          </p>
+          <button id="accept-roof" type="button">
+            This returned roof is correct
+          </button>
+          <button id="reject-roof" type="button">
+            Wrong building — select again
+          </button>
+        </div>
+        <div id="roof-controls" hidden>
+          <button id="before-solar" type="button" aria-pressed="false">
+            Show Before
+          </button>
+          <button id="unusable-roof" type="button">
+            Roof changed, unclear or panels misplaced
+          </button>
+        </div>
+        <div id="solar-map" aria-label="Google satellite property map"></div>
+        <p id="solar-source" hidden>
+          Source: Includes solar data from Google. Proposed panels are a
+          preliminary concept, not an installation design.
+        </p>
+        <p id="roof-details"></p>
+      </div>
+      <p class="preview-links">
+        <a href="/#solar-planner" id="back-calculator">
+          Return to calculator
+        </a>{' '}
+        ·{' '}
+        <a href="/#site-visit" id="preview-visit">
+          Book a free site visit
+        </a>
+      </p>
+      <noscript>
+        <p>
+          The map needs JavaScript. Our calculator and contact options remain
+          available.
+        </p>
+      </noscript>
+    </div>
+  </section>
+</SiteLayout>
+<script>
+  import '../scripts/solar-preview';
+</script>
+<style>
+  .preview-shell h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    letter-spacing: -0.045em;
+    margin-bottom: 1.5rem;
+  }
+  .preview-shell p {
+    max-width: 75ch;
+  }
+  .preview-shell button {
+    padding: 0.85rem 1.2rem;
+    min-height: 44px;
+    border: 1px solid var(--color-ink);
+    background: var(--color-ink);
+    color: white;
+    cursor: pointer;
+    margin: 0.4rem 0.5rem 0.4rem 0;
+  }
+  .preview-shell button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  #coordinate-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 1rem;
+    margin-block: 1rem;
+  }
+  #coordinate-form label {
+    display: grid;
+    gap: 0.25rem;
+    flex: 1 1 150px;
+  }
+  #coordinate-form input {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 0.5rem;
+  }
+  #solar-map {
+    width: 100%;
+    height: min(65vh, 700px);
+    min-height: 340px;
+    background: #e2e6e6;
+    margin-block: 1rem;
+  }
+  #preview-status {
+    padding-block: 1rem;
+  }
+  #returned-building {
+    border-left: 3px solid #ad5b14;
+    padding-left: 1rem;
+  }
+  .preview-links {
+    margin-top: 2rem;
+  }
+  [hidden] {
+    display: none !important;
+  }
+</style>

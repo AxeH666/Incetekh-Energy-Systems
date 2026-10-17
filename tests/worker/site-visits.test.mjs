@@ -69,6 +69,7 @@ before(async () => {
       { type: 'ESModule', path: '.wrangler/test-worker/email.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/solar.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/solar-endpoint.js' },
+      { type: 'ESModule', path: '.wrangler/test-worker/solar-page.js' },
     ],
     compatibilityDate: '2026-09-30',
     bindings,
