@@ -47,6 +47,10 @@ for (const width of [390, 1440]) {
       await expect(analytics.locator('p').first()).toContainText('(EU)');
       await expect(page.locator('html')).toHaveAttribute('lang', code);
       const retention = page.locator('[data-enquiry-retention]');
+      const emailNotice = page.locator('[data-enquiry-email]');
+      await expect(emailNotice).toBeVisible();
+      await expect(emailNotice).toContainText('Resend');
+      await expect(emailNotice).toContainText('Hostinger');
       await expect(retention).toBeVisible();
       await expect(retention).toContainText('12');
       await expect(retention).toContainText('90');
@@ -54,10 +58,20 @@ for (const width of [390, 1440]) {
         page.locator('[data-staff-notification-privacy]'),
       ).toHaveCount(0);
       if (code === 'en') {
+        await expect(emailNotice).toContainText(
+          'If internal email notifications are enabled',
+        );
+        await expect(emailNotice).toContainText(
+          'does not confirm email delivery',
+        );
         await expect(retention).toContainText(
           'subject to legal retention requirements',
         );
       } else {
+        await expect(emailNotice).not.toContainText(
+          'If internal email notifications',
+        );
+        expect(await emailNotice.innerText()).toMatch(/[\u0900-\u0d7f]/);
         await expect(retention).not.toContainText('We normally keep');
         expect(await retention.innerText()).toMatch(/[\u0900-\u0d7f]/);
       }

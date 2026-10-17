@@ -1,11 +1,19 @@
 # Infrastructure and operations
 
-**Lead-capture-only cleanup, 17 October 2026 (not deployed):** the unused
-notification implementation from PR #31 has been removed from this branch.
+**Email notification component, 17 October 2026 (not deployed):** disabled
+Resend notification handling is proposed in a separate PR. No production
+schedule, migration, credential, DNS or email change has been made. See
+[EMAIL.md](EMAIL.md) for current Hostinger DNS evidence, provider selection,
+setup requirements and limits. Older no-MX observations below are historical.
+
+**Lead-capture-only cleanup, 17 October 2026 (released):** PR #32 merged as
+`97cbb53`, removing the unused notification implementation from PR #31.
 The website's customer-facing WhatsApp links, D1 lead capture, Turnstile,
 rate limiting and receipt handling remain. Enquiry checks remain manual.
-Production still runs the previously approved release until the owner approves
-merge and deployment of this cleanup.
+Production build `de215cbe` succeeded. The owner submitted one Turnstile-protected
+test enquiry; its D1 row and receipt retry were verified without duplication or
+changes to the earlier enquiry. The public WhatsApp link resolved correctly.
+Both disabled notification flags were preserved.
 
 Read-only Cloudflare inspection on 17 October confirmed that production and
 preview D1 have only `0001_site_visit_leads.sql` applied, with no notification
@@ -30,7 +38,7 @@ No notification-only package dependency existed; the package manifests are uncha
   configured outside the repository, inventory them with the owner and obtain
   approval before revocation or deletion. No production resource was changed.
 - The inspected production build trigger includes only `main` and deploys with
-  `npx wrangler deploy`. This PR must remain unmerged until release approval.
+  `npx wrangler deploy`. The new email PR must remain unmerged until release approval.
 
 Cloudflare documents [migration tracking](https://developers.cloudflare.com/d1/reference/migrations/)
 and [build branch controls](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/).
