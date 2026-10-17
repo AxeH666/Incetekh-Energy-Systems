@@ -249,7 +249,7 @@ language. Bill and location values never enter navigation URLs.
 The bill-based target stays visible when roof data is unavailable or insufficient.
 Default rooftop selection is the closest actual returned configuration, with ties
 toward the smaller count. Selection changes reuse the same in-memory assessment
-and map. Displayed panel count, first-N polygons, capacity (count � model watts)
+and map. Displayed panel count, first-N polygons, capacity (count times model watts)
 and annual DC energy all refer to that same configuration. An explicit comparison
 shows the target difference and modeled maximum, with the prescribed insufficient
 space message when the maximum is below the bill target.
@@ -257,7 +257,7 @@ space message when the maximum is below the bill target.
 The owner approved the disclosed 0.85 DC-to-AC factor on 18 October 2026. The
 versioned illustration applies it once to Google's annual DC estimate; it is not
 measured local inverter efficiency. Monthly AC is annual AC / 12. Illustrative
-monthly generation value is annual AC � INR 8 / 12, conditional on all energy
+monthly generation value is annual AC times INR 8 / 12, conditional on all energy
 being used or credited at that rate. Fixed charges, actual export credit,
 consumption timing and seasonality are excluded; no guaranteed bill reduction,
 new ROI model or committed hardware is claimed. Original calculator estimates
