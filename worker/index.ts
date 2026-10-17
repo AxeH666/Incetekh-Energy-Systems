@@ -1,6 +1,7 @@
 import { dispatchEmails, type EmailEnv } from './email.js';
+import { solarEndpoint, type SolarEnv } from './solar-endpoint.js';
 
-interface Env extends EmailEnv {
+interface Env extends EmailEnv, SolarEnv {
   ASSETS: Fetcher;
   LEADS_DB?: D1Database;
   LEAD_RATE_LIMIT?: RateLimit;
@@ -150,6 +151,8 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+    if (url.pathname === '/api/solar-assessments')
+      return solarEndpoint(request, env);
     if (url.pathname !== endpoint || url.search) return reply(404, 'not_found');
     if (request.method !== 'POST') return reply(405, 'method_not_allowed');
     const origin = allowedOrigin(env);
