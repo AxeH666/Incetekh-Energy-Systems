@@ -1,5 +1,13 @@
 import { createSolarMap, loadGoogleMaps, type MapsApi } from '../lib/solar-map';
 import type { SolarResult, Coordinates } from '../../worker/solar';
+import {
+  readSolarSession,
+  billEstimate,
+  sessionLifetime,
+} from '../lib/solar-session';
+import { rooftopResults } from '../lib/solar-results';
+import { localPath } from '../i18n/languages';
+import { financialEstimate } from '../data/solar';
 
 interface Marker {
   setCenter(point: { lat: number; lng: number }): void;
@@ -24,6 +32,24 @@ type Assessment = Extract<SolarResult, { status: 'available' }> & {
 const byId = <T extends HTMLElement = HTMLElement>(id: string) =>
   document.getElementById(id) as T;
 const status = byId('preview-status');
+const session = readSolarSession();
+const need = session ? billEstimate(session) : null;
+const money = (value: number) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(value);
+const number = (value: number) =>
+  value.toLocaleString('en-IN', { maximumFractionDigits: 3 });
+if (session && need) {
+  byId<HTMLAnchorElement>('back-calculator').href =
+    localPath('/', session.language) + '#solar-planner';
+  byId<HTMLAnchorElement>('preview-visit').href =
+    localPath('/', session.language) + '#site-visit';
+  byId('bill-summary-text').textContent =
+    `${money(session.bill)}/month · ${session.residential ? 'Residential' : 'Commercial'} · ${need.kw} kW bill-based target · approximately ${need.units} units used/month. Original calculator generation-value scenario: ${money(financialEstimate(need.kw, need.subsidy).monthlySavings)}/month, not guaranteed bill reduction.`;
+}
 const assess = byId<HTMLButtonElement>('assess-property');
 const coordinateForm = byId<HTMLFormElement>('coordinate-form');
 const latInput = coordinateForm.elements.namedItem(
@@ -59,6 +85,20 @@ function discardRoof() {
   byId('roof-controls').hidden = true;
   byId('solar-source').hidden = true;
   byId('roof-details').textContent = '';
+  byId('roof-results').hidden = true;
+  byId('roof-configuration').replaceChildren();
+}
+function freshSession() {
+  if (session && need && Date.now() - session.createdAt < sessionLifetime)
+    return true;
+  discardRoof();
+  byId('preview-intro').hidden = true;
+  byId('property-controls').hidden = true;
+  show(
+    'Your calculator estimate is missing or expired. Return to the calculator to start again, or book a free site visit.',
+    true,
+  );
+  return false;
 }
 function choose(point: Coordinates, recenter = true) {
   if (mapFailed) {
@@ -236,6 +276,7 @@ const messages: Record<string, string> = {
     'Online assessments are at their usage limit. A free manual site visit is still available.',
 };
 assess.addEventListener('click', async () => {
+  if (!freshSession()) return;
   if (!selected || !token || pending || mapFailed) return;
   const revision = generation;
   const point = { ...selected };
@@ -307,20 +348,34 @@ assess.addEventListener('click', async () => {
     }
   }
 });
-byId('accept-roof').addEventListener('click', () => {
-  if (!assessment || !view || mapFailed) return;
+function renderResults(panelsCount?: number) {
+  if (!assessment || !view || mapFailed || !need || !freshSession()) return;
   const roof = assessment.roof;
   try {
-    view.setVisible(true);
-    view.show(roof, roof.configurations[0].panelsCount);
+    const result = rooftopResults(roof, need.kw, panelsCount);
+    if (!result) throw new Error('Unavailable configuration');
+    view.show(roof, result.panelsCount);
     byId('returned-building').hidden = true;
     byId('roof-controls').hidden = false;
     byId('solar-source').hidden = false;
-    const toggle = byId('before-solar');
-    toggle.textContent = 'Show Before';
-    toggle.setAttribute('aria-pressed', 'false');
+    byId('roof-results').hidden = false;
+    byId<HTMLSelectElement>('roof-configuration').value = String(
+      result.panelsCount,
+    );
+    byId('result-panels').textContent = String(result.panelsCount);
+    byId('result-capacity').textContent = `${number(result.capacityKw)} kW`;
+    byId('result-dc').textContent = `${number(result.annualDc)} kWh DC/year`;
+    byId('result-ac').textContent = `${number(result.annualAc)} kWh AC/year`;
+    byId('result-monthly').textContent =
+      `${number(result.monthlyAc)} kWh AC/month`;
+    byId('result-value').textContent = `${money(result.monthlyValue)}/month`;
+    byId('roof-comparison').textContent =
+      `Bill-based target: ${need.kw} kW. Selected returned configuration: ${number(result.capacityKw)} kW (${number(Math.abs(result.capacityKw - need.kw))} kW ${result.capacityKw >= need.kw ? 'above' : 'below'} target). Modeled roof maximum: ${number(result.maximumKw)} kW. Initial selection is the closest returned configuration, with ties toward the smaller size.`;
+    byId('roof-limited').hidden = !result.limited;
+    byId('panel-model').textContent =
+      `Model panel: ${number(roof.panelCapacityWatts)} W, ${number(roof.panelHeightMeters)} m × ${number(roof.panelWidthMeters)} m. Model hardware is not a committed Incetekh product. Physical inspection must confirm setbacks, access, mounting, tanks, existing installations and structure.`;
     byId('roof-details').textContent =
-      `${roof.configurations[0].panelsCount} preliminary model panels. Solar imagery acquired ${roof.imageryDate}; processed ${roof.imageryProcessedDate ?? 'date unavailable'}. Data quality: ${roof.imageryQuality}. Map imagery may differ. Roof changes, obstacles, access and structure need physical inspection.`;
+      `${result.panelsCount} preliminary model panels. Solar imagery acquired ${roof.imageryDate}; processed ${roof.imageryProcessedDate ?? 'date unavailable'}. Data quality: ${roof.imageryQuality}. Map imagery may differ. Roof changes, obstacles, access and structure need physical inspection.`;
     show(
       'Preliminary rooftop concept. Check the layout and arrange a free site visit.',
       true,
@@ -332,7 +387,25 @@ byId('accept-roof').addEventListener('click', () => {
       true,
     );
   }
+}
+byId('accept-roof').addEventListener('click', () => {
+  if (!assessment || !view || !freshSession()) return;
+  byId('roof-configuration').replaceChildren(
+    ...assessment.roof.configurations.map((config) => {
+      const option = document.createElement('option');
+      option.value = String(config.panelsCount);
+      option.textContent = `${config.panelsCount} panels · ${number((config.panelsCount * assessment!.roof.panelCapacityWatts) / 1000)} kW`;
+      return option;
+    }),
+  );
+  view.setVisible(true);
+  byId('before-solar').textContent = 'Show Before';
+  byId('before-solar').setAttribute('aria-pressed', 'false');
+  renderResults();
 });
+byId('roof-configuration').addEventListener('change', () =>
+  renderResults(Number(byId<HTMLSelectElement>('roof-configuration').value)),
+);
 byId('before-solar').addEventListener('click', () => {
   const button = byId('before-solar');
   const before = button.getAttribute('aria-pressed') !== 'true';
@@ -350,6 +423,7 @@ for (const id of ['reject-roof', 'unusable-roof'])
   });
 
 async function initialize() {
+  if (!freshSession()) return;
   try {
     const response = await fetch('/api/solar-preview-config', {
       cache: 'no-store',
@@ -369,6 +443,7 @@ async function initialize() {
     byId<HTMLButtonElement>('open-map').addEventListener(
       'click',
       async (event) => {
+        if (!freshSession()) return;
         (event.currentTarget as HTMLButtonElement).disabled = true;
         show('Loading Google satellite map…');
         try {
