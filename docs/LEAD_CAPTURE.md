@@ -1,5 +1,10 @@
 # Site-visit lead capture
 
+**Email follow-up component, 17 October 2026:** [EMAIL.md](EMAIL.md) describes
+the separate, disabled email dispatcher and additive migration. The form's
+validation, save and receipt path is unchanged. No email release, activation
+or real message is authorized by that implementation PR.
+
 **Production follow-up:** the owner subsequently authorized production release
 after the independently reviewed PR #29 merge and disabled-production health
 check. [PRODUCTION_LEAD_ACTIVATION.md](PRODUCTION_LEAD_ACTIVATION.md) is the current

@@ -1,4 +1,6 @@
-interface Env {
+import { dispatchEmails, type EmailEnv } from './email.js';
+
+interface Env extends EmailEnv {
   ASSETS: Fetcher;
   LEADS_DB?: D1Database;
   LEAD_RATE_LIMIT?: RateLimit;
@@ -10,7 +12,7 @@ interface Env {
 }
 
 const endpoint = '/api/site-visits';
-const privacyVersion = '2026-10-17';
+const privacyVersion = '2026-10-17.1';
 const encoder = new TextEncoder();
 const fields = [
   'id',
@@ -137,6 +139,14 @@ function allowedOrigin(env: Env) {
 }
 
 export default {
+  async scheduled(_event: ScheduledController, env: Env): Promise<void> {
+    try {
+      await dispatchEmails(env);
+    } catch {
+      // Keep D1/provider error content out of logs; failed runs are observable.
+      throw new Error('site_visit_email_dispatch_failed');
+    }
+  },
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);

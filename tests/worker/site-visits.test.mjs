@@ -64,8 +64,10 @@ before(async () => {
   await mkdir('.wrangler', { recursive: true });
   const persist = await mkdtemp('.wrangler/lead-test-');
   options = {
-    modules: true,
-    scriptPath: '.wrangler/test-worker/index.js',
+    modules: [
+      { type: 'ESModule', path: '.wrangler/test-worker/index.js' },
+      { type: 'ESModule', path: '.wrangler/test-worker/email.js' },
+    ],
     compatibilityDate: '2026-09-30',
     bindings,
     d1Databases: { LEADS_DB: 'local-leads' },
@@ -139,7 +141,7 @@ test('receipt follows durable insert; native text, optional email and metadata s
   assert.equal(saved.phone, '+919876543210');
   assert.equal(saved.email, null);
   assert.equal(saved.notification_status, 'not_configured');
-  assert.equal(saved.privacy_notice_version, '2026-10-17');
+  assert.equal(saved.privacy_notice_version, '2026-10-17.1');
   assert.ok(Date.now() - Date.parse(saved.created_at) < 10000);
   assert.equal('token' in saved || 'ip' in saved, false);
   await mf.dispose();
@@ -160,7 +162,7 @@ test('lost receipt retry needs no second token; changed payload cannot overwrite
   assert.equal(await count(input.id), 1);
 });
 
-for (const version of ['2026-10-15.1', '2026-10-16']) {
+for (const version of ['2026-10-15.1', '2026-10-16', '2026-10-17']) {
   test(`existing ${version} enquiry keeps its fields and receipt after cleanup`, async () => {
     const input = lead();
     assert.equal((await send(input)).status, 201);

@@ -13,6 +13,8 @@
     "LEAD_CAPTURE_ENABLED": "true",
     "LEAD_CAPTURE_ENV": "production",
     "LEAD_ALLOWED_ORIGIN": "https://incetekhenergy.com",
+    // No Cron Trigger or secret is provisioned by this PR. See docs/EMAIL.md.
+    "EMAIL_NOTIFY_ENABLED": "false",
     // Retain existing production flags until separately approved cleanup.
     "WHATSAPP_NOTIFY_ENABLED": "false",
     "WHATSAPP_WEBHOOK_ENABLED": "false",
@@ -37,6 +39,7 @@
     "vars": {
       "LEAD_CAPTURE_ENABLED": "false",
       "LEAD_CAPTURE_ENV": "preview",
+      "EMAIL_NOTIFY_ENABLED": "false",
       "LEAD_ALLOWED_ORIGIN": "https://feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev",
     },
     "d1_databases": [
