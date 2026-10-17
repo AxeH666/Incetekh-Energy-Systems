@@ -14,8 +14,8 @@ SolarCAD is excluded.
 
 | Order | Component                                               | Status      |
 | ----- | ------------------------------------------------------- | ----------- |
-| 1     | Server adapter, safeguards and atomic usage allowance   | In progress |
-| 2     | Geographic panel geometry and alignment proof           | Pending     |
+| 1     | Server adapter, safeguards and atomic usage allowance   | Merged #35  |
+| 2     | Geographic panel geometry and alignment proof           | In progress |
 | 3     | Property selector and confirmed assessment              | Pending     |
 | 4     | Existing calculator handoff and consistent results      | Pending     |
 | 5     | Consented enquiry context and compatible receipts/email | Pending     |
@@ -25,10 +25,17 @@ Exactly one component/PR is active. Each must pass self-review, independent
 review, relevant validation and deployment verification before the next branch.
 The goal permits mock/local development where live approval is unavailable;
 that never constitutes real-rooftop visual acceptance. Real placement and owner
-approval remain release gates. The proposed 0.85 DC-to-AC factor also needs owner
-approval before customer-facing estimate acceptance.
+approval remain release gates. On 18 October 2026 the owner approved the disclosed
+0.85 DC-to-AC factor for the illustrative estimate in PR 4.
 
 ## PR 1 design
+
+Released as PR #35, merge `ac26cfcb7414e1209e145064b4fc5518a1e71a90`.
+Self-review and separate exact-head review passed. Full verification passed:
+lint/types/build, 79 Worker tests, 126 browser tests and an additional opt-in
+Worker routing test. Production build `857e6475-8367-42e4-81fa-ee295fd94677`
+succeeded. Live homepage/contact returned 200, enquiry GET retained 405, and Solar
+POST returned 503 `disabled`. No customer enquiry was submitted or changed.
 
 `POST /api/solar-assessments` is independent of `/api/site-visits` and the email
 dispatcher. Production and preview configuration explicitly disable it. The
@@ -122,12 +129,60 @@ No mock or source check establishes live Google configuration, paid-call approva
 correct real-rooftop alignment, device acceptance, inbox delivery or public
 activation approval. Keep those gates explicit in the final release record.
 
+## PR 2 local alignment proof
+
+`src/lib/solar-geometry.ts` converts each returned panel centre into four
+geographic corners. The long axis follows the segment azimuth for portrait,
+and crosses it for landscape. Only the slope-axis length is foreshortened by
+cosine(pitch). Metre offsets use a local tangent plane and latitude-aware longitude
+scale. This is preliminary panel geometry, not survey accuracy. Configurations
+use exactly their original first N candidates, without sorting or manual shifts.
+
+`src/lib/solar-map.ts` creates one north-up, zero-tilt satellite map and native
+geographic polygons. Before detaches every proposed panel; With Solar reattaches
+them without another map load. Existing attribution remains owned by Google.
+Unsupported rotation is omitted. A late Google authentication failure clears
+panels and invalidates the proof, even after the load callback has completed.
+
+The harness under `scripts/` runs only on loopback and is not in `dist/`, sitemap
+or production routing. It never fetches Solar data. Each HTML response generates
+a fresh nonce for script/style CSP, following Google's strict-CSP guidance.
+The existing site's policy remains unchanged. PR 3 must apply that per-response
+approach only to the customer preview route, without a static reusable nonce.
+
+To prepare a manual check after approving the Maps load, use the still-valid
+retained response and its actual cache expiry (do not extend its lifetime):
+
+```powershell
+$env:SOLAR_ALIGNMENT_ROOF = '.wrangler/solar-feasibility/temporary-google-data/request-2.json'
+$env:SOLAR_ALIGNMENT_EXPIRES = '2026-11-15T00:00:00Z'
+node scripts/solar-alignment-server.mjs
+```
+
+Open `http://127.0.0.1:4332`, enter an appropriately restricted development browser
+key and explicitly load the approved map. No map loads automatically. The server
+refuses absent/unusable/expired roof content and serves it with no-store. Shut it
+down after testing. Do not use its synthetic test mode as real property evidence.
+
+Offline geometry and mocked-browser checks cover axis signs, cardinal/non-cardinal
+bearings, portrait/landscape, pitch, latitude scaling, exact candidate count, layer
+cleanup, one map load, Before/With Solar, late auth failure, fresh CSP nonces and
+mobile/desktop overflow. The synthetic screenshots explicitly state they are not
+satellite imagery. These tests do not prove real Google projection/imagery match.
+
+**Still open:** authorized Maps load, actual-roof identity, model alignment on
+satellite imagery, stable pan/zoom/resize at device pixel ratios, unobscured live
+attribution and owner visual acceptance. Do not claim PR 2's live visual gate has
+passed or publicly activate the eventual preview based on mocks.
+
 ## Official references verified during implementation
 
 - [Building Insights contract and first-N panel configuration](https://developers.google.com/maps/documentation/solar/reference/rest/v1/buildingInsights/findClosest)
 - [Solar policy and attribution](https://developers.google.com/maps/documentation/solar/policies)
 - [Maps service-specific terms](https://cloud.google.com/maps-platform/terms/maps-service-terms)
 - [Cloudflare rate limiter semantics](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
+- [Google Maps strict CSP](https://developers.google.com/maps/documentation/javascript/content-security-policy)
+- [Google geographic polygon overlays](https://developers.google.com/maps/documentation/javascript/shapes)
 
 Use Google Maps for mapped Google Solar results and keep attribution visible.
 Before activation, update public privacy/terms and verify browser API restrictions,
