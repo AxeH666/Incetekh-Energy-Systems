@@ -68,15 +68,17 @@ test('production activation keeps preview disabled and separates data and rate n
   assert.match(limiter[0].namespace_id, /^[1-9][0-9]*$/);
   assert.deepEqual(limiter[0].simple, { limit: 5, period: 60 });
   for (const vars of [app.vars, app.previews.vars]) {
-    assert.equal(vars.EMAIL_NOTIFY_ENABLED, 'false');
-    assert.equal(vars.EMAIL_NOTIFY_SINCE, undefined);
     assert.equal(vars.RESEND_API_KEY, undefined);
     assert.equal(vars.TURNSTILE_SECRET_KEY, undefined);
     assert.equal(vars.RATE_LIMIT_KEY_SECRET, undefined);
   }
+  assert.equal(app.vars.EMAIL_NOTIFY_ENABLED, 'true');
   assert.equal(
-    app.triggers,
-    undefined,
-    'no email schedule before release approval',
+    app.vars.EMAIL_NOTIFY_SINCE,
+    '2026-10-17T10:26:08.400Z',
+    'activation cutoff must not drift',
   );
+  assert.deepEqual(app.triggers.crons, ['*/5 * * * *']);
+  assert.equal(app.previews.vars.EMAIL_NOTIFY_ENABLED, 'false');
+  assert.equal(app.previews.vars.EMAIL_NOTIFY_SINCE, undefined);
 });

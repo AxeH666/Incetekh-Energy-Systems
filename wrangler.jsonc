@@ -13,12 +13,14 @@
     "LEAD_CAPTURE_ENABLED": "true",
     "LEAD_CAPTURE_ENV": "production",
     "LEAD_ALLOWED_ORIGIN": "https://incetekhenergy.com",
-    // No Cron Trigger or secret is provisioned by this PR. See docs/EMAIL.md.
-    "EMAIL_NOTIFY_ENABLED": "false",
+    // Owner-approved activation. Keep this cutoff fixed; never backfill old leads.
+    "EMAIL_NOTIFY_ENABLED": "true",
+    "EMAIL_NOTIFY_SINCE": "2026-10-17T10:26:08.400Z",
     // Retain existing production flags until separately approved cleanup.
     "WHATSAPP_NOTIFY_ENABLED": "false",
     "WHATSAPP_WEBHOOK_ENABLED": "false",
   },
+  "triggers": { "crons": ["*/5 * * * *"] },
   "d1_databases": [
     {
       "binding": "LEADS_DB",

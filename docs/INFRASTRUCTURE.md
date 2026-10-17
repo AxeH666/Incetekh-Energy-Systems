@@ -1,10 +1,15 @@
 # Infrastructure and operations
 
-**Email notification component, 17 October 2026 (not deployed):** disabled
-Resend notification handling is proposed in a separate PR. No production
-schedule, migration, credential, DNS or email change has been made. See
-[EMAIL.md](EMAIL.md) for current Hostinger DNS evidence, provider selection,
-setup requirements and limits. Older no-MX observations below are historical.
+**Email activation, 17 October 2026:** PR #33 merged as `bed13d2` and its disabled
+production release passed. The additive email migration and runtime secret are
+installed; both existing enquiries were preserved. The owner subsequently
+approved activation with cutoff `2026-10-17T10:26:08.400Z` and five-minute Cron
+`*/5 * * * *`, plus one controlled form/email test. The deployable configuration
+now enables production email; previews remain disabled. See [EMAIL.md](EMAIL.md)
+for operation, rollback, Hostinger DNS evidence and acceptance procedure. The
+activation PR records live verification; older disabled/no-MX statements below
+describe historical checkpoints. No paid plan, Hostinger DNS or WhatsApp flag
+change is part of activation.
 
 **Lead-capture-only cleanup, 17 October 2026 (released):** PR #32 merged as
 `97cbb53`, removing the unused notification implementation from PR #31.
