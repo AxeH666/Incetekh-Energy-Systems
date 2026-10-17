@@ -2,8 +2,18 @@
 
 ## Status and provider decision — 17 October 2026
 
-Implemented for review, **disabled and not deployed**. Only new eligible D1
-enquiries will be emailed to `info@incetekhenergy.com`. The public contact address
+PR #33 was independently reviewed, merged as `bed13d2`, and deployed with email
+disabled. Its additive migration and production secret are installed. The owner
+has now approved activation and one controlled synthetic enquiry/email test.
+The activation configuration uses `EMAIL_NOTIFY_ENABLED=true`, the fixed cutoff
+`EMAIL_NOTIFY_SINCE=2026-10-17T10:26:08.400Z` (15:56:08.400 IST), and Cron Trigger
+`*/5 * * * *`. Only enquiries saved at or after this cutoff are eligible; the two
+existing enquiries are excluded. Keep the cutoff unchanged across deployments,
+pauses and restarts. Preview email remains disabled. The activation PR records
+the live deployment and controlled acceptance evidence; configuration alone is
+not proof of inbox delivery.
+
+Eligible enquiries are emailed to `info@incetekhenergy.com`. The public contact address
 remains the owner's confirmed `incetekhenergy@gmail.com`; changing it is separate.
 The two disabled WhatsApp variables are untouched.
 
@@ -14,8 +24,13 @@ Confirmed through public DNS on 17 October:
 - `hostingermail-a/b/c._domainkey` CNAMEs point to Hostinger DKIM hosts.
 - `_dmarc.incetekhenergy.com`: `v=DMARC1; p=none`.
 
-The owner identifies the existing Hostinger mailbox. Mailbox access, inbound
-delivery and spam placement have not been tested in this component. Older
+The owner confirms Resend domain `notify.incetekhenergy.com` is Verified and a
+sending-only, domain-restricted key is installed. The production
+`RESEND_API_KEY` secret's name/type was independently verified without reading
+its value. Public DNS also confirms Resend DKIM at
+`resend._domainkey.notify.incetekhenergy.com` and return-path DNS at
+`send.notify.incetekhenergy.com`. Delivery is checked with the one approved test,
+with mailbox-owner assistance; see the activation PR for its result. Older
 repository observations that the domain had no mail records are superseded.
 
 The owner states Workers Free. Cloudflare's API confirmed a Free **website zone**,
@@ -36,9 +51,10 @@ timeout after possible acceptance. Cloudflare is not ruled out for being on Free
 
 **Resend is selected** for its documented 24-hour send idempotency and separate
 sending-subdomain setup. Its published Free allowance is 100 emails/day and
-3,000/month. A Free account/domain/API key has not been provisioned or verified.
+3,000/month. Domain verification and key scope are owner-confirmed; DNS and
+the production secret binding were checked independently.
 No paid tier, receiving service or automatic upgrade is needed or authorized.
-Account quota/plan and inbox delivery must be checked before enabling. Exceeding
+Monitor the existing Free account's usage and confirm the controlled inbox test. Exceeding
 the free quota delays or holds notifications; the enquiry stays in D1. Acceptance
 by an API does not prove delivery to the mailbox.
 [Pricing](https://resend.com/pricing),
@@ -58,10 +74,12 @@ indexed `email_enqueued = 0` marker and an explicit UTC activation cutoff. A D1
 transaction inserts the frozen email payload under a unique lead ID and marks
 the lead queued. Failed transactions leave it eligible for repair next run.
 Migration `0002_site_visit_email.sql` is additive; existing customer fields,
-receipts and applied migration `0001` are preserved. It has not been applied
-remotely. The legacy `notification_status` column stays inert; use the new outbox.
+receipts and applied migration `0001` are preserved. It was applied during the
+approved PR #33 release after a verified recovery snapshot and in-memory
+migration rehearsal. Both existing enquiries survived unchanged. The legacy
+`notification_status` column stays inert; use the new outbox.
 
-One email is attempted per run with an atomic two-minute lease. A future
+One email is attempted per run with an atomic two-minute lease. The approved
 five-minute schedule yields a normal queue-free delay of up to five minutes,
 plus provider delivery time. Bursts wait in D1. This uses the existing Worker
 and D1, with no new service binding or package dependency.
@@ -89,10 +107,12 @@ cutoff, switch Resend accounts, delete outbox rows or reset attempted entries
 to force a resend: that can bypass deduplication. Key rotation must stay within
 the same provider account. Disabling cannot recall an email already in flight.
 
-## Exact external setup and release steps (approval required)
+## Setup and release record
 
-No account creation, DNS change, secret upload, migration, real email, merge or
-production deployment is authorized by this implementation PR.
+The owner completed Resend setup and secret installation, approved the migration
+and disabled PR #33 release, then separately approved activation and one test.
+The steps below record that sequence. Do not repeat setup, recreate keys, reapply
+migrations or change DNS. No paid change or additional service is authorized.
 
 1. Confirm access to the existing Hostinger mailbox and Cloudflare DNS zone.
    Verify Workers Free and D1 usage in the account dashboard; do not upgrade.
@@ -111,8 +131,8 @@ production deployment is authorized by this implementation PR.
    run `npx wrangler d1 migrations apply LEADS_DB --remote` for the additive
    migration. Deploy the reviewed commit with email disabled. Check existing
    receipts, D1 counts and website; preserve both false WhatsApp flags.
-5. For separately approved activation, set `EMAIL_NOTIFY_SINCE` to the agreed
-   activation instant in exact UTC format `YYYY-MM-DDTHH:mm:ss.sssZ`, set
+5. For the now-approved activation, use the fixed cutoff above for
+   `EMAIL_NOTIFY_SINCE`, set
    `EMAIL_NOTIFY_ENABLED=true`, and add production Cron Trigger `*/5 * * * *`.
    Keep these non-secret values in approved deployable configuration so later
    deployments preserve them. Previews stay disabled without a schedule. Allow
@@ -120,8 +140,11 @@ production deployment is authorized by this implementation PR.
 6. Submit one approved synthetic lead through real Turnstile. Confirm the
    receipt, one D1 lead, one `accepted` outbox row and matching Resend ID.
    Confirm arrival in Hostinger, correct details, SPF/DKIM/DMARC results and
-   spam placement. Retry the receipt and verify no second email. No real email
-   test was performed during this PR.
+   spam placement. Retry the same receipt and verify the outbox/provider ID and
+   attempt count stay unchanged after a later scheduled run. Do not submit a
+   second enquiry to troubleshoot delivery. Check Resend history and the
+   Hostinger spam folder against the same reference if delivery is uncertain.
+   Record receipt, D1/outbox and mailbox results in the activation PR.
 
 ## Operations, recovery and privacy
 
@@ -148,6 +171,12 @@ deployment. Remove the schedule only with release authorization. Do not delete
 D1 data, applied migrations, outbox history or Hostinger records for rollback. An older Worker
 remains compatible with the additive schema. Do not change capture or Turnstile
 to work around notification failures.
+
+Keep the fixed activation cutoff on pause/resume. Cron changes can take up to
+15 minutes to propagate; wait for the actual scheduled run rather than adding
+manual sends. Check the Worker deployment/build result and scheduled outcomes.
+An accepted outbox row proves provider acceptance, not mailbox delivery.
+[Cloudflare Cron behavior](https://developers.cloudflare.com/workers/configuration/cron-triggers/).
 
 Outbox payloads, provider records and Hostinger mailbox copies contain customer
 details. Apply the access, correction/deletion and retention policy in
