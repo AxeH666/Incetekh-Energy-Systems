@@ -13,8 +13,6 @@
     "LEAD_CAPTURE_ENABLED": "true",
     "LEAD_CAPTURE_ENV": "production",
     "LEAD_ALLOWED_ORIGIN": "https://incetekhenergy.com",
-    "WHATSAPP_NOTIFY_ENABLED": "false",
-    "WHATSAPP_WEBHOOK_ENABLED": "false",
   },
   "d1_databases": [
     {
@@ -37,8 +35,6 @@
       "LEAD_CAPTURE_ENABLED": "false",
       "LEAD_CAPTURE_ENV": "preview",
       "LEAD_ALLOWED_ORIGIN": "https://feat-site-visit-lead-capture-incetekh-energy-systems.incetekhenergy.workers.dev",
-      "WHATSAPP_NOTIFY_ENABLED": "false",
-      "WHATSAPP_WEBHOOK_ENABLED": "false",
     },
     "d1_databases": [
       {
