@@ -148,7 +148,7 @@ export function localizeHTML(html: string, path: string, site: URL) {
       `Missing ${language} translations: ${[...missing].join(' | ')}`,
     );
   if (!head || !body) return html;
-  const noindex = original === '/404.html';
+  const noindex = original === '/404.html' || original === '/solar-preview/';
   if (!noindex) {
     for (const code of [...languages.map((item) => item.code), 'x-default']) {
       const href = new URL(

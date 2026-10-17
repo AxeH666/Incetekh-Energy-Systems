@@ -54,10 +54,12 @@ async function send(input = {}, request = {}) {
 }
 before(async () => {
   options = {
-    modules: ['index', 'email', 'solar', 'solar-endpoint'].map((name) => ({
-      type: 'ESModule',
-      path: `.wrangler/test-worker/${name}.js`,
-    })),
+    modules: ['index', 'email', 'solar', 'solar-endpoint', 'solar-page'].map(
+      (name) => ({
+        type: 'ESModule',
+        path: `.wrangler/test-worker/${name}.js`,
+      }),
+    ),
     compatibilityDate: '2026-09-30',
     bindings,
     d1Databases: { LEADS_DB: 'solar-local-only' },

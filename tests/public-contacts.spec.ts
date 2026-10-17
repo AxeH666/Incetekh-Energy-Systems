@@ -79,14 +79,14 @@ test('all generated languages publish only the approved contacts and valid inter
         ).toBe(true);
     }
   }
-  // 23 content routes plus the error page, in each supported language.
+  // 23 content routes plus the error page in each language; English-only preview.
   expect(languageCounts).toEqual({
-    en: 24,
+    en: 25,
     te: 24,
     hi: 24,
     ta: 24,
     ml: 24,
     kn: 24,
   });
-  expect(documents.size).toBe(145); // Also includes the legacy Reviews redirect.
+  expect(documents.size).toBe(146); // Also includes the legacy Reviews redirect.
 });

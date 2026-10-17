@@ -1,7 +1,7 @@
 import { isAllowedExternal } from './support/links';
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { readdir, stat } from 'node:fs/promises';
+import { readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
 test('semantic shell, metadata, and main navigation', async ({ page }) => {
@@ -235,10 +235,20 @@ test('static output keeps planning and motion scripts small and local', async ()
   }
   await walk('dist');
   const scripts = files.filter((file) => file.endsWith('.js'));
+  const previewScripts = scripts.filter((file) =>
+    file.includes('solar-preview.astro_'),
+  );
   const scriptBytes = await Promise.all(
-    scripts.map(async (file) => (await stat(file)).size),
+    scripts
+      .filter((file) => !previewScripts.includes(file))
+      .map(async (file) => (await stat(file)).size),
   );
   expect(scriptBytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(10_000);
+  expect(previewScripts).toHaveLength(1);
+  expect((await stat(previewScripts[0])).size).toBeLessThan(12_000);
+  expect(await readFile('dist/index.html', 'utf8')).not.toContain(
+    'solar-preview.astro_',
+  );
   expect(
     files.some((file) => /review pictures|ChatGPT|hf_2026/.test(file)),
   ).toBe(false);

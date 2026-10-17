@@ -38,6 +38,31 @@ function limit(value: string | undefined, max: number) {
   const parsed = Number(value);
   return Number.isSafeInteger(parsed) && parsed <= max ? parsed : 0;
 }
+export function solarConfigured(
+  env: SolarEnv,
+): env is SolarEnv &
+  Required<
+    Pick<
+      SolarEnv,
+      | 'LEADS_DB'
+      | 'SOLAR_RATE_LIMIT'
+      | 'SOLAR_API_KEY'
+      | 'TURNSTILE_SECRET_KEY'
+      | 'RATE_LIMIT_KEY_SECRET'
+    >
+  > {
+  return Boolean(
+    limit(env.SOLAR_DAILY_LIMIT, 50) &&
+    limit(env.SOLAR_MONTHLY_LIMIT, 300) &&
+    env.LEADS_DB &&
+    env.SOLAR_RATE_LIMIT &&
+    env.SOLAR_API_KEY &&
+    env.TURNSTILE_SECRET_KEY &&
+    !/^[123]x0+AA$/.test(env.TURNSTILE_SECRET_KEY) &&
+    env.RATE_LIMIT_KEY_SECRET &&
+    env.RATE_LIMIT_KEY_SECRET.length >= 32,
+  );
+}
 
 // Both counters change in ONE SQLite statement. Failed outbound attempts are
 // intentionally not refunded. This table contains no locations or Google data.
@@ -87,17 +112,7 @@ export async function solarEndpoint(
     return reply(unavailable('invalid_input'), 403);
   const daily = limit(env.SOLAR_DAILY_LIMIT, 50);
   const monthly = limit(env.SOLAR_MONTHLY_LIMIT, 300);
-  if (
-    !daily ||
-    !monthly ||
-    !env.LEADS_DB ||
-    !env.SOLAR_RATE_LIMIT ||
-    !env.SOLAR_API_KEY ||
-    !env.TURNSTILE_SECRET_KEY ||
-    /^[123]x0+AA$/.test(env.TURNSTILE_SECRET_KEY) ||
-    !env.RATE_LIMIT_KEY_SECRET ||
-    env.RATE_LIMIT_KEY_SECRET.length < 32
-  )
+  if (!solarConfigured(env))
     return reply(unavailable('provider_configuration_failure'), 503);
   if (
     request.headers.get('Content-Type')?.split(';')[0].trim().toLowerCase() !==

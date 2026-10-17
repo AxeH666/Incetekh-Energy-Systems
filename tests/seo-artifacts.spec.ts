@@ -42,7 +42,7 @@ test('every eligible artifact has reciprocal language alternates and valid searc
     const links = (rel: string) =>
       elements.filter((el) => el.tagName === 'link' && attr(el, 'rel') === rel);
     if (
-      /^(404\.html|(?:te|hi|ta|ml|kn)\/404\/index\.html|reviews\/index\.html)$/.test(
+      /^(404\.html|(?:te|hi|ta|ml|kn)\/404\/index\.html|reviews\/index\.html|solar-preview\/index\.html)$/.test(
         normalized,
       )
     ) {
@@ -113,7 +113,7 @@ test('every eligible artifact has reciprocal language alternates and valid searc
     );
   }
   expect(eligible.size).toBe(138);
-  expect(excluded).toBe(7);
+  expect(excluded).toBe(8);
   const xml = await readFile('dist/sitemap.xml', 'utf8');
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
   expect(urls.length).toBe(launch ? 138 : 0);

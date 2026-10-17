@@ -26,7 +26,10 @@ const path = sourcePath(Astro.url.pathname);
         current="en"
         options={languages.map((language) => ({
           ...language,
-          href: localPath(path, language.code),
+          href: localPath(
+            path === '/solar-preview/' ? '/' : path,
+            language.code,
+          ),
         }))}
       />
     </div>

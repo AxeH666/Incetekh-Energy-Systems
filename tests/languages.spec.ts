@@ -176,6 +176,8 @@ test('translated calculators and forms keep numbers, state and privacy behavior'
 
 for (const width of [320, 390, 768, 1024, 1025, 1100, 1280, 1281, 1440])
   test(`language layouts and menu fit at ${width}px`, async ({ page }) => {
+    // This case also runs two accessibility audits for each of six languages.
+    if (width === 390) test.setTimeout(60_000);
     await page.setViewportSize({ width, height: 1000 });
     for (const { code } of languages) {
       for (const path of ['/', '/products/', '/solar-in/visakhapatnam/']) {
