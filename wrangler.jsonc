@@ -10,6 +10,7 @@
   },
   // Production activation is a separate owner-authorized release after PR #29.
   "vars": {
+    "SOLAR_PREVIEW_ENABLED": "false",
     "LEAD_CAPTURE_ENABLED": "true",
     "LEAD_CAPTURE_ENV": "production",
     "LEAD_ALLOWED_ORIGIN": "https://incetekhenergy.com",
@@ -39,6 +40,7 @@
   "previews": {
     // Enable only after preview migration and runtime secrets are verified.
     "vars": {
+      "SOLAR_PREVIEW_ENABLED": "false",
       "LEAD_CAPTURE_ENABLED": "false",
       "LEAD_CAPTURE_ENV": "preview",
       "EMAIL_NOTIFY_ENABLED": "false",
