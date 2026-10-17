@@ -13,6 +13,9 @@
     "LEAD_CAPTURE_ENABLED": "true",
     "LEAD_CAPTURE_ENV": "production",
     "LEAD_ALLOWED_ORIGIN": "https://incetekhenergy.com",
+    // Retain existing production flags until separately approved cleanup.
+    "WHATSAPP_NOTIFY_ENABLED": "false",
+    "WHATSAPP_WEBHOOK_ENABLED": "false",
   },
   "d1_databases": [
     {

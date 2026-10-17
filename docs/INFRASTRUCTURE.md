@@ -18,9 +18,10 @@ No notification-only package dependency existed; the package manifests are uncha
 ### Deferred resource cleanup (owner approval required)
 
 - Production still has the two false runtime variables `WHATSAPP_NOTIFY_ENABLED`
-  and `WHATSAPP_WEBHOOK_ENABLED`. Their repository declarations are removed;
-  recheck/remove any remaining dashboard or preview overrides only during an
-  approved release. They do not control anything in the cleaned Worker.
+  and `WHATSAPP_WEBHOOK_ENABLED`. Their production declarations are retained so
+  deploying this cleanup preserves them unchanged. Removal requires separate
+  owner approval, including any dashboard or preview overrides. They do not
+  control anything in the cleaned Worker.
 - The inspected production Worker has no Meta/WhatsApp credential bindings and
   no Cron Triggers. Preserve `LEADS_DB`, `LEAD_RATE_LIMIT`, `ASSETS`, all lead
   configuration, `TURNSTILE_SECRET_KEY` and `RATE_LIMIT_KEY_SECRET`.
