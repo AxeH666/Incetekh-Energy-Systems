@@ -13,7 +13,24 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
   test.afterAll(async () => {
     await mf.dispose();
   });
-  async function setup(page: import('@playwright/test').Page, enabled = true) {
+  async function setup(
+    page: import('@playwright/test').Page,
+    enabled = true,
+    bill: number | null = 2500,
+  ) {
+    if (bill !== null)
+      await page.addInitScript((amount) => {
+        sessionStorage.setItem(
+          'incetekh.solar-preview.v1',
+          JSON.stringify({
+            version: 1,
+            createdAt: Date.now(),
+            bill: amount,
+            residential: amount !== 50000,
+            language: 'te',
+          }),
+        );
+      }, bill);
     let maps = 0,
       assessments = 0;
     await page.route('**/solar-preview/', async (route) => {
@@ -120,7 +137,14 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await page
         .getByRole('button', { name: 'This returned roof is correct' })
         .click();
-      await expect(page.locator('[data-mock-panel]')).toHaveCount(4);
+      await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+      await expect(page.locator('#bill-summary-text')).toContainText(
+        '3 kW bill-based target',
+      );
+      await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+      await expect(page.locator('#result-dc')).toHaveText('4,800 kWh DC/year');
+      await expect(page.locator('#result-ac')).toHaveText('4,080 kWh AC/year');
+      await expect(page.locator('#result-value')).toHaveText('₹2,720/month');
       await page
         .getByRole('button', { name: 'Show Before', exact: true })
         .click();
@@ -128,9 +152,18 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await page
         .getByRole('button', { name: 'Show With Solar', exact: true })
         .click();
+      await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+      await page.locator('#roof-configuration').selectOption('4');
       await expect(page.locator('[data-mock-panel]')).toHaveCount(4);
+      await expect(page.locator('#result-capacity')).toHaveText('1.6 kW');
+      await expect(page.locator('#result-ac')).toHaveText('2,040 kWh AC/year');
+      await expect(page.locator('#result-value')).toHaveText('₹1,360/month');
       expect(calls.maps()).toBe(1);
       expect(calls.assessments()).toBe(1);
+      await page.screenshot({
+        path: `.wrangler/solar-results-synthetic-${width}.png`,
+        fullPage: true,
+      });
       await page
         .getByRole('button', {
           name: 'Roof changed, unclear or panels misplaced',
@@ -241,5 +274,99 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
         page.getByRole('link', { name: 'Book a free site visit', exact: true }),
       ).toBeVisible();
     }
+  });
+  test('maximum commercial bill keeps its target when roof is limited', async ({
+    page,
+  }) => {
+    await setup(page, true, 50000);
+    await page.getByRole('button', { name: 'Open property map' }).click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await page.locator('#accept-roof').click();
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      'Commercial · 53 kW',
+    );
+    await expect(page.locator('#roof-limited')).toBeVisible();
+    await expect(page.locator('#roof-limited')).toContainText(
+      'Not enough rooftop space for the estimated system.',
+    );
+    await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+    await expect(page.locator('#back-calculator')).toHaveAttribute(
+      'href',
+      '/te/#solar-planner',
+    );
+    expect(
+      await page.evaluate(() =>
+        sessionStorage.getItem('incetekh.solar-preview.v1'),
+      ),
+    ).not.toMatch(/latitude|longitude|roof|panels|energy|reference/);
+    expect(page.url()).not.toMatch(/bill|50000|latitude/);
+  });
+  test('missing or expired calculator state prevents map loads', async ({
+    page,
+  }) => {
+    const calls = await setup(page, true, null);
+    await expect(page.locator('#preview-status')).toContainText(
+      'missing or expired',
+    );
+    await expect(page.locator('#open-map')).toBeHidden();
+    expect(calls.maps()).toBe(0);
+    await page.evaluate(() =>
+      sessionStorage.setItem(
+        'incetekh.solar-preview.v1',
+        JSON.stringify({
+          version: 1,
+          createdAt: 1,
+          bill: 2500,
+          residential: true,
+          language: 'en',
+        }),
+      ),
+    );
+    await page.reload();
+    await expect(page.locator('#open-map')).toBeHidden();
+    await expect(page.locator('#preview-status')).toContainText(
+      'missing or expired',
+    );
+    expect(calls.maps()).toBe(0);
+  });
+  test('calculator handoff, reload and return preserve exact bill/type/language', async ({
+    page,
+  }) => {
+    const calls = await setup(page, true, null);
+    await page.goto('/te/');
+    const slider = page.locator('#solar-bill');
+    await slider.fill('50000');
+    await page.locator('input[value="commercial"]').check();
+    await page.locator('[data-preview-link]').click();
+    await expect(page).toHaveURL('/solar-preview/');
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      '₹50,000/month · Commercial · 53 kW',
+    );
+    await page.reload();
+    await expect(page.locator('#bill-summary-text')).toContainText('53 kW');
+    await page.locator('#back-calculator').click();
+    await expect(page).toHaveURL('/te/#solar-planner');
+    await expect(page.locator('#solar-bill')).toHaveValue('50000');
+    await expect(page.locator('input[value="commercial"]')).toBeChecked();
+    expect(calls.maps()).toBe(0);
+  });
+  test('unavailable storage leaves calculator usable and does not navigate', async ({
+    page,
+  }) => {
+    await setup(page, true, null);
+    await page.addInitScript(() => {
+      Storage.prototype.setItem = () => {
+        throw new Error('Blocked');
+      };
+    });
+    await page.goto('/');
+    await page.locator('[data-preview-link]').click();
+    await expect(page).toHaveURL('/');
+    await expect(page.locator('[data-preview-handoff-status]')).toContainText(
+      'temporary session storage',
+    );
+    await page.locator('#solar-bill').fill('3000');
+    await expect(page.locator('[data-result="kw"]')).toHaveText('4');
   });
 });

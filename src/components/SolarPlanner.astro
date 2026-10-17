@@ -158,6 +158,17 @@ const money = (value: number) =>
         <a class="button visit-link" href="#site-visit">
           Free site visit
         </a>
+        <div translate="no" lang="en" data-preview-entry hidden>
+          <a
+            class="button preview-link"
+            href="/solar-preview/"
+            data-preview-link
+          >
+            See solar on your roof
+          </a>
+          <p class="result-note">English preview · preliminary assessment</p>
+          <p class="result-note" data-preview-handoff-status role="status"></p>
+        </div>
         <p class="result-note">
           Illustrative usage, not a simultaneous appliance or backup guarantee.
           Savings assume all generation offsets usage or earns ₹8/unit credit.
@@ -304,6 +315,9 @@ const money = (value: number) =>
 <style>
   .planner {
     background: #eceee7;
+  }
+  [hidden] {
+    display: none !important;
   }
   .planning-heading {
     display: grid;
@@ -484,7 +498,8 @@ const money = (value: number) =>
     font-size: var(--text-small);
     color: #d9e3d6;
   }
-  .visit-link {
+  .visit-link,
+  .preview-link {
     background: #fff;
     color: #18382e;
     align-self: start;

@@ -16,8 +16,8 @@ SolarCAD is excluded.
 | ----- | ------------------------------------------------------- | ----------- |
 | 1     | Server adapter, safeguards and atomic usage allowance   | Merged #35  |
 | 2     | Geographic panel geometry and alignment proof           | Merged #36  |
-| 3     | Property selector and confirmed assessment              | In progress |
-| 4     | Existing calculator handoff and consistent results      | Pending     |
+| 3     | Property selector and confirmed assessment              | Merged #37  |
+| 4     | Existing calculator handoff and consistent results      | In progress |
 | 5     | Consented enquiry context and compatible receipts/email | Pending     |
 | 6     | Release readiness and acceptance evidence               | Pending     |
 
@@ -197,6 +197,15 @@ permanently archive rooftop content from permission to retain a Place ID.
 
 ## PR 3 property selector
 
+Released as PR #37, merge `56a5936d82690365567f872bf4706a3cebcde851`.
+Self-review and independent exact-head review passed. Lint/types/build, 81 Worker
+tests and 147 browser cases passed (143 in the full run; four artifact-budget/count
+and accessibility-timeout failures corrected and rerun successfully). The optional
+local Worker-routing case was skipped. Production build
+`d7afc014-68d5-4461-bf04-37d22d79016c` succeeded; homepage/contact/preview returned
+200, preview stayed noindex, enquiry GET stayed 405, runtime config returned
+`enabled:false`, and Solar POST returned 503 `disabled`. Feature branch retired.
+
 `/solar-preview/` is an English, noindex route with no translated variants or
 sitemap entry. It remains disabled in production and preview. A runtime config
 endpoint exposes public browser/widget keys only with the enabled flag, approved
@@ -224,3 +233,39 @@ mandatory acceptance checks. This PR installs neither keys nor migrations.
 Automated browser checks exercise actual built HTML and Worker CSP with synthetic
 Maps/Places/Turnstile/Solar substitutes; all outbound provider traffic is blocked.
 These checks establish flow/state behavior, not real map or device acceptance.
+
+## PR 4 calculator handoff and results
+
+The existing calculator gets a runtime-gated English preview CTA; it remains
+hidden while the feature is disabled. No Google payload loads on ordinary pages.
+The handoff stores only a strict versioned bill, connection type, originating
+language and creation time in sessionStorage for 30 minutes. It never stores
+coordinates, contact details, Google content or calculated output. Preview
+recomputes `estimateSolar`; invalid, expired or unavailable storage gives a clear
+calculator/manual-visit path. Reload and return preserve valid calculator inputs.
+The preview remains English, with return and enquiry links in the originating
+language. Bill and location values never enter navigation URLs.
+
+The bill-based target stays visible when roof data is unavailable or insufficient.
+Default rooftop selection is the closest actual returned configuration, with ties
+toward the smaller count. Selection changes reuse the same in-memory assessment
+and map. Displayed panel count, first-N polygons, capacity (count � model watts)
+and annual DC energy all refer to that same configuration. An explicit comparison
+shows the target difference and modeled maximum, with the prescribed insufficient
+space message when the maximum is below the bill target.
+
+The owner approved the disclosed 0.85 DC-to-AC factor on 18 October 2026. The
+versioned illustration applies it once to Google's annual DC estimate; it is not
+measured local inverter efficiency. Monthly AC is annual AC / 12. Illustrative
+monthly generation value is annual AC � INR 8 / 12, conditional on all energy
+being used or credited at that rate. Fixed charges, actual export credit,
+consumption timing and seasonality are excluded; no guaranteed bill reduction,
+new ROI model or committed hardware is claimed. Original calculator estimates
+remain separate. Changed, unclear or misplaced roofs clear panels and results.
+
+Tests cover strict session validation/expiry, storage denial, language/back/reload
+flow, sparse configurations, tie breaking independent of returned order, tiny roofs,
+maximum commercial input, consistent count/energy/value and no extra provider
+requests during configuration changes. Synthetic results are not real-roof evidence.
+See Google's [non-US calculation guidance](https://developers.google.com/maps/documentation/solar/calculate-costs-non-us)
+for the distinction between returned DC energy and a locally chosen AC factor.

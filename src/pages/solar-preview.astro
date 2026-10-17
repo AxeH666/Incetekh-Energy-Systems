@@ -16,6 +16,14 @@ import SiteLayout from '../layouts/SiteLayout.astro';
         or arrange a free site visit.
       </p>
       <div id="preview-intro" hidden>
+        <section id="bill-summary" aria-labelledby="bill-heading">
+          <h2 id="bill-heading">Your bill-based estimate</h2>
+          <p id="bill-summary-text"></p>
+          <p>
+            This uses the calculator's ₹8/unit and 4 units/kW/day scenario,
+            rounded up to a whole kW. It does not establish rooftop space.
+          </p>
+        </section>
         <p>
           Choose your actual building on Google satellite imagery. Opening the
           map shares network and location information with Google. Solar data
@@ -102,6 +110,58 @@ import SiteLayout from '../layouts/SiteLayout.astro';
           preliminary concept, not an installation design.
         </p>
         <p id="roof-details"></p>
+        <section
+          id="roof-results"
+          hidden
+          aria-labelledby="roof-results-heading"
+        >
+          <h2 id="roof-results-heading">Preliminary rooftop estimate</h2>
+          <label for="roof-configuration">Returned rooftop configuration</label>
+          <select id="roof-configuration"></select>
+          <p id="roof-comparison"></p>
+          <p id="roof-limited" hidden>
+            Not enough rooftop space for the estimated system. If you have other
+            available space, please contact our office.
+          </p>
+          <dl>
+            <div>
+              <dt>Proposed model panels</dt>
+              <dd id="result-panels"></dd>
+            </div>
+            <div>
+              <dt>Modeled rooftop capacity</dt>
+              <dd id="result-capacity"></dd>
+            </div>
+            <div>
+              <dt>Google annual DC energy estimate</dt>
+              <dd id="result-dc"></dd>
+            </div>
+            <div>
+              <dt>Illustrative annual AC generation</dt>
+              <dd id="result-ac"></dd>
+            </div>
+            <div>
+              <dt>Average monthly AC generation</dt>
+              <dd id="result-monthly"></dd>
+            </div>
+            <div>
+              <dt>Illustrative generation value / potential savings</dt>
+              <dd id="result-value"></dd>
+            </div>
+          </dl>
+          <p>
+            AC illustration = Google's annual DC estimate × 0.85, an
+            Incetekh-approved planning assumption (version 2026-10-18.1), not a
+            verified local efficiency. No second loss factor is applied.
+          </p>
+          <p>
+            Value assumes all generation offsets use or earns ₹8/unit credit,
+            averaged over 12 months. This is not guaranteed bill reduction.
+            Fixed charges, actual export credit, consumption timing and seasonal
+            variation are not modeled.
+          </p>
+          <p id="panel-model"></p>
+        </section>
       </div>
       <p class="preview-links">
         <a href="/#solar-planner" id="back-calculator">
@@ -177,6 +237,22 @@ import SiteLayout from '../layouts/SiteLayout.astro';
   #returned-building {
     border-left: 3px solid #ad5b14;
     padding-left: 1rem;
+  }
+  #roof-results dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-block: 1.5rem;
+  }
+  #roof-results dd {
+    margin: 0.4rem 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+  #roof-results select {
+    max-width: 100%;
+    min-height: 44px;
+    padding: 0.5rem;
   }
   .preview-links {
     margin-top: 2rem;

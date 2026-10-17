@@ -243,9 +243,10 @@ test('static output keeps planning and motion scripts small and local', async ()
       .filter((file) => !previewScripts.includes(file))
       .map(async (file) => (await stat(file)).size),
   );
-  expect(scriptBytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(10_000);
+  // Includes the shared, validated calculator session handoff (about 2.5 KB).
+  expect(scriptBytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(14_000);
   expect(previewScripts).toHaveLength(1);
-  expect((await stat(previewScripts[0])).size).toBeLessThan(12_000);
+  expect((await stat(previewScripts[0])).size).toBeLessThan(16_000);
   expect(await readFile('dist/index.html', 'utf8')).not.toContain(
     'solar-preview.astro_',
   );

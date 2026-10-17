@@ -5,6 +5,8 @@ import {
   usageProfile,
 } from '../data/solar';
 import { t } from '../i18n/text';
+import { languageOf } from '../i18n/languages';
+import { readSolarSession, writeSolarSession } from '../lib/solar-session';
 
 const root = document.querySelector<HTMLElement>('[data-solar-calculator]');
 if (root) {
@@ -16,6 +18,40 @@ if (root) {
   });
   slider.disabled = false;
   root.querySelector('fieldset')!.disabled = false;
+  const prior = readSolarSession();
+  if (prior) {
+    slider.value = String(prior.bill);
+    root.querySelector<HTMLInputElement>(
+      `input[value="${prior.residential ? 'residential' : 'commercial'}"]`,
+    )!.checked = true;
+  }
+  const previewLink = root.querySelector<HTMLAnchorElement>(
+    '[data-preview-link]',
+  )!;
+  previewLink.addEventListener('click', (event) => {
+    event.preventDefault();
+    const saved = writeSolarSession({
+      version: 1,
+      createdAt: Date.now(),
+      bill: slider.valueAsNumber,
+      residential:
+        root.querySelector<HTMLInputElement>(
+          'input[name="solar-connection"]:checked',
+        )!.value === 'residential',
+      language: languageOf(location.pathname),
+    });
+    if (saved) location.assign('/solar-preview/');
+    else
+      root.querySelector('[data-preview-handoff-status]')!.textContent =
+        'Preview needs temporary session storage. Your calculator still works; please arrange a free site visit.';
+  });
+  void fetch('/api/solar-preview-config', { cache: 'no-store' })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((config) => {
+      if (config?.enabled === true)
+        root.querySelector<HTMLElement>('[data-preview-entry]')!.hidden = false;
+    })
+    .catch(() => {});
   function update() {
     const residential =
       root!.querySelector<HTMLInputElement>(
