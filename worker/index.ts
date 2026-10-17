@@ -1,8 +1,4 @@
-import { type NotificationEnv } from './notification-config.js';
-import { dispatchNotifications } from './notifications.js';
-import { whatsappWebhook, processStatusEvents } from './whatsapp-webhook.js';
-
-interface Env extends NotificationEnv {
+interface Env {
   ASSETS: Fetcher;
   LEADS_DB?: D1Database;
   LEAD_RATE_LIMIT?: RateLimit;
@@ -14,7 +10,7 @@ interface Env extends NotificationEnv {
 }
 
 const endpoint = '/api/site-visits';
-const privacyVersion = '2026-10-16';
+const privacyVersion = '2026-10-17';
 const encoder = new TextEncoder();
 const fields = [
   'id',
@@ -141,28 +137,8 @@ function allowedOrigin(env: Env) {
 }
 
 export default {
-  async scheduled(
-    _controller: ScheduledController,
-    env: Env,
-    ctx: ExecutionContext,
-  ) {
-    ctx.waitUntil(
-      (async () => {
-        try {
-          await processStatusEvents(env);
-          await dispatchNotifications(env);
-        } catch {
-          console.error(
-            'WhatsApp status processing deferred; saved enquiries are unaffected.',
-          );
-        }
-      })(),
-    );
-  },
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    if (url.pathname === '/api/whatsapp/webhook')
-      return whatsappWebhook(request, env);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
     if (url.pathname !== endpoint || url.search) return reply(404, 'not_found');
     if (request.method !== 'POST') return reply(405, 'method_not_allowed');

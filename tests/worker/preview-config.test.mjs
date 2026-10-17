@@ -35,6 +35,8 @@ test('preview application and migration target the same approved non-production 
 test('production activation keeps preview disabled and separates data and rate namespaces', async () => {
   const app = await readConfig('wrangler.jsonc');
   assert.equal(app.vars.LEAD_CAPTURE_ENABLED, 'true');
+  assert.equal(app.vars.WHATSAPP_NOTIFY_ENABLED, 'false');
+  assert.equal(app.vars.WHATSAPP_WEBHOOK_ENABLED, 'false');
   assert.equal(app.vars.LEAD_CAPTURE_ENV, 'production');
   assert.equal(app.vars.LEAD_ALLOWED_ORIGIN, 'https://incetekhenergy.com');
   assert.equal(app.previews.vars.LEAD_CAPTURE_ENABLED, 'false');
@@ -68,20 +70,5 @@ test('production activation keeps preview disabled and separates data and rate n
   for (const vars of [app.vars, app.previews.vars]) {
     assert.equal(vars.TURNSTILE_SECRET_KEY, undefined);
     assert.equal(vars.RATE_LIMIT_KEY_SECRET, undefined);
-    assert.equal(vars.WHATSAPP_NOTIFY_ENABLED, 'false');
-    assert.equal(vars.WHATSAPP_WEBHOOK_ENABLED, 'false');
-    for (const name of [
-      'WHATSAPP_ACCESS_TOKEN',
-      'META_APP_SECRET',
-      'WHATSAPP_STAFF_NUMBER',
-      'WHATSAPP_WEBHOOK_VERIFY_TOKEN',
-    ]) {
-      assert.equal(vars[name], undefined);
-    }
   }
-  assert.equal(
-    app.triggers,
-    undefined,
-    'No schedule is deployed before approval',
-  );
 });

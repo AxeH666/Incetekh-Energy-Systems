@@ -64,15 +64,8 @@ before(async () => {
   await mkdir('.wrangler', { recursive: true });
   const persist = await mkdtemp('.wrangler/lead-test-');
   options = {
-    modules: [
-      'index',
-      'notifications',
-      'notification-config',
-      'whatsapp-webhook',
-    ].map((name) => ({
-      type: 'ESModule',
-      path: `.wrangler/test-worker/${name}.js`,
-    })),
+    modules: true,
+    scriptPath: '.wrangler/test-worker/index.js',
     compatibilityDate: '2026-09-30',
     bindings,
     d1Databases: { LEADS_DB: 'local-leads' },
@@ -146,7 +139,7 @@ test('receipt follows durable insert; native text, optional email and metadata s
   assert.equal(saved.phone, '+919876543210');
   assert.equal(saved.email, null);
   assert.equal(saved.notification_status, 'not_configured');
-  assert.equal(saved.privacy_notice_version, '2026-10-16');
+  assert.equal(saved.privacy_notice_version, '2026-10-17');
   assert.ok(Date.now() - Date.parse(saved.created_at) < 10000);
   assert.equal('token' in saved || 'ip' in saved, false);
   await mf.dispose();
@@ -165,6 +158,56 @@ test('lost receipt retry needs no second token; changed payload cannot overwrite
     409,
   );
   assert.equal(await count(input.id), 1);
+});
+
+for (const version of ['2026-10-15.1', '2026-10-16']) {
+  test(`existing ${version} enquiry keeps its fields and receipt after cleanup`, async () => {
+    const input = lead();
+    assert.equal((await send(input)).status, 201);
+    await db
+      .prepare(
+        'UPDATE site_visit_leads SET privacy_notice_version = ? WHERE id = ?',
+      )
+      .bind(version, input.id)
+      .run();
+    const saved = () =>
+      db
+        .prepare('SELECT * FROM site_visit_leads WHERE id = ?')
+        .bind(input.id)
+        .first();
+    const before = await saved();
+    const verifications = verificationCount;
+    const receipt = await send({ ...input, token: '' });
+    assert.equal(receipt.status, 200);
+    assert.deepEqual(await receipt.json(), { code: 'received', id: input.id });
+    assert.equal(
+      (await send({ ...input, location: 'Changed location' })).status,
+      409,
+    );
+    assert.equal(verificationCount, verifications);
+    assert.deepEqual(await saved(), before);
+    assert.equal(await count(input.id), 1);
+  });
+}
+
+test('retired notification routes behave as unknown APIs without outbound requests or writes', async () => {
+  const before = await db
+    .prepare('SELECT count(*) n FROM site_visit_leads')
+    .first();
+  const verifications = verificationCount;
+  for (const method of ['GET', 'POST']) {
+    const response = await mf.dispatchFetch(origin + '/api/whatsapp/webhook', {
+      method,
+    });
+    assert.equal(response.status, 404);
+    assert.deepEqual(await response.json(), { code: 'not_found' });
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+  }
+  assert.equal(verificationCount, verifications);
+  assert.deepEqual(
+    await db.prepare('SELECT count(*) n FROM site_visit_leads').first(),
+    before,
+  );
 });
 test('concurrent same-ID submissions make exactly one row; distinct ID on same phone remains valid', async () => {
   const input = lead();

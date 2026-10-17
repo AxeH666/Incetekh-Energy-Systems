@@ -1,17 +1,40 @@
 # Infrastructure and operations
 
-**PR #31, disabled production release (16 October 2026):** internal WhatsApp
-enquiry notifications are explicitly in scope. See
-[WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md](WHATSAPP_LEAD_NOTIFICATIONS_PLAN.md) for the
-Worker/D1 design, Meta setup, verified pricing and approval boundaries, and
-[WHATSAPP_LEAD_NOTIFICATIONS.md](WHATSAPP_LEAD_NOTIFICATIONS.md) for configuration,
-failure handling and the controlled release procedure. Local implementation and
-fault tests exist; sending and webhooks default off, with no Cron Trigger.
-The owner approved merging the reviewed implementation and deploying through the
-existing production CI with both WhatsApp flags false. [PR #31](https://github.com/AxeH666/Incetekh-Energy-Systems/pull/31)
-records the final commit, build/deployment and preservation checks. This release
-does not authorize migrations, schedules, Meta credentials/configuration, webhook
-enablement or real messages. Production enquiry checks remain manual.
+**Lead-capture-only cleanup, 17 October 2026 (not deployed):** the unused
+notification implementation from PR #31 has been removed from this branch.
+The website's customer-facing WhatsApp links, D1 lead capture, Turnstile,
+rate limiting and receipt handling remain. Enquiry checks remain manual.
+Production still runs the previously approved release until the owner approves
+merge and deployment of this cleanup.
+
+Read-only Cloudflare inspection on 17 October confirmed that production and
+preview D1 have only `0001_site_visit_leads.sql` applied, with no notification
+tables or marker column. The unapplied `0002_whatsapp_notifications.sql` file
+was removed; no remote migration or schema/data change was performed.
+The original migration and its inert `notification_status = 'not_configured'`
+column remain unchanged to preserve applied migration history and stored rows.
+No notification-only package dependency existed; the package manifests are unchanged.
+
+### Deferred resource cleanup (owner approval required)
+
+- Production still has the two false runtime variables `WHATSAPP_NOTIFY_ENABLED`
+  and `WHATSAPP_WEBHOOK_ENABLED`. Their production declarations are retained so
+  deploying this cleanup preserves them unchanged. Removal requires separate
+  owner approval, including any dashboard or preview overrides. They do not
+  control anything in the cleaned Worker.
+- The inspected production Worker has no Meta/WhatsApp credential bindings and
+  no Cron Triggers. Preserve `LEADS_DB`, `LEAD_RATE_LIMIT`, `ASSETS`, all lead
+  configuration, `TURNSTILE_SECRET_KEY` and `RATE_LIMIT_KEY_SECRET`.
+- Meta account tokens, webhook subscriptions, app/template/phone resources and
+  any disconnected Cloudflare preview overrides were not audited. If any were
+  configured outside the repository, inventory them with the owner and obtain
+  approval before revocation or deletion. No production resource was changed.
+- The inspected production build trigger includes only `main` and deploys with
+  `npx wrangler deploy`. This PR must remain unmerged until release approval.
+
+Cloudflare documents [migration tracking](https://developers.cloudflare.com/d1/reference/migrations/)
+and [build branch controls](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/).
+Recheck live state before any later release; the observations above are dated.
 
 **Production lead activation:** PR #29 merged after independent review as
 `78acb87`. Production build `c56fb610` passed, all 138 sitemap pages were healthy,
@@ -57,8 +80,7 @@ This is the current infrastructure reference. [SCOPE.md](../SCOPE.md) still cont
 Phase 1. Earlier delivery reports describe historical tasks, not today's hosting.
 The supplied `INCETEKH_INFRASTRUCTURE_HANDOFF.md` is preserved unchanged in the
 local recovery archive described below;
-its broader proposed backend work remains **outside the locked scope**. Only the
-limited internal staff notification exception above has since been authorized.
+its proposed WhatsApp Cloud API/backend work is **outside the locked scope**.
 The initial audit changed documentation only. The owner subsequently authorized
 commit, push, PR merge, synchronization and stale-branch cleanup. Existing
 Cloudflare Git integration may publish this documentation release; no manual
@@ -142,29 +164,33 @@ operational ownership and professional email still need closure.
 
 ## Architecture and inventory
 
+Runtime inventory updated for the lead-capture-only branch on 17 October 2026;
+the original audit findings above remain dated evidence.
+
 ```text
 Hostinger: domain registration and renewal
     -> Cloudflare authoritative DNS
     -> HTTPS incetekhenergy.com
-    -> Cloudflare Workers Static Assets: incetekh-energy-systems
-    -> dist/ (Astro-generated HTML, CSS, JS, fonts and image derivatives)
+    -> Cloudflare Worker: incetekh-energy-systems
+       -> /api/site-visits: Turnstile + rate limiting -> Cloudflare D1
+       -> Static Assets: dist/ (Astro HTML, CSS, JS, fonts and images)
 
 GitHub main -> Cloudflare Workers Builds -> build -> Wrangler deployment
 GitHub feature branches -> Cloudflare branch previews (historically verified)
 HTTPS www -> Cloudflare 301 -> HTTPS apex, preserving path and query
 ```
 
-| Item           | Configuration / status                                                                                                                 |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Repository     | [AxeH666/Incetekh-Energy-Systems](https://github.com/AxeH666/Incetekh-Energy-Systems), public; default branch `main` — GitHub verified |
-| Local checkout | `C:\Users\axehe\Desktop\incetekh energy` — verified                                                                                    |
-| Production     | <https://incetekhenergy.com/> — live 200                                                                                               |
-| Host alias     | <https://incetekh-energy-systems.incetekhenergy.workers.dev/> — live 200, public, noindex, canonical points at apex                    |
-| Worker         | `incetekh-energy-systems` — Wrangler config and GitHub build check agree; owner reports apex custom-domain binding                     |
-| Rendering      | Astro `7.3.5`, static output, TypeScript, plain CSS, self-hosted Manrope; no SSR adapter                                               |
-| Runtime        | Static Assets service; no Worker entrypoint, database, VM, queues, cron, storage bindings or application secrets declared in repo      |
-| Middleware     | `src/middleware.ts` localizes HTML at build time; it is not a production request API                                                   |
-| Asset boundary | Upload `dist/` only; original project/review photographs and repository documents stay outside the website artifact                    |
+| Item           | Configuration / status                                                                                                                             |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository     | [AxeH666/Incetekh-Energy-Systems](https://github.com/AxeH666/Incetekh-Energy-Systems), public; default branch `main` — GitHub verified             |
+| Local checkout | `C:\Users\axehe\Desktop\incetekh energy` — verified                                                                                                |
+| Production     | <https://incetekhenergy.com/> — live 200                                                                                                           |
+| Host alias     | <https://incetekh-energy-systems.incetekhenergy.workers.dev/> — live 200, public, noindex, canonical points at apex                                |
+| Worker         | `incetekh-energy-systems` — Wrangler config and GitHub build check agree; owner reports apex custom-domain binding                                 |
+| Rendering      | Astro `7.3.5`, static output, TypeScript, plain CSS, self-hosted Manrope; no SSR adapter                                                           |
+| Runtime        | `worker/index.ts` serves the enquiry API with D1, Turnstile and rate limiting; Static Assets serves the website. No queues or cron.                |
+| Middleware     | `src/middleware.ts` localizes HTML at build time; it is not a production request API                                                               |
+| Asset boundary | Static Assets uploads `dist/`; Worker code is bundled separately. Original photographs and repository documents stay outside the website artifact. |
 
 The GitHub repository itself is public, including tracked original assets. The
 `dist/` boundary does **not** make those originals private. Confirm their publication
@@ -373,9 +399,10 @@ Public contact contract, owner-confirmed on 13 October and corrected in source:
   all five translation catalogues and shared page/footer contact paths. The
   invalid historical `support@incetekh.com` and inactive future
   `info@incetekhenergy.com` must be absent from generated public HTML.
-- Site-visit form validates locally and reports that nothing was sent. No
-  server handler, persistence or delivery integration exists. No real enquiry,
-  call, WhatsApp message or email was sent during this audit.
+- At the original contact audit, the form only validated locally. The subsequent
+  production activation added the Worker API and D1 persistence; see
+  [PRODUCTION_LEAD_ACTIVATION.md](PRODUCTION_LEAD_ACTIVATION.md). No real enquiry,
+  call, WhatsApp message or email was sent during this cleanup.
 
 `tests/public-contacts.spec.ts` checks every generated HTML artifact (all six
 languages, error pages and legacy redirect), contact destinations, invalid
@@ -545,7 +572,7 @@ Record date, verifier and non-secret evidence for each completed item.
 | Worker Builds             | Repo/main, commands/root/runtime, preview filters, watch paths, public variables, token permissions | Owner verified commands/root and production-only true flag; runtime/watch paths/token scope remain unknown                           |
 | Worker Deployments        | Active SHA/version, previous accepted version, rollback availability                                | Owner reports `5051254`; matching build success and live output verified; version ID/retention unknown                               |
 | Worker previews + Access  | Current preview URLs, noindex and authentication, variable isolation                                | PR #26 preview noindex verified before retirement; fresh documentation-preview result in follow-up PR; Access/authentication unknown |
-| Worker runtime + security | Bindings/secret names only, metrics/log retention, security events, build alerts                    | No source bindings; account state unknown                                                                                            |
+| Worker runtime + security | Bindings/secret names only, metrics/log retention, security events, build alerts                    | Lead bindings and secret names verified 17 October as recorded above; metrics/log retention and account controls remain unverified   |
 | Hostinger                 | Ownership/MFA/recovery, contacts, renewal date/price/payment, purchased mail plans                  | Registrar/registry expiry verified; account state unknown                                                                            |
 | Google                    | Gmail recovery/MFA, Search Console property/access/submission, Business Profile                     | Administrative address owner-confirmed; settings unknown                                                                             |
 

@@ -50,25 +50,14 @@ for (const width of [390, 1440]) {
       await expect(retention).toBeVisible();
       await expect(retention).toContainText('12');
       await expect(retention).toContainText('90');
-      const staffNotice = page.locator('[data-staff-notification-privacy]');
-      await expect(staffNotice).toBeVisible();
-      await expect(staffNotice).toContainText('WhatsApp');
-      await expect(staffNotice).toContainText('Meta');
+      await expect(
+        page.locator('[data-staff-notification-privacy]'),
+      ).toHaveCount(0);
       if (code === 'en') {
-        await expect(staffNotice).toContainText(
-          'When internal notifications are enabled',
-        );
-        await expect(staffNotice).toContainText(
-          'does not send you automated WhatsApp replies',
-        );
         await expect(retention).toContainText(
           'subject to legal retention requirements',
         );
       } else {
-        await expect(staffNotice).not.toContainText(
-          'When internal notifications',
-        );
-        expect(await staffNotice.innerText()).toMatch(/[\u0900-\u0d7f]/);
         await expect(retention).not.toContainText('We normally keep');
         expect(await retention.innerText()).toMatch(/[\u0900-\u0d7f]/);
       }
