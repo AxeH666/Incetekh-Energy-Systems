@@ -15,6 +15,9 @@ import {
 import { loadTurnstile } from '../lib/turnstile';
 import { rooftopResults } from '../lib/solar-results';
 import { moduleLayout, referenceModule } from '../lib/solar-module-layout';
+import { configurationPaths } from '../lib/solar-geometry';
+import type { SolarRaster } from '../../worker/solar-imagery';
+import type { MatchedRoofImage } from '../lib/solar-raster';
 import { localPath } from '../i18n/languages';
 import { financialEstimate } from '../data/solar';
 
@@ -38,6 +41,7 @@ type Assessment = Extract<SolarResult, { status: 'available' }> & {
   reference: string;
   selectedLocation: Coordinates;
   roofImage?: RoofImage;
+  roofRaster?: SolarRaster;
 };
 const byId = <T extends HTMLElement = HTMLElement>(id: string) =>
   document.getElementById(id) as T;
@@ -81,6 +85,7 @@ let view: ReturnType<typeof createSolarMap> | undefined;
 let selectedMarker: Marker | undefined;
 let selected: Coordinates | undefined;
 let assessment: Assessment | undefined;
+let matchedRoof: MatchedRoofImage | undefined;
 let preferGrouped = true;
 let closeView = false;
 let pending = false,
@@ -99,6 +104,7 @@ function updateButton() {
   assess.hidden = !!assessment;
 }
 function discardRoof() {
+  matchedRoof = undefined;
   assessment = undefined;
   preferGrouped = true;
   closeView = false;
@@ -330,7 +336,7 @@ assess.addEventListener('click', async () => {
   updateButton();
   const attemptController = new AbortController();
   controller = attemptController;
-  const timeout = setTimeout(() => attemptController.abort(), 20000);
+  const timeout = setTimeout(() => attemptController.abort(), 55000);
   show('Assessing the confirmed property…');
   try {
     const response = await fetch('/api/solar-assessments', {
@@ -344,6 +350,7 @@ assess.addEventListener('click', async () => {
       reference: string;
       selectedLocation: Coordinates;
       roofImage?: RoofImage;
+      roofRaster?: SolarRaster;
     };
     if (revision !== generation || mapFailed) return;
     if (
@@ -376,7 +383,22 @@ assess.addEventListener('click', async () => {
       );
       return;
     }
-    if (result.roofImage) {
+    if (result.roofRaster) {
+      const { loadSolarRaster } = await import('../lib/solar-raster');
+      const raster = await loadSolarRaster(
+        result.roofRaster,
+        result.roof,
+        attemptController.signal,
+      );
+      if (revision !== generation || mapFailed || !view) {
+        raster.release();
+        return;
+      }
+      view.setRoofImage(raster);
+      matchedRoof = raster;
+      // Release encoded provider bytes after decoding; never put them in storage.
+      delete result.roofRaster;
+    } else if (result.roofImage) {
       const roofImage = await loadRoofImage(
         result.roofImage,
         result.roof,
@@ -414,10 +436,19 @@ function renderResults(panelsCount?: number) {
   try {
     const result = rooftopResults(roof, targetKw!, panelsCount);
     if (!result) throw new Error('Unavailable configuration');
-    const concept = moduleLayout(roof, targetKw!);
+    let concept = moduleLayout(roof, targetKw!);
+    if (concept && matchedRoof && !matchedRoof.contains(concept.paths))
+      concept = null;
     const grouped = preferGrouped && !!concept;
     if (grouped) view.showConcept(concept!.paths);
-    else view.show(roof, result.panelsCount);
+    else {
+      if (
+        matchedRoof &&
+        !matchedRoof.contains(configurationPaths(roof, result.panelsCount))
+      )
+        throw new Error('Roof mask mismatch');
+      view.show(roof, result.panelsCount);
+    }
     byId('grouped-layout').hidden = !concept;
     byId('grouped-layout').textContent = grouped
       ? 'Compare Google model'
@@ -433,9 +464,10 @@ function renderResults(panelsCount?: number) {
     byId('returned-building').hidden = true;
     byId('roof-controls').hidden = false;
     byId('solar-source').hidden = false;
-    byId('solar-source').textContent = assessment.roofImage
-      ? `Source: Includes solar data from Google. Roof imagery: ${roof.imageryDate}. A site visit must confirm the roof's current condition.`
-      : 'Source: Includes solar data from Google. Map imagery may differ; panel alignment needs verification.';
+    byId('solar-source').textContent =
+      assessment.roofImage || matchedRoof
+        ? `Source: Includes solar data from Google. Roof imagery: ${roof.imageryDate}. A site visit must confirm the roof's current condition.`
+        : 'Source: Includes solar data from Google. Map imagery may differ; panel alignment needs verification.';
     byId('roof-results').hidden = grouped;
     byId<HTMLSelectElement>('roof-configuration').value = String(
       result.panelsCount,

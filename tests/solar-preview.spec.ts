@@ -5,6 +5,7 @@ import { gridRoof } from './fixtures/grouped-roof';
 import { solarFixture } from './fixtures/solar.mjs';
 import { normalizeSolar } from '../worker/solar';
 import AxeBuilder from '@axe-core/playwright';
+import { rasterFixture } from './fixtures/solar-raster';
 
 test.describe('property selector with real Worker CSP and mocked providers', () => {
   test.describe.configure({ mode: 'serial' });
@@ -137,6 +138,93 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       expect((await request.get(href)).status()).toBe(200);
     }
   });
+  for (const mode of [
+    'matched',
+    'off-roof',
+    'unknown-projection',
+    'shifted-tiepoint',
+    'matrix',
+  ] as const)
+    test(`matched GeoTIFF imagery ${mode} uses no external raster downloads`, async ({
+      page,
+    }) => {
+      await setup(page);
+      const errors: string[] = [];
+      page.on('pageerror', (error) => errors.push(error.message));
+      await page.route('**/api/solar-assessments', (route) =>
+        route.fulfill({
+          json: rasterFixture(
+            mode !== 'off-roof',
+            mode === 'unknown-projection' ? 9999 : 32644,
+            mode === 'shifted-tiepoint',
+            mode === 'matrix',
+          ),
+        }),
+      );
+      await page.getByRole('button', { name: 'Enter your address' }).click();
+      await page
+        .getByRole('textbox', { name: 'Enter your full address' })
+        .fill('15 Example Street');
+      await page
+        .getByRole('button', {
+          name: '15 Example Street, Proddatur (test address)',
+        })
+        .click();
+      await page
+        .getByRole('button', { name: 'Confirm roof & preview' })
+        .click();
+      if (mode === 'matched' || mode === 'matrix') {
+        await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+        await expect(page.locator('#solar-source')).toContainText(
+          'Roof imagery: 2021-03-02',
+        );
+        const colors = await page
+          .locator('[data-mock-roof-image]')
+          .evaluate(async (node) => {
+            const url = (node as HTMLElement).dataset.mockRoofImage!;
+            const bitmap = await createImageBitmap(
+              await (await fetch(url)).blob(),
+            );
+            const canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            const ctx = canvas.getContext('2d')!;
+            ctx.drawImage(bitmap, 0, 0);
+            bitmap.close();
+            return [0.25, 0.75].map((p) =>
+              Array.from(
+                ctx.getImageData(
+                  Math.floor(canvas.width * p),
+                  Math.floor(canvas.height * p),
+                  1,
+                  1,
+                ).data,
+              ),
+            );
+          });
+        expect(colors).toEqual([
+          [220, 220, 80, 255],
+          [20, 20, 80, 255],
+        ]);
+        await page
+          .getByRole('button', { name: 'Show Before', exact: true })
+          .click();
+        await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+        await page
+          .getByRole('button', { name: 'Show With Solar', exact: true })
+          .click();
+        await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+      } else {
+        await expect(page.locator('#preview-status')).toContainText(
+          mode === 'off-roof'
+            ? 'layout is unusable'
+            : 'assessment could not finish',
+        );
+        await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+        await expect(page.locator('#roof-results')).toBeHidden();
+      }
+      expect(errors).toEqual([]);
+    });
   for (const width of [390, 1440])
     test(`address lookup and one confirmation reuse the map at ${width}px`, async ({
       page,
@@ -877,6 +965,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
             'email',
             'solar',
             'solar-endpoint',
+            'solar-imagery',
             'solar-page',
             'preview-context',
           ].map((name) => ({

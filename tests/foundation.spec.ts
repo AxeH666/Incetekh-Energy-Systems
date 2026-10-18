@@ -2,7 +2,7 @@ import { isAllowedExternal } from './support/links';
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readdir, readFile, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 
 test('semantic shell, metadata, and main navigation', async ({ page }) => {
   await page.goto('/');
@@ -242,17 +242,59 @@ test('static output keeps planning and motion scripts small and local', async ()
   const previewScripts = scripts.filter((file) =>
     file.includes('solar-preview.astro_'),
   );
+  async function dependencies(roots: string[]) {
+    const result = new Set<string>();
+    async function visit(file: string) {
+      if (result.has(file)) return;
+      expect(scripts).toContain(file);
+      result.add(file);
+      for (const match of (await readFile(file, 'utf8')).matchAll(
+        /["'`]\.\/([^"'`]+\.js)["'`]/g,
+      ))
+        await visit(join(dirname(file), match[1]));
+    }
+    for (const file of roots) await visit(file);
+    return result;
+  }
+  const sharedRoots: string[] = [];
+  for (const file of files.filter(
+    (file) =>
+      file.endsWith('.html') &&
+      !file.endsWith(join('solar-preview', 'index.html')),
+  )) {
+    for (const match of (await readFile(file, 'utf8')).matchAll(
+      /<script[^>]+src="\/(\_astro\/[^"?]+\.js)"/g,
+    ))
+      sharedRoots.push(join('dist', match[1]));
+  }
+  const shared = await dependencies(sharedRoots);
+  const previewOnly = new Set(
+    [...(await dependencies(previewScripts))].filter(
+      (file) => !shared.has(file),
+    ),
+  );
+  const previewBytes = await Promise.all(
+    [...previewOnly].map(async (file) => (await stat(file)).size),
+  );
+  // TIFF decoders and CRS conversion load only after a confirmed assessment.
+  expect(previewBytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(
+    500_000,
+  );
   const scriptBytes = await Promise.all(
     scripts
-      .filter((file) => !previewScripts.includes(file))
+      .filter((file) => !previewOnly.has(file))
       .map(async (file) => (await stat(file)).size),
   );
   // Includes shared calculator state, consent validation and the single widget loader.
   expect(scriptBytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(15_000);
   expect(previewScripts).toHaveLength(1);
   // Isolated rooftop geometry, reference-module packing and matched-image checks.
-  // This bundle is never loaded by the homepage; its measured size is ~24 KB.
-  expect((await stat(previewScripts[0])).size).toBeLessThan(25_000);
+  // This entry is never loaded by the homepage; raster decoders are lazy imports.
+  expect((await stat(previewScripts[0])).size).toBeLessThan(27_000);
+  expect(shared.has(previewScripts[0])).toBe(false);
+  expect([...shared].some((file) => file.includes('solar-raster.'))).toBe(
+    false,
+  );
   expect(await readFile('dist/index.html', 'utf8')).not.toContain(
     'solar-preview.astro_',
   );
@@ -261,7 +303,7 @@ test('static output keeps planning and motion scripts small and local', async ()
   ).toBe(false);
   // Translated HTML shares the same assets; cap asset size and each page separately.
   const assets = files.filter(
-    (file) => !file.endsWith('.html') && !previewScripts.includes(file),
+    (file) => !file.endsWith('.html') && !previewOnly.has(file),
   );
   const bytes = await Promise.all(
     assets.map(async (file) => (await stat(file)).size),

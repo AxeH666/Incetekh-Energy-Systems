@@ -19,7 +19,9 @@
   },
   "dependencies": {
     "@fontsource-variable/manrope": "5.3.0",
-    "astro": "7.3.5"
+    "astro": "7.3.5",
+    "geotiff": "3.0.5",
+    "proj4": "2.22.0"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

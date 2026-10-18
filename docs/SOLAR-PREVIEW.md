@@ -351,8 +351,8 @@ checked 18 October 2026.
 
 The owner accepted the matched overhead SS Mall image as the visual target for
 the website and authorized official manufacturer dimensions. Public activation
-remains disabled. The general matched-imagery service is not implemented; the
-current retained image is specific to SS Mall.
+remains disabled pending production configuration. The shared matched-imagery
+path is now implemented as described below; the saved review remains SS Mall only.
 
 The reference is **Waaree AHNAY Bi-55-550: 550 W, 2.272 by 1.133 m**, verified on
 18 October 2026 against the [official datasheet](https://waaree.com/upload/media/datasheet_bi_55_520_550_12_03012025_1756379026.pdf).
@@ -401,3 +401,52 @@ geometry on matching Google imagery; no new Solar or Places request was needed.
 References: [Google configuration and orientation contract](https://developers.google.com/maps/documentation/solar/reference/rest/v1/buildingInsights/findClosest),
 [roof coverage limitations](https://developers.google.com/maps/documentation/solar/search-buildings),
 and [NREL site-assessment guidance](https://docs.nrel.gov/docs/fy10osti/46078.pdf).
+
+## Shared matched imagery
+
+When `SOLAR_MATCHED_IMAGERY_ENABLED=true`, each confirmed assessment reserves
+one existing daily/monthly allowance before making up to four Google requests:
+one Building Insights, one Data Layers, one RGB GeoTIFF and one roof-mask GeoTIFF.
+There are no retries. An obvious pin/building mismatch stops before Data Layers.
+The image request is limited to a 100 m radius and 0.25 m pixels; roofs extending
+beyond the supported image get a manual-visit fallback. The returned acquisition
+date and quality must exactly match Building Insights. Both asset URLs must be
+the fixed Google GeoTIFF endpoint before any download. Redirects, malformed TIFFs,
+oversized files or image failures suppress the assessment. No provider URL or
+server credential reaches the browser. The aggregate usage counter counts these
+assessment bundles, not individual requests or direct Maps/Places traffic.
+
+RGB and mask files are capped at 4 MB each, sent in the existing no-store response,
+and decoded only in browser memory. `geotiff` and `proj4` supply TIFF decoding and
+coordinate conversion; they load lazily after a successful assessment, never on
+the homepage. The renderer accepts bounded 8-bit north-up WGS84 UTM grids with
+consistent RGB/mask georeferencing and known photometric interpretation. It
+supports zero-raster-offset tiepoints or an explicit north-up transformation
+matrix, retaining the negative Y scale. Unknown or ambiguous metadata fails closed.
+Pixels are reprojected into Web Mercator before a native Google GroundOverlay is
+created. Map credits and Solar attribution stay visible. Image blobs are released
+when the selected property changes; encoded raster bytes are dropped after decode.
+
+Every mask cell intersected by a panel footprint is checked, including internal
+holes and edge cells. A small 0.01 pixel margin treats rounding conservatively;
+work is bounded to 4,096 candidate cells per panel and two million per layout.
+This checks the provider mask, not current obstacles, ownership, structural
+suitability or surveyed roof boundaries. If the reference-module grid fails, the
+original Google configuration is offered only if it also passes the mask check.
+Otherwise no layout is shown. Estimates remain preliminary and are not assigned
+to resized/rearranged modules.
+
+The isolated preview entry is capped at 27 KB; its complete dependency graph,
+including lazy TIFF decoders and projection code, is capped at 500 KB. Other
+scripts keep the 15 KB limit and shared assets retain 2.1 MB. Tests trace imports
+from all non-preview HTML pages to verify the raster graph remains isolated.
+
+Offline verification of retained SS Mall RGB/mask completed with zero external
+requests. All touched mask cells for the nine-panel layout passed. Browser RGB
+reprojection matched independent Rasterio nearest-neighbour reprojection in
+99.97% of 230,704 visible pixels (mean channel difference 0.0034/255). This is
+software evidence on the retained roof, not a live residential acceptance result.
+
+Sources checked 18 October 2026: [Google Data Layers](https://developers.google.com/maps/documentation/solar/reference/rest/v1/dataLayers/get),
+[GeoTIFF.js](https://geotiffjs.github.io/geotiff.js/), [Proj4js](https://proj4js.org/).
+See [production setup](SOLAR-PUBLIC-SETUP.md) for the remaining activation inputs.

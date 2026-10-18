@@ -1,8 +1,9 @@
-param([switch]$Check)
+param([switch]$Check, [switch]$Production)
 
 # Local hidden input only. No Google requests; never print the key.
 $ErrorActionPreference = 'Stop'
 $solarOwnerFolder = Join-Path $env:USERPROFILE '.codex\secrets\incetekh-solar-owner-preview'
+if ($Production) { $solarOwnerFolder = Join-Path $env:USERPROFILE '.codex\secrets\incetekh-solar-production' }
 $solarOwnerPath = Join-Path $solarOwnerFolder 'browser-key.dpapi'
 if ($Check) {
     if (-not (Test-Path -LiteralPath $solarOwnerPath -PathType Leaf)) { Write-Host 'Browser key not installed.'; exit 2 }
@@ -12,7 +13,11 @@ if ($Check) {
     exit 0
 }
 if (Test-Path -LiteralPath $solarOwnerPath) { Write-Host 'Existing browser key retained. Nothing overwritten.'; exit 0 }
-Write-Host 'Use a SEPARATE browser key: Website restriction http://127.0.0.1:4333/*; API restriction Maps JavaScript API only.'
+if ($Production) {
+    Write-Host 'Use a SEPARATE production browser key: Website restriction https://incetekhenergy.com/*; API restrictions Maps JavaScript API and Places API (New) only.'
+} else {
+    Write-Host 'Use a SEPARATE browser key: Website restriction http://127.0.0.1:4333/*; API restriction Maps JavaScript API only.'
+}
 Write-Host 'Do not use the existing Solar server key. Do not paste any key into chat.'
 $solarOwnerConfirmed = Read-Host 'Have you verified those restrictions in Google Cloud? Type YES'
 if ($solarOwnerConfirmed -cne 'YES') { Write-Host 'Cancelled. No credential saved.'; exit 1 }
