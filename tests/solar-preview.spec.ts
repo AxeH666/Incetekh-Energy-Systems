@@ -1767,7 +1767,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
           {
             type: 'ESModule',
             path: '.wrangler/test-worker/funnel-harness.js',
-            contents: `import worker from './index.js';export default {async fetch(request,env){if(new URL(request.url).pathname==='/local-test-tick'){await worker.scheduled({},env);return new Response('ok');}return worker.fetch(request,env);}};`,
+            contents: `import worker from './index.js';export default {async fetch(request,env,ctx){if(new URL(request.url).pathname==='/local-test-tick'){await worker.scheduled({},env);return new Response('ok');}return worker.fetch(request,env,ctx);}};`,
           },
           ...[
             'index',
@@ -1885,6 +1885,18 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
         'enquiry has been received',
       );
       expect(submitted).toBeDefined();
+      // The booking itself starts delivery; no synthetic scheduled tick yet.
+      await expect
+        .poll(
+          async () =>
+            (
+              await db
+                .prepare('SELECT status FROM site_visit_email_outbox')
+                .first()
+            )?.status,
+        )
+        .toBe('accepted');
+      expect(emailCalls).toBe(1);
       const saved = await db.prepare('SELECT * FROM site_visit_leads').all();
       expect(saved.results).toHaveLength(1);
       expect(saved.results[0].plan).toBe('advice');
