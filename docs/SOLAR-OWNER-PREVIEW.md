@@ -128,3 +128,23 @@ Official references: [Places address widget](https://developers.google.com/maps/
 [GeoTIFF interpretation](https://developers.google.com/maps/documentation/solar/geotiff),
 [GroundOverlay](https://developers.google.com/maps/documentation/javascript/groundoverlays),
 and [key restrictions](https://developers.google.com/maps/api-security-best-practices).
+
+## Grouped layout revision
+
+The website preview code now supports a grouped concept on a single roof section
+where the provider candidates support a complete interior rectangle. The old
+Google configuration remains available for comparison. Only that original
+configuration displays its energy/savings estimates; those estimates are hidden
+for the grouped concept. The roof-capacity warning remains visible in either mode.
+Closer view changes the map camera, never the physical dimensions of a panel.
+
+SS Mall's current model panels are 400 W, 1.879 by 1.045 m. The selected group uses
+12 unchanged candidate positions and all 972 sampled footprint points were in the
+retained roof mask. The model has no verified mounting clearance, access, obstacle,
+structural or setback design. This is an engineer-review concept, not an engineered
+installation layout. A larger physical module needs the intended product model.
+
+The saved comparison currently remains the earlier capture. Updating it requires
+one additional explicitly approved Maps load; no new Solar or Places request is
+needed. The original exhausted counters must remain unchanged. Public access stays
+disabled. See [grouping constraints](SOLAR-PREVIEW.md#grouped-concept-and-panel-visibility-private-revision).

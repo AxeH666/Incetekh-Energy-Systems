@@ -14,6 +14,7 @@ import {
 } from '../lib/solar-session';
 import { loadTurnstile } from '../lib/turnstile';
 import { rooftopResults } from '../lib/solar-results';
+import { groupedLayout } from '../lib/solar-grouped-layout';
 import { localPath } from '../i18n/languages';
 import { financialEstimate } from '../data/solar';
 
@@ -80,6 +81,8 @@ let view: ReturnType<typeof createSolarMap> | undefined;
 let selectedMarker: Marker | undefined;
 let selected: Coordinates | undefined;
 let assessment: Assessment | undefined;
+let preferGrouped = true;
+let closeView = false;
 let pending = false,
   generation = 0,
   searchGeneration = 0,
@@ -97,6 +100,13 @@ function updateButton() {
 }
 function discardRoof() {
   assessment = undefined;
+  preferGrouped = true;
+  closeView = false;
+  byId('grouped-layout-note').hidden = true;
+  byId('roof-limited').hidden = true;
+  byId('grouped-layout').hidden = true;
+  byId('panel-view').textContent = 'Closer view';
+  byId('panel-view').setAttribute('aria-pressed', 'false');
   view?.clear();
   byId('returned-building').hidden = true;
   byId('roof-controls').hidden = true;
@@ -402,14 +412,23 @@ function renderResults(panelsCount?: number) {
   try {
     const result = rooftopResults(roof, targetKw!, panelsCount);
     if (!result) throw new Error('Unavailable configuration');
-    view.show(roof, result.panelsCount);
+    const concept = groupedLayout(roof, result.panelsCount);
+    const grouped = preferGrouped && !!concept;
+    view.show(roof, result.panelsCount, grouped ? concept! : undefined);
+    byId('grouped-layout').hidden = !concept;
+    byId('grouped-layout').textContent = grouped
+      ? 'Compare Google model'
+      : 'Try grouped layout';
+    byId('grouped-layout-note').hidden = !grouped;
+    byId('grouped-layout-note').textContent =
+      `${result.panelsCount} panels / ${number(result.capacityKw)} kW grouped concept on one roof section. Model panels remain ${number(roof.panelHeightMeters)} by ${number(roof.panelWidthMeters)} m. Access, setbacks, obstacles, drainage, structure and mounting need an engineer's site check. Energy and savings are not shown for this rearranged concept.`;
     byId('returned-building').hidden = true;
     byId('roof-controls').hidden = false;
     byId('solar-source').hidden = false;
     byId('solar-source').textContent = assessment.roofImage
       ? `Source: Includes solar data from Google. Roof imagery: ${roof.imageryDate}. A site visit must confirm the roof's current condition.`
       : 'Source: Includes solar data from Google. Map imagery may differ; panel alignment needs verification.';
-    byId('roof-results').hidden = false;
+    byId('roof-results').hidden = grouped;
     byId<HTMLSelectElement>('roof-configuration').value = String(
       result.panelsCount,
     );
@@ -428,8 +447,11 @@ function renderResults(panelsCount?: number) {
     byId('roof-details').textContent =
       `${result.panelsCount} preliminary model panels. Solar imagery acquired ${roof.imageryDate}; processed ${roof.imageryProcessedDate ?? 'date unavailable'}. Data quality: ${roof.imageryQuality}. Map imagery may differ. Roof changes, obstacles, access and structure need physical inspection.`;
     show(
-      'Preliminary rooftop concept. Check the layout and arrange a free site visit.',
+      grouped
+        ? 'Grouped layout concept. Review the roof and arrange a site visit.'
+        : 'Preliminary rooftop concept. Check the layout and arrange a free site visit.',
     );
+    if (closeView) view.focusPanels();
   } catch {
     discardRoof();
     show(
@@ -456,6 +478,19 @@ function showAssessment() {
 byId('roof-configuration').addEventListener('change', () =>
   renderResults(Number(byId<HTMLSelectElement>('roof-configuration').value)),
 );
+byId('grouped-layout').addEventListener('click', () => {
+  if (!assessment || !freshSession()) return;
+  preferGrouped = !preferGrouped;
+  renderResults(Number(byId<HTMLSelectElement>('roof-configuration').value));
+});
+byId('panel-view').addEventListener('click', () => {
+  if (!assessment || !view || !freshSession()) return;
+  closeView = !closeView;
+  if (closeView) view.focusPanels();
+  else view.fit(assessment.roof);
+  byId('panel-view').textContent = closeView ? 'Whole roof' : 'Closer view';
+  byId('panel-view').setAttribute('aria-pressed', String(closeView));
+});
 byId('before-solar').addEventListener('click', () => {
   const button = byId('before-solar');
   const before = button.getAttribute('aria-pressed') !== 'true';

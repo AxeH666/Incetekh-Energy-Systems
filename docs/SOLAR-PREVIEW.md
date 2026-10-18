@@ -346,3 +346,36 @@ alongside the Solar-specific source statement. Native map attribution must remai
 visible; final real-device review is still required. See Google's
 [Solar attribution policy](https://developers.google.com/maps/documentation/solar/policies),
 checked 18 October 2026.
+
+## Grouped concept and panel visibility (private revision)
+
+The owner accepted the matched overhead SS Mall image as the visual quality target
+for the website. Public activation is still disabled. The general imagery-service
+pipeline is not yet implemented; the current matched image is the retained SS Mall
+review. Do not substitute unrelated basemap imagery and call it matched.
+
+`groupedLayout` can propose an interior rectangular group on one provider roof
+segment and orientation, using the original candidate centres and panel dimensions.
+It requires a complete candidate ring around the rectangle and declines near-flat
+segments whose azimuth is undefined, incomplete grids and unsupported counts. A
+100,000 operation budget covers grid lookups, bucket candidates, pair comparisons
+and footprint checks. A 3 cm coordinate tolerance for overlap is below
+the source image resolution; it is not a mounting gap or construction allowance.
+The surrounding candidate ring is not a code setback, clear access route, obstacle
+survey or structural check. Placement remains a visual concept requiring an engineer.
+
+The grouped view hides the original configuration's generation and savings. Those
+figures return only when comparing Google's original first-N panel configuration.
+No provider order, panel size, system rating or energy estimate is silently changed.
+The optional enquiry context still contains only the bill and chosen location, not
+a roof design. `Closer view` adjusts the map camera; it never scales panel geometry.
+The current SS Mall model uses 400 W, 1.879 by 1.045 m panels. A larger physical
+module needs an actual module datasheet and a new layout check.
+
+For the SS Mall 12-panel concept, all 972 sampled points (9 by 9 per footprint)
+were within the retained roof mask. This is sampled provider-model evidence, not
+engineering acceptance. No additional Google calls were needed for that check.
+
+References: [Google configuration and orientation contract](https://developers.google.com/maps/documentation/solar/reference/rest/v1/buildingInsights/findClosest),
+[Google roof coverage limits](https://developers.google.com/maps/documentation/solar/search-buildings),
+and [NREL rooftop design and site assessment guidance](https://docs.nrel.gov/docs/fy10osti/46078.pdf).

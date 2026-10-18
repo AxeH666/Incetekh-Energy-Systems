@@ -77,10 +77,21 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
           <button id="before-solar" type="button" aria-pressed="false">
             Show Before
           </button>
+          <button id="panel-view" type="button" aria-pressed="false">
+            Closer view
+          </button>
+          <button id="grouped-layout" type="button" hidden>
+            Try grouped layout
+          </button>
           <button id="unusable-roof" type="button">
             Panels don't match my roof
           </button>
         </div>
+        <p id="roof-limited" hidden>
+          Not enough rooftop space for the estimated system. If you have other
+          available space, please contact our office.
+        </p>
+        <p id="grouped-layout-note" hidden role="status"></p>
         <p id="solar-source" hidden>
           Source: Includes solar data from Google. Proposed panels are a
           preliminary concept, not an installation design.
@@ -94,10 +105,7 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
           <p class="google-attribution" translate="no">
             Includes data from <span>Google Maps</span>
           </p>
-          <p id="roof-limited" hidden>
-            Not enough rooftop space for the estimated system. If you have other
-            available space, please contact our office.
-          </p>
+
           <dl>
             <div>
               <dt>Proposed model panels</dt>

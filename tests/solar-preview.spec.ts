@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { previewWorker } from './support/solar-preview-worker.mjs';
+import { gridRoof } from './fixtures/grouped-roof';
 import { solarFixture } from './fixtures/solar.mjs';
 import { normalizeSolar } from '../worker/solar';
 import AxeBuilder from '@axe-core/playwright';
@@ -333,6 +334,53 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     );
     await expect(page.locator('#assess-property')).toBeDisabled();
     await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+  });
+  test('grouped draft hides unrelated generation estimates and closer view does not request another assessment', async ({
+    page,
+  }) => {
+    await setup(page);
+    let assessments = 0;
+    await page.route('**/api/solar-assessments', (route) => {
+      assessments++;
+      return route.fulfill({
+        json: {
+          status: 'available',
+          data_available: true,
+          roof: gridRoof(),
+          reference: 'group-test',
+        },
+      });
+    });
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await expect(page.locator('#grouped-layout-note')).toBeVisible();
+    await expect(page.locator('#grouped-layout-note')).toContainText(
+      'Energy and savings are not shown',
+    );
+    await expect(page.locator('#roof-results')).toBeHidden();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+    await page
+      .getByRole('button', { name: 'Closer view', exact: true })
+      .click();
+    await expect(
+      page.getByRole('button', { name: 'Whole roof', exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole('button', { name: 'Compare Google model', exact: true })
+      .click();
+    await expect(page.locator('#roof-results')).toBeVisible();
+    await expect(page.locator('#result-dc')).toContainText('4,800');
+    await page
+      .getByRole('button', { name: 'Try grouped layout', exact: true })
+      .click();
+    await expect(page.locator('#roof-results')).toBeHidden();
+    expect(assessments).toBe(1);
+    await page
+      .getByRole('textbox', { name: 'Enter your full address' })
+      .fill('Changed address');
+    await expect(page.locator('#grouped-layout-note')).toBeHidden();
+    await expect(page.locator('#roof-controls')).toBeHidden();
   });
   test('matching roof imagery stays under toggled panels and clears on a changed selection', async ({
     page,

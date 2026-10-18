@@ -1,5 +1,10 @@
 import type { SolarRoof } from '../../worker/solar';
-import { configurationPaths, type MapPoint } from './solar-geometry.js';
+import {
+  configurationPaths,
+  panelCorners,
+  offsetPoint,
+  type MapPoint,
+} from './solar-geometry.js';
 
 export interface MapHandle {
   setCenter(point: MapPoint): void;
@@ -152,9 +157,11 @@ export function createSolarMap(
   let roofImage: PolygonHandle | undefined;
   let releaseRoofImage: (() => void) | undefined;
   let visible = true;
+  let displayedPaths: MapPoint[][] = [];
   function clear() {
     for (const polygon of polygons) polygon.setMap(null);
     polygons = [];
+    displayedPaths = [];
   }
   return {
     map,
@@ -189,10 +196,20 @@ export function createSolarMap(
       visible = value;
       for (const polygon of polygons) polygon.setMap(value ? map : null);
     },
-    show(roof: SolarRoof, panelsCount: number) {
-      const paths = configurationPaths(roof, panelsCount); // Validate before replacing.
+    show(roof: SolarRoof, panelsCount: number, conceptIndices?: number[]) {
+      if (
+        conceptIndices &&
+        (conceptIndices.length !== panelsCount ||
+          new Set(conceptIndices).size !== panelsCount ||
+          conceptIndices.some((i) => !Number.isSafeInteger(i) || i < 0))
+      )
+        throw new Error('Invalid grouped concept');
+      const paths = conceptIndices
+        ? conceptIndices.map((i) => panelCorners(roof, i))
+        : configurationPaths(roof, panelsCount);
       clear();
       try {
+        displayedPaths = paths;
         for (const path of paths)
           polygons.push(
             new api.Polygon({
@@ -211,6 +228,22 @@ export function createSolarMap(
         clear();
         throw error;
       }
+    },
+    focusPanels() {
+      const points = displayedPaths.flat();
+      if (!points.length) return;
+      const south = Math.min(...points.map((p) => p.lat)),
+        north = Math.max(...points.map((p) => p.lat));
+      const west = Math.min(...points.map((p) => p.lng)),
+        east = Math.max(...points.map((p) => p.lng));
+      const sw = offsetPoint({ lat: south, lng: west }, -3, -3),
+        ne = offsetPoint({ lat: north, lng: east }, 3, 3);
+      map.fitBounds({
+        south: sw.lat,
+        west: sw.lng,
+        north: ne.lat,
+        east: ne.lng,
+      });
     },
     fit(roof: SolarRoof) {
       map.fitBounds({
