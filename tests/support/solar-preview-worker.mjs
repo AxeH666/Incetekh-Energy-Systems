@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 
-export function previewWorker(patch = {}) {
+export function previewWorker(patch = {}, overrides = {}) {
   return new Miniflare(
     convertV4MiniflareOptions({
       modules: [
@@ -47,6 +47,7 @@ export function previewWorker(patch = {}) {
       outboundService: () => {
         throw new Error('External requests are forbidden in this test');
       },
+      ...overrides,
     }),
   );
 }

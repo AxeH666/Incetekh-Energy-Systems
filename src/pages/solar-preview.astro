@@ -117,6 +117,9 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
           aria-labelledby="roof-results-heading"
         >
           <h2 id="roof-results-heading">Preliminary rooftop estimate</h2>
+          <p class="google-attribution" translate="no">
+            Includes data from <span>Google Maps</span>
+          </p>
           <label for="roof-configuration">Returned rooftop configuration</label>
           <select id="roof-configuration"></select>
           <p id="roof-comparison"></p>
@@ -250,6 +253,17 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
     margin: 0.4rem 0;
     font-size: 1.4rem;
     font-weight: 600;
+  }
+  .google-attribution {
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: normal;
+    color: #1f1f1f;
+  }
+  .google-attribution span {
+    white-space: nowrap;
   }
   #roof-results select {
     max-width: 100%;

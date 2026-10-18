@@ -16,6 +16,19 @@ test('local Wrangler preserves static pages and closes the unconfigured API', as
   );
   expect((await request.get('/api/missing')).status()).toBe(404);
   expect((await request.get('/privacy/')).status()).toBe(200);
+  const preview = await request.get('/solar-preview/');
+  expect(preview.status()).toBe(200);
+  expect(preview.headers()['x-robots-tag']).toContain('noindex');
+  expect(preview.headers()['cache-control']).toBe('no-store');
+  const config = await request.get('/api/solar-preview-config');
+  expect(config.status()).toBe(200);
+  expect(await config.json()).toEqual({ enabled: false });
+  const assessment = await request.post('/api/solar-assessments', { data: {} });
+  expect(assessment.status()).toBe(503);
+  expect(await assessment.json()).toEqual({
+    status: 'disabled',
+    data_available: false,
+  });
   expect((await request.get('/synthetic-missing-page/')).status()).toBe(404);
   const redirected = await request.get('/reviews/', { maxRedirects: 0 });
   // Astro's existing static redirect is an HTML refresh, not an edge 301.
