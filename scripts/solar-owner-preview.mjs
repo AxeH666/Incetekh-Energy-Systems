@@ -173,6 +173,44 @@ const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, origin);
     if (url.origin !== origin) return send(403, '{}');
+    // Refresh-safe saved review: no calculator session or provider bootstrap.
+    if (
+      ssMall &&
+      url.pathname === '/solar-preview/' &&
+      live.remaining().maps === 0
+    ) {
+      response.setHeader('Location', '/__owner/ss-mall/');
+      return send(302, '');
+    }
+    if (url.pathname.startsWith('/__owner/ss-mall/')) {
+      if (!ssMall || Date.now() >= ssMall.expires) return send(404, '{}');
+      if (!['GET', 'HEAD'].includes(request.method)) return send(405, '{}');
+      const captures = {
+        '/__owner/ss-mall/before.png': 'saved-before.png',
+        '/__owner/ss-mall/with-solar.png': 'saved-with-solar.png',
+      };
+      if (Object.hasOwn(captures, url.pathname))
+        return send(
+          200,
+          await readFile(
+            resolve(root, '.wrangler/solar-ss-mall', captures[url.pathname]),
+          ),
+          'image/png',
+        );
+      if (url.pathname !== '/__owner/ss-mall/') return send(404, '{}');
+      const nonce = randomBytes(24).toString('base64');
+      response.setHeader(
+        'Content-Security-Policy',
+        `default-src 'none'; img-src 'self'; style-src 'nonce-${nonce}'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`,
+      );
+      return send(
+        200,
+        `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SS Mall | Private saved review</title><style nonce="${nonce}">
+      *{box-sizing:border-box}body{margin:0;background:#f5f4ee;color:#202722;font:16px/1.6 system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:28px 20px}header{border-bottom:1px solid #c9cec6;padding:12px 20px;background:#202722;color:white}h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.1;margin:16px 0}p{max-width:800px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:12px}fieldset{border:0;padding:0;margin:24px 0 12px}legend{font-weight:600;margin-bottom:8px}label{display:inline-block;margin-right:20px;cursor:pointer}input{accent-color:#075e54;width:18px;height:18px;vertical-align:middle}figure{margin:16px 0}img{width:100%;height:auto;display:block}#before-image{display:none}main:has(#before:checked) #before-image{display:block}main:has(#before:checked) #solar-image{display:none}figcaption,footer{font-size:14px;color:#475147}a{color:inherit}
+      </style></head><body><header>INCETEKH SOLAR - Private review on this computer</header><main><p class="eyebrow">Saved rooftop preview</p><h1>SS Mall, Proddatur</h1><p>5 kW selected / 12 model panels / 4.8 kW modeled capacity</p><p>This saved view reopens without the calculator or another Google request. You can refresh this page. Address search and map navigation are unavailable in this saved review.</p><fieldset><legend>Compare the roof</legend><label><input id="before" type="radio" name="view"> Before</label><label><input id="solar" type="radio" name="view" checked> With solar</label></fieldset><figure><img id="solar-image" src="with-solar.png" alt="Saved Google map view of SS Mall with 12 preliminary model solar panels"><img id="before-image" src="before.png" alt="Saved Google map view of the same SS Mall roof without panel overlays"><figcaption>Saved Google Maps captures. Includes solar data from Google. Roof imagery: 14 January 2023. Map credits remain in each image.</figcaption></figure><footer>Preliminary model only. A site visit must confirm current obstacles, structure and installation layout. <a href="/#solar-planner">Return to calculator</a></footer></main></body></html>`,
+        'text/html; charset=utf-8',
+      );
+    }
     if (url.pathname === '/api/site-visits')
       return send(503, JSON.stringify({ code: 'unavailable' }));
     if (url.pathname === '/api/solar-imagery/ss-mall.png') {

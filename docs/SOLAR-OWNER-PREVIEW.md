@@ -3,6 +3,21 @@
 Public activation remains disabled. This branch is for owner review on this
 computer only; no push, deployment, lead writes, email or WhatsApp messages.
 
+## Reopen the saved view (no Google calls)
+
+Open **http://127.0.0.1:4333/__owner/ss-mall/** while the local server is running.
+This page has Before/With Solar controls over saved map captures of the reviewed
+5 kW choice (12 model panels / 4.8 kW). It requires no calculator session, permits
+refreshing and makes no external requests. Google attribution remains embedded in
+the captures. It is explicitly a saved comparison, without address search or map
+navigation. It does not assess the user's current calculator choice.
+
+When the SS Mall Maps allowance is exhausted, the local `/solar-preview/` route
+redirects here instead of displaying an expired-session dead end. No budget is
+reset. The two ignored map-only captures share the existing evidence expiry;
+the page and images fail closed after that deadline. A direct-open/reload/toggle
+browser check verifies zero external requests and unchanged counters.
+
 ## Open the SS Mall review
 
 Build with `npm run build`, then run:
@@ -80,9 +95,8 @@ attribution, and Before/With Solar worked without a new request. Desktop and
 390px screenshots were inspected; resizing preserves the current map zoom.
 
 The three additional normal-server Maps loads have now been consumed, including
-one image-CSP failure corrected before the successful final check. The working
-private browser tab remains open. Reloading and starting another map will be
-blocked by the exhausted cap; the counter is deliberately not reset. An additional
+one image-CSP failure corrected before the successful final check. Starting another live map is blocked by the exhausted cap; the counter is
+deliberately not reset. The saved comparison above remains refresh-safe. An additional
 live allowance requires owner approval. No new Solar call was made in this mode.
 
 ## Behaviour and failure handling

@@ -8,6 +8,7 @@ import { solarFixture } from './fixtures/solar.mjs';
 
 test('private saved-roof mode serves only its matching image and location without outbound Solar calls', async ({
   request,
+  page,
 }) => {
   const folder = await mkdtemp('.wrangler/owner-replay-test-');
   for (const directory of [
@@ -62,6 +63,11 @@ test('private saved-roof mode serves only its matching image and location withou
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1kAAAAASUVORK5CYII=',
       'base64',
     ),
+  );
+  await copyFile(join(cache, 'map-rgb.png'), join(cache, 'saved-before.png'));
+  await copyFile(
+    join(cache, 'map-rgb.png'),
+    join(cache, 'saved-with-solar.png'),
   );
   const preload = join(folder, 'block-network.mjs');
   await writeFile(
@@ -141,7 +147,45 @@ test('private saved-roof mode serves only its matching image and location withou
     expect(
       await (await request.get(origin + '/__owner/allowance')).json(),
     ).toEqual({ mode: 'ss-mall-review', maps: 3, solar: 0 });
+    const external: string[] = [];
+    page.on('request', (req) => {
+      if (!req.url().startsWith(origin + '/')) external.push(req.url());
+    });
+    await page.goto(origin + '/__owner/ss-mall/');
+    await expect(
+      page.getByRole('heading', { name: 'SS Mall, Proddatur' }),
+    ).toBeVisible();
+    await expect(page.locator('#solar-image')).toBeVisible();
+    await page.getByLabel('Before', { exact: true }).check();
+    await expect(page.locator('#before-image')).toBeVisible();
+    await expect(page.locator('#solar-image')).toBeHidden();
+    await page.reload();
+    await expect(page.locator('#solar-image')).toBeVisible();
+    expect(
+      await page
+        .locator('#solar-image')
+        .evaluate(
+          (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+        ),
+    ).toBe(true);
+    expect(external).toEqual([]);
+    expect(
+      await (await request.get(origin + '/__owner/allowance')).json(),
+    ).toMatchObject({ maps: 3, solar: 0 });
+    for (let i = 0; i < 3; i++) await request.get(origin + '/__owner/maps.js'); // Reserve locally; never execute these scripts.
+    await page.goto(origin + '/solar-preview/');
+    await expect(page).toHaveURL(origin + '/__owner/ss-mall/');
+    expect(
+      await (await request.get(origin + '/__owner/allowance')).json(),
+    ).toMatchObject({ maps: 0, solar: 0 });
+    expect(external).toEqual([]);
     await writeFile(join(folder, 'clock.txt'), String(2 * 86400000));
+    expect((await request.get(origin + '/__owner/ss-mall/')).status()).toBe(
+      404,
+    );
+    expect(
+      (await request.get(origin + '/__owner/ss-mall/with-solar.png')).status(),
+    ).toBe(404);
     expect(await (await assess(15)).json()).toMatchObject({
       status: 'no_coverage',
       data_available: false,
