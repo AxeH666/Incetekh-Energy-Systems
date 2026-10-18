@@ -5,9 +5,11 @@ import {
   unavailable,
   type SolarResult,
 } from './solar.js';
+import { fetchSolarImagery, type SolarRaster } from './solar-imagery.js';
 
 export interface SolarEnv {
   SOLAR_PREVIEW_ENABLED?: string;
+  SOLAR_MATCHED_IMAGERY_ENABLED?: string;
   SOLAR_ALLOWED_ORIGIN?: string;
   SOLAR_API_KEY?: string;
   SOLAR_DAILY_LIMIT?: string;
@@ -209,7 +211,28 @@ export async function solarEndpoint(
     if (!(await reserveSolar(env.LEADS_DB, daily, monthly)))
       return reply(unavailable('budget_exhausted'), 429);
     const started = Date.now();
-    const result = await fetchSolar(point, env.SOLAR_API_KEY);
+    let result = await fetchSolar(point, env.SOLAR_API_KEY);
+    let roofRaster: SolarRaster | undefined;
+    if (
+      result.status === 'available' &&
+      env.SOLAR_MATCHED_IMAGERY_ENABLED === 'true'
+    ) {
+      const bounds = result.roof.bounds;
+      if (
+        point.latitude < bounds.sw.latitude ||
+        point.latitude > bounds.ne.latitude ||
+        point.longitude < bounds.sw.longitude ||
+        point.longitude > bounds.ne.longitude
+      ) {
+        result = unavailable('unusable_geometry');
+      } else {
+        try {
+          roofRaster = await fetchSolarImagery(result.roof, env.SOLAR_API_KEY);
+        } catch {
+          result = unavailable('unusable_geometry');
+        }
+      }
+    }
     // No request URL, error text, key, IP, coordinates, token or content in logs.
     console.log(
       JSON.stringify({
@@ -227,7 +250,11 @@ export async function solarEndpoint(
             )
           ? 503
           : 200,
-      { reference: crypto.randomUUID(), selectedLocation: point },
+      {
+        reference: crypto.randomUUID(),
+        selectedLocation: point,
+        ...(roofRaster ? { roofRaster } : {}),
+      },
     );
   } catch {
     return reply(unavailable('transient_failure'), 503);

@@ -59,6 +59,7 @@ before(async () => {
       'email',
       'solar',
       'solar-endpoint',
+      'solar-imagery',
       'solar-page',
       'preview-context',
     ].map((name) => ({

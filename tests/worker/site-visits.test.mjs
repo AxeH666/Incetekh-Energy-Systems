@@ -71,6 +71,7 @@ before(async () => {
       { type: 'ESModule', path: '.wrangler/test-worker/solar.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/solar-endpoint.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/solar-page.js' },
+      { type: 'ESModule', path: '.wrangler/test-worker/solar-imagery.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/preview-context.js' },
     ],
     compatibilityDate: '2026-09-30',
