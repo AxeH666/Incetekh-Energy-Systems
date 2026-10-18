@@ -5,7 +5,11 @@ import {
   type MapsApi,
   type RoofImage,
 } from '../lib/solar-map';
-import type { SolarResult, Coordinates } from '../../worker/solar';
+import {
+  roofSelection,
+  type SolarResult,
+  type Coordinates,
+} from '../../worker/solar';
 import {
   readSolarSession,
   billEstimate,
@@ -85,6 +89,7 @@ let view: ReturnType<typeof createSolarMap> | undefined;
 let selectedMarker: Marker | undefined;
 let selected: Coordinates | undefined;
 let assessment: Assessment | undefined;
+let candidate: Assessment | undefined;
 let matchedRoof: MatchedRoofImage | undefined;
 let preferGrouped = true;
 let closeView = false;
@@ -101,9 +106,12 @@ function show(message: string, focus = false) {
   if (focus) status.focus();
 }
 function updateButton() {
-  assess.disabled = !selected || !token || pending || mapFailed || !!assessment;
-  assess.hidden = !!assessment;
-  byId('solar-security').hidden = !!assessment;
+  assess.disabled =
+    !selected || !token || pending || mapFailed || !!assessment || !!candidate;
+  assess.hidden = !!assessment || !!candidate;
+  byId('solar-security').hidden = !!assessment || !!candidate;
+  byId<HTMLButtonElement>('confirm-detected-roof').disabled =
+    !candidate || pending || mapFailed;
   assess.textContent = pending
     ? 'Preparing your preview…'
     : 'Confirm roof & preview';
@@ -112,6 +120,8 @@ function updateButton() {
 function discardRoof() {
   matchedRoof = undefined;
   assessment = undefined;
+  candidate = undefined;
+  byId('confirm-detected-roof').hidden = true;
   preferGrouped = true;
   closeView = false;
   byId('grouped-layout-note').hidden = true;
@@ -139,6 +149,7 @@ function syncEnquiryContext() {
     !session ||
     !need ||
     !selected ||
+    candidate ||
     Date.now() - session.createdAt >= sessionLifetime
   )
     return;
@@ -239,7 +250,7 @@ function security(sitekey: string) {
   const fail = () => {
     token = '';
     updateButton();
-    if (!pending && !assessment)
+    if (!pending && !assessment && !candidate)
       show(
         'The security check is unavailable. Please use the free site visit option.',
       );
@@ -257,7 +268,7 @@ function security(sitekey: string) {
       'expired-callback': () => {
         token = '';
         updateButton();
-        if (selected && !pending && !assessment)
+        if (selected && !pending && !assessment && !candidate)
           show(
             'Your security check expired. Please verify again to preview your roof.',
           );
@@ -349,7 +360,8 @@ const messages: Record<string, string> = {
 };
 assess.addEventListener('click', async () => {
   if (!freshSession()) return;
-  if (!selected || !token || pending || mapFailed || assessment) return;
+  if (!selected || !token || pending || mapFailed || assessment || candidate)
+    return;
   const revision = generation;
   const point = { ...selected };
   const submittedToken = token;
@@ -389,15 +401,8 @@ assess.addEventListener('click', async () => {
       );
       return;
     }
-    // This rejects obvious mismatches; a bounding box is not a roof outline.
-    // Never translate Google's panel coordinates to make a neighbouring roof fit.
-    const bounds = result.roof.bounds;
-    if (
-      point.latitude < bounds.sw.latitude ||
-      point.latitude > bounds.ne.latitude ||
-      point.longitude < bounds.sw.longitude ||
-      point.longitude > bounds.ne.longitude
-    ) {
+    const selection = roofSelection(result.roof, point);
+    if (selection === 'unmatched') {
       byId('returned-building').hidden = false;
       byId('returned-location').textContent =
         'No layout shown for this location.';
@@ -434,22 +439,45 @@ assess.addEventListener('click', async () => {
       }
       view.setRoofImage(roofImage);
     }
+    if (selection === 'candidate') {
+      candidate = result;
+      byId('selection-label').textContent =
+        'The pin is your original selection. The box shows the detected building.';
+      view?.showBuildingArea(result.roof, {
+        lat: point.latitude,
+        lng: point.longitude,
+      });
+      byId('returned-building').hidden = false;
+      byId('confirm-detected-roof').hidden = false;
+      byId('returned-location').textContent =
+        'We found solar data for the highlighted building. Is this your property?';
+      byId('solar-source').hidden = false;
+      byId('solar-source').textContent =
+        `Source: Includes solar data from Google. Roof imagery: ${result.roof.imageryDate}. The box marks the detected building area, not a surveyed roof outline.`;
+      show(
+        'Check the highlighted building, then choose Yes or No below.',
+        true,
+      );
+      return;
+    }
     assessment = result;
     selectedMarker?.setMap(null);
     view?.fit(result.roof);
     showAssessment();
   } catch {
-    if (revision === generation && !mapFailed)
+    if (revision === generation && !mapFailed) {
+      discardRoof();
       show(
         'The assessment could not finish. No layout is shown. Please try later or book a free site visit.',
         true,
       );
+    }
   } finally {
     clearTimeout(timeout);
     if (revision === generation) {
       pending = false;
       syncEnquiryContext();
-      if (widgetId && !assessment && challengeUsed) {
+      if (widgetId && !assessment && !candidate && challengeUsed) {
         token = '';
         challengeUsed = false;
         window.turnstile?.reset(widgetId);
@@ -457,6 +485,17 @@ assess.addEventListener('click', async () => {
       updateButton();
     }
   }
+});
+byId('confirm-detected-roof').addEventListener('click', () => {
+  if (!freshSession() || !candidate || pending || mapFailed) return;
+  assessment = candidate;
+  candidate = undefined;
+  selected = { ...assessment.roof.center };
+  selectedMarker?.setMap(null);
+  view?.fit(assessment.roof);
+  showAssessment();
+  syncEnquiryContext();
+  updateButton();
 });
 function renderResults(panelsCount?: number) {
   if (!assessment || !view || mapFailed || !need || !freshSession()) return;
@@ -530,6 +569,7 @@ function renderResults(panelsCount?: number) {
 }
 function showAssessment() {
   if (!assessment || !view || !freshSession()) return;
+  byId('selection-label').textContent = 'Your confirmed building.';
   byId('roof-configuration').replaceChildren(
     ...assessment.roof.configurations.map((config) => {
       const option = document.createElement('option');
@@ -631,7 +671,7 @@ async function initialize() {
           view.map.addListener('click', (point) => {
             // Map clicks also occur during double-click/tap zoom. A confirmed
             // or loading preview changes only via an explicit new selection.
-            if (assessment || pending) return;
+            if (assessment || candidate || pending) return;
             if (point.latLng)
               choose(
                 { latitude: point.latLng.lat(), longitude: point.latLng.lng() },

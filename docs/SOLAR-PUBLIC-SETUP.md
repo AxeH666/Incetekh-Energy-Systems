@@ -123,7 +123,7 @@ the pin to the middle. Live traces showed a completed HTTP 200 response with
 exception. That old status combined three different failure stages, so it did
 not establish whether the roof model, pin match or imagery was responsible.
 
-Responses now distinguish `roof_mismatch` (move the pin onto the actual roof),
+Responses now distinguish `roof_mismatch` (the returned building is too far away),
 `imagery_unavailable` (matching imagery could not be obtained), and
 `unusable_geometry` (the model was rejected). No layout is drawn for these states.
 The existing sanitized `solar_attempt` log additionally records the imagery
@@ -132,6 +132,23 @@ stage (`metadata`, `rgb`, `mask`), fixed reason (`http`, `data_mismatch`,
 URLs, error bodies, locations, tokens or keys, and are not returned publicly.
 Unknown transport/validation errors remain grouped as `invalid_data`; a
 diagnostic deployment does not itself prove the underlying live failure fixed.
+
+The subsequent live trace confirmed `roof_mismatch` even when the owner selected
+the middle of SS Mall. Google's [findClosest endpoint](https://developers.google.com/maps/documentation/solar/reference/rest/v1/buildingInsights/findClosest)
+selects the nearest building centroid, which is not necessarily the building
+containing the requested pin. Repeating the instruction to move the pin was not
+an adequate recovery flow.
+
+When the pin is outside the returned building's bounding box and within 100 metres
+of its centre, that building becomes an explicit candidate. The same assessment loads its matching
+imagery and highlights its bounding box; no panels, roof estimates or enquiry
+context appear until the visitor chooses “Yes, show solar here.” This confirmation
+reuses the loaded response with no second assessment or human check. “No, choose
+another roof,” address edits, expiry and map failures discard it. Distant results
+still fail closed. The box is labelled as a building area, not a surveyed outline.
+Acceptance uses the returned building's actual coordinates and unchanged mask
+checks; panels are never translated to the original pin. This offers confirmation
+of Google's candidate, not proof that Google returned the intended house.
 
 Official guidance: [Google key restrictions](https://developers.google.com/maps/api-security-best-practices),
 [Solar coverage limitations](https://developers.google.com/maps/documentation/solar/coverage).

@@ -43,6 +43,18 @@ export function unavailable(
 ): SolarResult {
   return { status, data_available: false };
 }
+
+// A nearby detected building is a candidate for explicit user confirmation,
+// never permission to translate its geometry onto the original address pin.
+export function roofSelection(roof: SolarRoof, point: Coordinates) {
+  if (inside(point, roof.bounds)) return 'matched';
+  const north = (point.latitude - roof.center.latitude) * 111320;
+  const east =
+    (point.longitude - roof.center.longitude) *
+    111320 *
+    Math.cos((point.latitude * Math.PI) / 180);
+  return Math.hypot(north, east) <= 100 ? 'candidate' : 'unmatched';
+}
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
     throw new Error('invalid');

@@ -51,8 +51,12 @@ window.google = {
     },
     Polygon: class {
       constructor(options) {
+        if (options.fillOpacity === 0 && window.syntheticBuildingAreaFailure)
+          throw new Error('Synthetic building highlight failure');
         this.node = document.createElement('span');
-        this.node.dataset.mockPanel = 'true';
+        if (options.fillOpacity === 0)
+          this.node.dataset.mockBuildingArea = 'true';
+        else this.node.dataset.mockPanel = 'true';
         this.node.textContent = ' ▣ ';
         this.setMap(options.map);
       }

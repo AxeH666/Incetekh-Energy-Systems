@@ -444,7 +444,8 @@ original Google configuration is offered only if it also passes the mask check.
 Otherwise no layout is shown. Estimates remain preliminary and are not assigned
 to resized/rearranged modules.
 
-The isolated preview entry is capped at 27 KB; its complete dependency graph,
+The isolated preview entry is capped at 29 KB to include the explicit detected
+building confirmation and its cancellation/recovery states; its complete dependency graph,
 including lazy TIFF decoders and projection code, is capped at 500 KB. Other
 scripts keep the 15 KB limit and shared assets retain 2.1 MB. Tests trace imports
 from all non-preview HTML pages to verify the raster graph remains isolated.

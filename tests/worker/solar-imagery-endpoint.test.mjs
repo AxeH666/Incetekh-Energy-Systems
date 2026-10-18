@@ -4,7 +4,12 @@ import { readFile } from 'node:fs/promises';
 import { previewWorker } from '../support/solar-preview-worker.mjs';
 import { solarFixture } from '../fixtures/solar.mjs';
 
-for (const scenario of ['available', 'imagery_unavailable', 'roof_mismatch'])
+for (const scenario of [
+  'available',
+  'candidate',
+  'imagery_unavailable',
+  'roof_mismatch',
+])
   test(`assessment reserves one bounded bundle and distinguishes ${scenario}`, async () => {
     const calls = [];
     const mf = previewWorker(
@@ -28,8 +33,15 @@ for (const scenario of ['available', 'imagery_unavailable', 'roof_mismatch'])
             request.headers.get('X-Goog-Api-Key'),
             'synthetic-private-solar-secret',
           );
-          if (url.pathname.endsWith('findClosest'))
-            return Response.json(solarFixture());
+          if (url.pathname.endsWith('findClosest')) {
+            const fixture = solarFixture();
+            if (scenario === 'candidate')
+              fixture.boundingBox = {
+                sw: { latitude: 14.9998, longitude: 78.9998 },
+                ne: { latitude: 15.0002, longitude: 79.0002 },
+              };
+            return Response.json(fixture);
+          }
           if (url.pathname.endsWith('dataLayers:get'))
             return Response.json({
               imageryDate: { year: 2021, month: 3, day: 2 },
@@ -59,14 +71,29 @@ for (const scenario of ['available', 'imagery_unavailable', 'roof_mismatch'])
             'CF-Connecting-IP': '192.0.2.1',
           },
           body: JSON.stringify({
-            latitude: scenario === 'roof_mismatch' ? 15.01 : 15,
+            latitude:
+              scenario === 'roof_mismatch'
+                ? 15.01
+                : scenario === 'candidate'
+                  ? 15.0003
+                  : 15,
             longitude: 79,
             token: 'synthetic-token',
           }),
         });
       const data = await (await send()).json();
-      assert.equal(data.status, scenario);
-      assert.equal(!!data.roofRaster, scenario === 'available');
+      assert.equal(
+        data.status,
+        scenario === 'candidate' ? 'available' : scenario,
+      );
+      assert.equal(
+        !!data.roofRaster,
+        ['available', 'candidate'].includes(scenario),
+      );
+      assert.equal(
+        data.confirmationRequired,
+        scenario === 'candidate' ? true : undefined,
+      );
       assert.equal(data.imageryStage, undefined);
       assert.equal(data.imageryReason, undefined);
       assert.equal(data.providerHttpStatus, undefined);
@@ -74,7 +101,7 @@ for (const scenario of ['available', 'imagery_unavailable', 'roof_mismatch'])
         assert.ok(!calls.some((p) => p.endsWith('dataLayers:get')));
       assert.equal(
         calls.filter((p) => p.endsWith('geoTiff:get')).length,
-        scenario === 'available'
+        ['available', 'candidate'].includes(scenario)
           ? 2
           : scenario === 'imagery_unavailable'
             ? 1
