@@ -5,7 +5,11 @@ import {
   unavailable,
   type SolarResult,
 } from './solar.js';
-import { fetchSolarImagery, type SolarRaster } from './solar-imagery.js';
+import {
+  fetchSolarImagery,
+  SolarImageryError,
+  type SolarRaster,
+} from './solar-imagery.js';
 
 export interface SolarEnv {
   SOLAR_PREVIEW_ENABLED?: string;
@@ -215,6 +219,13 @@ export async function solarEndpoint(
     const started = Date.now();
     let result = await fetchSolar(point, env.SOLAR_API_KEY);
     let roofRaster: SolarRaster | undefined;
+    let imageryFailure:
+      | {
+          imageryStage: string;
+          imageryReason: string;
+          providerHttpStatus?: number;
+        }
+      | undefined;
     if (
       result.status === 'available' &&
       env.SOLAR_MATCHED_IMAGERY_ENABLED === 'true'
@@ -226,12 +237,18 @@ export async function solarEndpoint(
         point.longitude < bounds.sw.longitude ||
         point.longitude > bounds.ne.longitude
       ) {
-        result = unavailable('unusable_geometry');
+        result = unavailable('roof_mismatch');
       } else {
         try {
           roofRaster = await fetchSolarImagery(result.roof, env.SOLAR_API_KEY);
-        } catch {
-          result = unavailable('unusable_geometry');
+        } catch (error) {
+          result = unavailable('imagery_unavailable');
+          if (error instanceof SolarImageryError)
+            imageryFailure = {
+              imageryStage: error.stage,
+              imageryReason: error.reason,
+              providerHttpStatus: error.httpStatus,
+            };
         }
       }
     }
@@ -241,6 +258,7 @@ export async function solarEndpoint(
         event: 'solar_attempt',
         status: result.status,
         latencyMs: Date.now() - started,
+        ...imageryFailure,
       }),
     );
     return reply(

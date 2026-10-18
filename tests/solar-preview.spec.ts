@@ -776,24 +776,25 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await expect(page.locator('[data-mock-roof-image]')).toHaveCount(0);
     }
   });
-  test('coverage/budget failures keep the manual visit path', async ({
+  test('coverage, budget, roof mismatch and imagery failures give distinct recovery instructions', async ({
     page,
   }) => {
     await setup(page);
     await page.getByRole('button', { name: 'Enter your address' }).click();
     await select(page);
-    for (const status of ['no_coverage', 'budget_exhausted']) {
+    for (const [status, message] of [
+      ['no_coverage', 'unavailable for this property'],
+      ['budget_exhausted', 'usage limit'],
+      ['roof_mismatch', 'Tap the middle of your roof'],
+      ['imagery_unavailable', 'Matching roof imagery is unavailable'],
+    ]) {
       await page.route('**/api/solar-assessments', (route) =>
         route.fulfill({ json: { status, data_available: false } }),
       );
       await page
         .getByRole('button', { name: 'Confirm roof & preview' })
         .click();
-      await expect(page.locator('#preview-status')).toContainText(
-        status === 'no_coverage'
-          ? 'unavailable for this property'
-          : 'usage limit',
-      );
+      await expect(page.locator('#preview-status')).toContainText(message);
       await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
       await expect(
         page.getByRole('link', { name: 'Book a free site visit', exact: true }),

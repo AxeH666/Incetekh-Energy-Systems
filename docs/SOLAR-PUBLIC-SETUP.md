@@ -115,6 +115,24 @@ This replay and the owner's successful attempt do not establish residential
 coverage, physical-device acceptance or the corrected live interaction by
 themselves; verify zooming and explicit reselection after the correction deploys.
 
+### Assessment failure diagnosis
+
+The owner subsequently reported the generic roof-data fallback even after moving
+the pin to the middle. Live traces showed a completed HTTP 200 response with
+`unusable_geometry`, approximately 1.26 seconds provider latency and no Worker
+exception. That old status combined three different failure stages, so it did
+not establish whether the roof model, pin match or imagery was responsible.
+
+Responses now distinguish `roof_mismatch` (move the pin onto the actual roof),
+`imagery_unavailable` (matching imagery could not be obtained), and
+`unusable_geometry` (the model was rejected). No layout is drawn for these states.
+The existing sanitized `solar_attempt` log additionally records the imagery
+stage (`metadata`, `rgb`, `mask`), fixed reason (`http`, `data_mismatch`,
+`invalid_data`) and optional numeric HTTP status. These diagnostics contain no
+URLs, error bodies, locations, tokens or keys, and are not returned publicly.
+Unknown transport/validation errors remain grouped as `invalid_data`; a
+diagnostic deployment does not itself prove the underlying live failure fixed.
+
 Official guidance: [Google key restrictions](https://developers.google.com/maps/api-security-best-practices),
 [Solar coverage limitations](https://developers.google.com/maps/documentation/solar/coverage).
 Usage is pay-as-you-go; Google recommends daily quotas for cost control:

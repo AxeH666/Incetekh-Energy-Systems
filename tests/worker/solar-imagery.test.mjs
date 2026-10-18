@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { fetchSolarImagery } from '../../.wrangler/test-worker/solar-imagery.js';
+import {
+  fetchSolarImagery,
+  SolarImageryError,
+} from '../../.wrangler/test-worker/solar-imagery.js';
 import { normalizeSolar } from '../../.wrangler/test-worker/solar.js';
 import { solarFixture } from '../fixtures/solar.mjs';
 
@@ -51,7 +54,21 @@ test('date/quality mismatch and either unsafe asset URL prevent every download',
       return Response.json(metadata(patch));
     };
     try {
-      await assert.rejects(fetchSolarImagery(roof, 'synthetic-key'));
+      await assert.rejects(
+        fetchSolarImagery(roof, 'synthetic-key'),
+        (error) => {
+          assert.ok(error instanceof SolarImageryError);
+          assert.equal(error.stage, 'metadata');
+          assert.equal(error.httpStatus, undefined);
+          assert.equal(
+            error.reason,
+            patch.imageryDate || patch.imageryQuality
+              ? 'data_mismatch'
+              : 'invalid_data',
+          );
+          return true;
+        },
+      );
       assert.equal(calls, 1);
     } finally {
       globalThis.fetch = originalFetch;
@@ -68,8 +85,50 @@ test('redirect, corrupt or oversized TIFF fails without retry or second download
     globalThis.fetch = async () =>
       ++calls === 1 ? Response.json(metadata()) : response();
     try {
-      await assert.rejects(fetchSolarImagery(roof, 'synthetic-key'));
+      await assert.rejects(
+        fetchSolarImagery(roof, 'synthetic-key'),
+        (error) => {
+          assert.ok(error instanceof SolarImageryError);
+          assert.equal(error.stage, 'rgb');
+          assert.equal(error.message, 'Matching imagery unavailable');
+          return true;
+        },
+      );
       assert.equal(calls, 2);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  }
+});
+
+test('imagery failures expose only a fixed stage and numeric HTTP status to internal diagnostics', async () => {
+  for (const [stage, failAt] of [
+    ['metadata', 1],
+    ['rgb', 2],
+    ['mask', 3],
+  ]) {
+    let calls = 0;
+    globalThis.fetch = async () => {
+      calls++;
+      if (calls === failAt)
+        return new Response('Sensitive provider error or URL must not escape', {
+          status: 429,
+        });
+      return calls === 1 ? Response.json(metadata()) : new Response(tiff);
+    };
+    try {
+      await assert.rejects(
+        fetchSolarImagery(roof, 'synthetic-key'),
+        (error) => {
+          assert.ok(error instanceof SolarImageryError);
+          assert.equal(error.stage, stage);
+          assert.equal(error.httpStatus, 429);
+          assert.equal(error.message, 'Matching imagery unavailable');
+          assert.ok(!JSON.stringify(error).includes('Sensitive'));
+          return true;
+        },
+      );
+      assert.equal(calls, failAt);
     } finally {
       globalThis.fetch = originalFetch;
     }
