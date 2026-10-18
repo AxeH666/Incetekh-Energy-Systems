@@ -85,6 +85,11 @@ test('session accepts only current bounded calculator inputs and recomputes exis
   const parse = (value: unknown) =>
     parseSolarSession(JSON.stringify(value), now);
   expect(billEstimate(parse(valid)!)).toMatchObject({ kw: 53, subsidy: 0 });
+  for (const requestedKw of [3, 5, 7, 10]) {
+    const chosen = parse({ ...valid, requestedKw });
+    expect(chosen?.requestedKw).toBe(requestedKw);
+    expect(billEstimate(chosen!).kw).toBe(53);
+  }
   for (const patch of [
     { version: 2 },
     { createdAt: now - sessionLifetime },
@@ -97,6 +102,9 @@ test('session accepts only current bounded calculator inputs and recomputes exis
     { language: 'xx' },
     { latitude: 15 },
     { target: 3 },
+    { requestedKw: 4 },
+    { requestedKw: '5' },
+    { requestedKw: null },
   ])
     expect(parse({ ...valid, ...patch })).toBeNull();
   expect(parseSolarSession('invalid')).toBeNull();

@@ -9,6 +9,7 @@ export interface SolarSession {
   bill: number;
   residential: boolean;
   language: Language;
+  requestedKw?: 3 | 5 | 7 | 10;
 }
 export function parseSolarSession(
   raw: string | null,
@@ -21,8 +22,11 @@ export function parseSolarSession(
       !value ||
       typeof value !== 'object' ||
       Array.isArray(value) ||
-      Object.keys(value).sort().join(',') !==
-        'bill,createdAt,language,residential,version' ||
+      ![
+        'bill,createdAt,language,residential,version',
+        'bill,createdAt,language,requestedKw,residential,version',
+      ].includes(Object.keys(value).sort().join(',')) ||
+      ('requestedKw' in value && ![3, 5, 7, 10].includes(value.requestedKw)) ||
       value.version !== 1 ||
       !Number.isSafeInteger(value.createdAt) ||
       value.createdAt > now ||

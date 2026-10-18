@@ -368,6 +368,52 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await expect(page.locator('input[value="commercial"]')).toBeChecked();
     expect(calls.maps()).toBe(0);
   });
+  test('capacity-card preview keeps chosen size distinct from bill recommendation', async ({
+    page,
+  }) => {
+    await setup(page, true, null);
+    await page.goto('/');
+    await page.locator('#solar-bill').fill('200');
+    await page.locator('[data-capacity-preview="5"]').click();
+    await expect(page).toHaveURL('/solar-preview/');
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      '1 kW bill-based target',
+    );
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      'Your selected system: 5 kW',
+    );
+    await expect(page.locator('#visit-plan')).toHaveValue('5kw');
+    await page.reload();
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      'Your selected system: 5 kW',
+    );
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await page.locator('#accept-roof').click();
+    await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+    await expect(page.locator('#roof-limited')).toBeVisible();
+    await expect(page.locator('#roof-comparison')).toContainText(
+      'Your selected system: 5 kW',
+    );
+    await page.locator('#back-calculator').click();
+    await expect(page.locator('#solar-bill')).toHaveValue('200');
+    await page.locator('[data-preview-link]').click();
+    await expect(page.locator('#bill-summary-text')).not.toContainText(
+      'Your selected system',
+    );
+  });
+  test('public-disabled entry hides every preview button and explains direct links', async ({
+    page,
+  }) => {
+    await setup(page, false, null);
+    await expect(page.locator('#preview-status')).toContainText(
+      'not publicly enabled',
+    );
+    await page.goto('/');
+    await expect(page.locator('[data-preview-entry]:visible')).toHaveCount(0);
+    await expect(page.locator('#solar-bill')).toBeEnabled();
+  });
   test('unavailable storage leaves calculator usable and does not navigate', async ({
     page,
   }) => {
@@ -380,9 +426,9 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await page.goto('/');
     await page.locator('[data-preview-link]').click();
     await expect(page).toHaveURL('/');
-    await expect(page.locator('[data-preview-handoff-status]')).toContainText(
-      'temporary session storage',
-    );
+    await expect(
+      page.locator('[data-solar-calculator] [data-preview-handoff-status]'),
+    ).toContainText('temporary session storage');
     await page.locator('#solar-bill').fill('3000');
     await expect(page.locator('[data-result="kw"]')).toHaveText('4');
   });

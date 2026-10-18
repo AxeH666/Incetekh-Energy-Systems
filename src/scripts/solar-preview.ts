@@ -36,6 +36,7 @@ const byId = <T extends HTMLElement = HTMLElement>(id: string) =>
 const status = byId('preview-status');
 const session = readSolarSession();
 const need = session ? billEstimate(session) : null;
+const targetKw = session?.requestedKw ?? need?.kw;
 const enquiryForm = document.querySelector<HTMLFormElement>(
   '[data-site-visit-form]',
 )!;
@@ -55,9 +56,12 @@ if (session && need) {
   byId<HTMLAnchorElement>('preview-visit').href = '#site-visit';
   enquiryForm.dataset.enquiryLanguage = session.language;
   (enquiryForm.elements.namedItem('plan') as HTMLSelectElement).value =
-    planForTarget(need.kw);
+    planForTarget(targetKw!);
   byId('bill-summary-text').textContent =
     `${money(session.bill)}/month · ${session.residential ? 'Residential' : 'Commercial'} · ${need.kw} kW bill-based target · approximately ${need.units} units used/month. Original calculator generation-value scenario: ${money(financialEstimate(need.kw, need.subsidy).monthlySavings)}/month, not guaranteed bill reduction.`;
+  if (session.requestedKw)
+    byId('bill-summary-text').textContent +=
+      ` Your selected system: ${session.requestedKw} kW${session.requestedKw === 10 ? ' (starting point for 10+ kW)' : ''}. The rooftop preview will aim for this chosen size; your bill-based recommendation stays separate.`;
 }
 const assess = byId<HTMLButtonElement>('assess-property');
 const coordinateForm = byId<HTMLFormElement>('coordinate-form');
@@ -376,7 +380,7 @@ function renderResults(panelsCount?: number) {
   if (!assessment || !view || mapFailed || !need || !freshSession()) return;
   const roof = assessment.roof;
   try {
-    const result = rooftopResults(roof, need.kw, panelsCount);
+    const result = rooftopResults(roof, targetKw!, panelsCount);
     if (!result) throw new Error('Unavailable configuration');
     view.show(roof, result.panelsCount);
     byId('returned-building').hidden = true;
@@ -394,7 +398,7 @@ function renderResults(panelsCount?: number) {
       `${number(result.monthlyAc)} kWh AC/month`;
     byId('result-value').textContent = `${money(result.monthlyValue)}/month`;
     byId('roof-comparison').textContent =
-      `Bill-based target: ${need.kw} kW. Selected returned configuration: ${number(result.capacityKw)} kW (${number(Math.abs(result.capacityKw - need.kw))} kW ${result.capacityKw >= need.kw ? 'above' : 'below'} target). Modeled roof maximum: ${number(result.maximumKw)} kW. Initial selection is the closest returned configuration, with ties toward the smaller size.`;
+      `Bill-based target: ${need.kw} kW.${session?.requestedKw ? ` Your selected system: ${session.requestedKw} kW.` : ''} Selected returned configuration: ${number(result.capacityKw)} kW (${number(Math.abs(result.capacityKw - targetKw!))} kW ${result.capacityKw >= targetKw! ? 'above' : 'below'} ${session?.requestedKw ? 'your selected size' : 'target'}). Modeled roof maximum: ${number(result.maximumKw)} kW. Initial selection is the closest returned configuration, with ties toward the smaller size.`;
     byId('roof-limited').hidden = !result.limited;
     byId('panel-model').textContent =
       `Model panel: ${number(roof.panelCapacityWatts)} W, ${number(roof.panelHeightMeters)} m × ${number(roof.panelWidthMeters)} m. Model hardware is not a committed Incetekh product. Physical inspection must confirm setbacks, access, mounting, tanks, existing installations and structure.`;
@@ -447,7 +451,6 @@ for (const id of ['reject-roof', 'unusable-roof'])
   });
 
 async function initialize() {
-  if (!freshSession()) return;
   try {
     const response = await fetch('/api/solar-preview-config', {
       cache: 'no-store',
@@ -458,8 +461,13 @@ async function initialize() {
       config.enabled !== true ||
       !config.mapsKey ||
       !config.turnstileSiteKey
-    )
+    ) {
+      show(
+        'Solar Preview is not publicly enabled yet. Use the private preview link supplied for your review, or return to the calculator.',
+      );
       return;
+    }
+    if (!freshSession()) return;
     byId('preview-intro').hidden = false;
     show(
       'Start with your actual property. No account or phone number is needed to see a preliminary concept.',
