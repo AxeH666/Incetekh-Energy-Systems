@@ -225,7 +225,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       }
       expect(errors).toEqual([]);
     });
-  for (const width of [390, 1440])
+  for (const width of [320, 390, 1440])
     test(`address lookup and one confirmation reuse the map at ${width}px`, async ({
       page,
     }) => {
@@ -277,6 +277,21 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await expect(page.locator('#result-capacity')).toHaveText('1.6 kW');
       await expect(page.locator('#result-ac')).toHaveText('2,040 kWh AC/year');
       await expect(page.locator('#result-value')).toHaveText('₹1,360/month');
+      // The result and controls must fit before any state change hides them.
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      const controlBounds = await page
+        .locator('#roof-controls button:visible')
+        .evaluateAll((buttons) =>
+          buttons.map((button) => {
+            const box = button.getBoundingClientRect();
+            return box.height >= 44 && box.x >= 0 && box.right <= innerWidth;
+          }),
+        );
+      expect(controlBounds.every(Boolean)).toBe(true);
       expect(
         (
           await new AxeBuilder({ page })

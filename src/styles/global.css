@@ -37,6 +37,11 @@
   --radius: 0.5rem;
   --color-green: #075e54;
   --color-green-hover: #064c44;
+  --color-surface: #fff;
+  --color-surface-soft: #edf0e9;
+  --color-forest: #172e25;
+  --color-field-border: #a5b1a7;
+  --text-page-title: clamp(2.25rem, 4.5vw, 4rem);
 }
 
 *,
@@ -101,6 +106,7 @@ section[id] {
 }
 a {
   color: inherit;
+  text-underline-offset: 0.25em;
 }
 img {
   display: block;
@@ -202,7 +208,9 @@ img {
   cursor: pointer;
   transition:
     transform 220ms ease,
-    background-color 220ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
     box-shadow 220ms ease;
 }
 .button-outline {
@@ -228,11 +236,11 @@ img {
   gap: var(--space-3) var(--space-6);
 }
 .button-dark {
-  color: var(--color-paper);
-  background: var(--color-ink);
+  color: #fff;
+  background: var(--color-green);
 }
 .button-dark:hover {
-  background: var(--color-accent);
+  background: var(--color-green-hover);
 }
 .skip-link {
   position: absolute;

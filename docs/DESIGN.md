@@ -15,6 +15,24 @@ and Organization schema. No recoloring, distortion or invented logo is used.
 
 ## Shared rules
 
+### Uniform visual polish (18 October 2026)
+
+The calculator, enquiry form and rooftop preview share surface, field-border,
+button and page-title tokens. Primary actions use the established deep green;
+secondary preview controls use outlined buttons with visible pressed states.
+The homepage, calculator result, contact panels and footer share the same forest background.
+City pages and the solar guide reuse the same quiet surfaces.
+The existing photo, review and link motion remains intact.
+
+The preview uses a simple numbered step list, a contained introduction, clear
+status and building-confirmation areas, and aligned result figures. Native
+disclosures retain the detailed assumptions. The map dimensions and Google
+attribution remain intact; no map, calculation, assessment, security, consent,
+enquiry or email logic changes are part of this styling pass. Narrow-screen
+checks include the visible results and controls at 320px.
+
+### Foundation rules
+
 - **Type:** self-hosted Manrope Latin variable font; system sans-serif fallback.
   Fluid display sizes use `clamp()`. Body copy stays at least 16px at default
   settings. Small uppercase labels are used sparingly. Headings can wrap under

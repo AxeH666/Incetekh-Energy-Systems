@@ -332,7 +332,7 @@ const money = (value: number) =>
 
 <style>
   .planner {
-    background: #eceee7;
+    background: var(--color-surface-soft);
   }
   [hidden] {
     display: none !important;
@@ -363,7 +363,8 @@ const money = (value: number) =>
     border-radius: var(--radius);
   }
   .calculator-inputs {
-    background: #dce5d5;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
   }
   .state-label,
   legend,
@@ -388,7 +389,7 @@ const money = (value: number) =>
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.25rem;
-    border: 1px solid #b5c0b1;
+    border: 1px solid var(--color-field-border);
     border-radius: 0.5rem;
     padding: 0.25rem;
     background: #fff;
@@ -415,7 +416,7 @@ const money = (value: number) =>
     padding: 0.5rem;
   }
   .connection-options input:checked + span {
-    background: #075e54;
+    background: var(--color-green);
     color: #fff;
   }
   .connection-options input:focus-visible + span {
@@ -425,8 +426,8 @@ const money = (value: number) =>
   .bill-control {
     margin-top: 0.75rem;
     padding: 1.5rem;
-    background: #fff;
-    border-radius: 0.75rem;
+    background: var(--color-surface-soft);
+    border-radius: var(--radius);
   }
   .bill-value {
     display: flex;
@@ -439,7 +440,8 @@ const money = (value: number) =>
     font-size: clamp(2rem, 3.5vw, 3rem);
     letter-spacing: -0.04em;
     font-weight: 600;
-    color: #075e54;
+    color: var(--color-green);
+    font-variant-numeric: tabular-nums;
   }
   .bill-value > span {
     font-size: 0.8125rem;
@@ -452,7 +454,7 @@ const money = (value: number) =>
     height: 3rem;
     margin: 1rem 0 0;
     padding: 0;
-    accent-color: #075e54;
+    accent-color: var(--color-green);
     cursor: pointer;
   }
   .range-labels {
@@ -468,7 +470,7 @@ const money = (value: number) =>
     margin-top: 1rem;
   }
   .calculator-result {
-    background: #20372d;
+    background: var(--color-forest);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -524,6 +526,18 @@ const money = (value: number) =>
   }
   .size-options [data-preview-entry] {
     margin-top: 0.75rem;
+  }
+  .size-options .preview-link {
+    background: transparent;
+    color: var(--color-green);
+    border-color: var(--color-green);
+  }
+  .size-options .preview-link:hover {
+    background: #e2e9df;
+  }
+  [data-preview-entry] .result-note {
+    margin-top: 0.65rem;
+    font-size: 0.8125rem;
   }
   .size-options .result-note {
     color: var(--color-muted);
