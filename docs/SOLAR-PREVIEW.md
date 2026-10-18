@@ -64,8 +64,9 @@ limit. Redirects are returned manually and treated as failures; there are no
 automatic retries. The adapter retains original panel order, model dimensions,
 segment orientation, returned bounds, dates and configurations. Invalid geometry
 or missing configurations produces a fallback; no replacement panels are made up.
-The selected pin and returned building are distinct. Later UI must confirm the
-returned building; a bounding box is not a surveyed roof outline.
+The selected pin and returned building are distinct. The private simplified UI
+rejects a returned bounding box that excludes the pin. This is only an obvious
+mismatch check: a bounding box is not a surveyed roof outline or alignment proof.
 
 Results are a discriminated `available`/fallback contract with `data_available`.
 Provider configuration failure, throttling, no coverage and transient errors are
@@ -215,12 +216,14 @@ Before each map initialization the client rechecks the runtime shutoff.
 The enabled route alone receives a fresh per-response script/style nonce and
 Google-compatible CSP through HTMLRewriter. Other routes retain their existing
 policy. Maps loads only after the visitor sees the privacy notice and explicitly
-opens it. Search requests only location fields. Coordinates and map selection are
-alternatives when search fails; no browser geolocation is requested.
+opens address search. Search requests only location fields. Map selection is the
+fallback when search fails; no browser geolocation is requested. Coordinate input
+fields have been removed from the simplified private flow.
 
-A selected blue marker requires explicit assessment confirmation. The returned
-orange building requires a separate confirmation before any panels are drawn;
-the viewport and text distinguish both locations. Editing coordinates, moving the
+A selected blue marker requires one explicit **Confirm roof & preview** action.
+The owner-requested private revision removes the second confirmation. Obvious
+returned-building mismatches show no panels; diagnostic markers disappear when
+the preliminary layout is shown. Editing the address, moving the
 pin or choosing another search result immediately invalidates the old assessment,
 including while Places details are pending. Late responses are discarded. Wrong,
 changed or unclear roofs, quota failures and unavailable maps retain a manual

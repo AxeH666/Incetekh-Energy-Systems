@@ -30,7 +30,45 @@ const { normalizeSolar, fetchSolar } = await import(
 );
 const synthetic = normalizeSolar(solarFixture());
 let live;
-if (process.env.SOLAR_OWNER_LIVE === 'approved-2026-10-18') {
+let ssMall;
+const ssMallMode =
+  process.env.SOLAR_OWNER_LIVE === 'approved-2026-10-18-ss-mall';
+if (ssMallMode) {
+  const folder = resolve(root, '.wrangler/solar-ss-mall');
+  const retention = JSON.parse(
+    await readFile(resolve(folder, 'retention.json'), 'utf8'),
+  );
+  const expires = Date.parse(retention.deleteBy);
+  if (
+    !Number.isFinite(expires) ||
+    expires <= Date.now() ||
+    expires > Date.now() + 30 * 86400000
+  )
+    throw new Error('SS Mall review data missing or expired');
+  const result = JSON.parse(
+    await readFile(resolve(folder, 'roof.json'), 'utf8'),
+  );
+  const bounds = JSON.parse(
+    await readFile(resolve(folder, 'map-bounds.json'), 'utf8'),
+  );
+  const metadata = JSON.parse(
+    await readFile(resolve(folder, 'layers-metadata.json'), 'utf8'),
+  );
+  const sourceDate = `${metadata.imageryDate.year}-${String(metadata.imageryDate.month).padStart(2, '0')}-${String(metadata.imageryDate.day).padStart(2, '0')}`;
+  if (result.status !== 'available' || result.roof.imageryDate !== sourceDate)
+    throw new Error('SS Mall imagery does not match roof data');
+  result.roofImage = {
+    url: '/api/solar-imagery/ss-mall.png',
+    imageryDate: sourceDate,
+    bounds,
+  };
+  ssMall = {
+    result,
+    expires,
+    image: await readFile(resolve(folder, 'map-rgb.png')),
+  };
+}
+if (process.env.SOLAR_OWNER_LIVE === 'approved-2026-10-18' || ssMallMode) {
   let input = '';
   for await (const chunk of process.stdin) {
     input += chunk;
@@ -51,8 +89,18 @@ if (process.env.SOLAR_OWNER_LIVE === 'approved-2026-10-18') {
     throw new Error('Private key format invalid');
   live = ownerLiveProvider(
     keys,
-    ownerBudget(resolve(root, '.wrangler/solar-owner-live')),
-    fetchSolar,
+    ownerBudget(
+      resolve(
+        root,
+        ssMallMode
+          ? '.wrangler/solar-ss-mall/owner-review'
+          : '.wrangler/solar-owner-live',
+      ),
+    ),
+    ssMallMode
+      ? async () => ({ status: 'no_coverage', data_available: false })
+      : fetchSolar,
+    ssMallMode,
   );
 }
 const mime = {
@@ -97,7 +145,7 @@ function transformHtml(html, nonce) {
   return serialize(tree)
     .replace(
       /(<body[^>]*>)/,
-      `$1<div id="owner-preview-notice" role="note">${live ? `Private live Google test. Remaining allowance: ${live.remaining().maps} map loads and ${live.remaining().solar} Solar attempts. Use map clicks or coordinates; address search is disabled. No enquiries or emails are saved or sent.` : 'Private local rehearsal · simulated roof, not satellite imagery. No Google calls, saved enquiries or emails. Choose a capacity below, then “Preview … on my roof”.'}</div>`,
+      `$1<div id="owner-preview-notice" role="note">${ssMall ? `Private SS Mall review. Search “SS Mall Proddatur” and select “ss mall, YMR Colony”. Real address lookup; saved Google roof image from ${ssMall.result.roof.imageryDate}. Other roofs are unavailable in this review. ${live.remaining().maps} map loads remain; no new Solar requests or saved enquiries.` : live ? `Private live Google test. Remaining allowance: ${live.remaining().maps} map loads and ${live.remaining().solar} Solar attempts. Address search is disabled. No enquiries or emails are saved or sent.` : 'Private local rehearsal · simulated roof, not satellite imagery. No Google calls, saved enquiries or emails. Choose a capacity below, then “Preview … on my roof”.'}</div>`,
     )
     .replace(
       '</head>',
@@ -127,6 +175,15 @@ const server = http.createServer(async (request, response) => {
     if (url.origin !== origin) return send(403, '{}');
     if (url.pathname === '/api/site-visits')
       return send(503, JSON.stringify({ code: 'unavailable' }));
+    if (url.pathname === '/api/solar-imagery/ss-mall.png') {
+      if (
+        !ssMall ||
+        Date.now() >= ssMall.expires ||
+        !['GET', 'HEAD'].includes(request.method)
+      )
+        return send(404, '{}');
+      return send(200, ssMall.image, 'image/png');
+    }
     if (url.pathname === '/api/solar-assessments') {
       if (request.method !== 'POST') return send(405, '{}');
       if (
@@ -149,12 +206,19 @@ const server = http.createServer(async (request, response) => {
         input.longitude > 85
       )
         return send(400, '{}');
-      const result = live
-        ? await live.assess({
-            latitude: input.latitude,
-            longitude: input.longitude,
-          })
-        : synthetic;
+      const savedPoint = ssMall?.result.selectedLocation;
+      const result = ssMall
+        ? Date.now() < ssMall.expires &&
+          Math.abs(input.latitude - savedPoint.latitude) < 0.000001 &&
+          Math.abs(input.longitude - savedPoint.longitude) < 0.000001
+          ? ssMall.result
+          : { status: 'no_coverage', data_available: false }
+        : live
+          ? await live.assess({
+              latitude: input.latitude,
+              longitude: input.longitude,
+            })
+          : synthetic;
       return send(
         200,
         JSON.stringify({
@@ -181,7 +245,11 @@ const server = http.createServer(async (request, response) => {
       return send(
         200,
         JSON.stringify(
-          live ? live.remaining() : { mode: 'synthetic', maps: 0, solar: 0 },
+          ssMall
+            ? { mode: 'ss-mall-review', maps: live.remaining().maps, solar: 0 }
+            : live
+              ? live.remaining()
+              : { mode: 'synthetic', maps: 0, solar: 0 },
         ),
       );
     if (url.pathname === '/__owner/maps.js') {
@@ -221,8 +289,8 @@ const server = http.createServer(async (request, response) => {
       response.setHeader(
         'Content-Security-Policy',
         live
-          ? `default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' blob:; style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com; img-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; frame-src https://*.google.com; worker-src blob:`
-          : `default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src 'none'`,
+          ? `default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' blob:; style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com; img-src 'self' blob: https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; frame-src https://*.google.com; worker-src blob:`
+          : `default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; frame-src 'none'`,
       );
       body = transformHtml(body.toString(), nonce);
     } else if (extension === '.js') {
@@ -245,6 +313,6 @@ const server = http.createServer(async (request, response) => {
 });
 server.listen(port, '127.0.0.1', () =>
   console.log(
-    `Private ${live ? 'approved live Google test (persistent 3 Maps / 1 Solar cap)' : 'synthetic rehearsal (no external calls)'}: ${origin}/#solar-planner`,
+    `Private ${ssMall ? 'SS Mall review (3 Maps cap; saved Solar roof and matching imagery)' : live ? 'approved live Google test (persistent 3 Maps / 1 Solar cap)' : 'synthetic rehearsal (no external calls)'}: ${origin}/#solar-planner`,
   ),
 );

@@ -1,3 +1,4 @@
+param([switch]$SsMall)
 # Start only the already approved local test. Keys travel over a private stdin pipe.
 $ErrorActionPreference = 'Stop'
 $solarOwnerRoot = Split-Path -Parent $PSScriptRoot
@@ -17,6 +18,7 @@ $solarOwnerStart.UseShellExecute = $false
 $solarOwnerStart.CreateNoWindow = $true
 $solarOwnerStart.RedirectStandardInput = $true
 $solarOwnerStart.EnvironmentVariables['SOLAR_OWNER_LIVE'] = 'approved-2026-10-18'
+if ($SsMall) { $solarOwnerStart.EnvironmentVariables['SOLAR_OWNER_LIVE'] = 'approved-2026-10-18-ss-mall' }
 $solarOwnerStart.EnvironmentVariables['SOLAR_OWNER_PORT'] = '4333'
 $solarOwnerProcess = [Diagnostics.Process]::Start($solarOwnerStart)
 try {
@@ -24,6 +26,8 @@ try {
     $solarOwnerProcess.StandardInput.Close()
 } finally { $solarBrowserKey=$null; $solarServerKey=$null }
 $solarOwnerProcess.Id | Set-Content (Join-Path $solarOwnerRoot '.wrangler\solar-preview-planning\owner-live-server.pid')
-Write-Host "Private live preview starting on http://127.0.0.1:4333/#solar-planner (PID $($solarOwnerProcess.Id)). Persistent cap: 3 map loads, 1 Solar attempt. No enquiry or email writes."
+Write-Host "Private preview starting on http://127.0.0.1:4333/#solar-planner (PID $($solarOwnerProcess.Id)). No enquiry or email writes."
+if ($SsMall) { Write-Host 'SS Mall review: 3 retained-counter map loads; Places address search; cached roof/image only, no new Solar requests.' }
+else { Write-Host 'Original live test: persistent 3 map / 1 Solar cap.' }
 $solarOwnerProcess.WaitForExit()
 exit $solarOwnerProcess.ExitCode

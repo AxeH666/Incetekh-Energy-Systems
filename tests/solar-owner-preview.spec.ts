@@ -56,7 +56,6 @@ test('private local preview is usable without external calls and rejects foreign
       .getByRole('button', { name: 'Select the simulated example roof' })
       .click();
     await page.locator('#assess-property').click();
-    await page.locator('#accept-roof').click();
     await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
     await expect(page.locator('#solar-map polygon')).toHaveCount(8);
     await page.locator('#before-solar').click();

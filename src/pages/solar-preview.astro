@@ -10,25 +10,29 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
 >
   <section class="section preview-shell">
     <div class="container">
-      <p class="eyebrow">Preliminary assessment · English preview</p>
+      <p class="eyebrow">Preliminary rooftop preview</p>
       <h1>See solar on your roof.</h1>
+      <p class="preview-steps">
+        1. Enter address &nbsp; → &nbsp; 2. Confirm roof &nbsp; → &nbsp; 3. See
+        solar
+      </p>
       <p id="preview-status" role="status" tabindex="-1">
         Solar Preview is currently unavailable. You can still use our calculator
         or arrange a free site visit.
       </p>
       <div id="preview-intro" hidden>
-        <section id="bill-summary" aria-labelledby="bill-heading">
-          <h2 id="bill-heading">Your bill-based estimate</h2>
+        <p id="chosen-system"></p>
+        <details id="bill-summary">
+          <summary>Calculator details</summary>
           <p id="bill-summary-text"></p>
           <p>
             This uses the calculator's ₹8/unit and 4 units/kW/day scenario,
             rounded up to a whole kW. It does not establish rooftop space.
           </p>
-        </section>
+        </details>
         <p>
-          Choose your actual building on Google satellite imagery. Opening the
-          map shares network and location information with Google. Solar data
-          and satellite imagery may have different dates.
+          Find your address, then check the pin is on your roof. Address search
+          and the map share your search and location with Google.
         </p>
         <p>
           <a href="https://policies.google.com/privacy">
@@ -41,7 +45,7 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
           · <a href="/privacy/">Our privacy notice</a>
         </p>
         <button type="button" id="open-map">
-          Open property map
+          Enter your address
         </button>
       </div>
       <div id="property-controls" hidden>
@@ -50,51 +54,23 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
           aria-label="Search for an address or business"
         ></div>
         <p>
-          Search for your property or click the map to place the selection
-          marker. Confirm the actual building before requesting an assessment.
+          Select your address from the suggestions. If needed, tap your roof on
+          the map to move the pin.
         </p>
-        <form id="coordinate-form">
-          <label>
-            Latitude{' '}
-            <input
-              name="latitude"
-              type="number"
-              step="any"
-              min="12"
-              max="20"
-              required
-            />
-          </label>
-          <label>
-            Longitude{' '}
-            <input
-              name="longitude"
-              type="number"
-              step="any"
-              min="75"
-              max="85"
-              required
-            />
-          </label>
-          <button type="submit">Move selection</button>
-        </form>
         <p id="selection-label">No property selected.</p>
+        <div id="solar-map" aria-label="Google satellite property map"></div>
         <div id="solar-security"></div>
         <button id="assess-property" type="button" disabled>
-          This is my building — assess roof
+          Confirm roof &amp; preview
         </button>
         <div id="returned-building" hidden>
           <p id="returned-location"></p>
           <p>
-            Google returned the building marked in orange. Its bounds are
-            approximate. Confirm this is the same roof you selected; nearby
-            buildings can be returned instead.
+            We could not confidently match the roof data to your pin. Tap the
+            middle of your roof and try again, or arrange a site visit.
           </p>
-          <button id="accept-roof" type="button">
-            This returned roof is correct
-          </button>
           <button id="reject-roof" type="button">
-            Wrong building — select again
+            Choose roof again
           </button>
         </div>
         <div id="roof-controls" hidden>
@@ -102,27 +78,22 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
             Show Before
           </button>
           <button id="unusable-roof" type="button">
-            Roof changed, unclear or panels misplaced
+            Panels don't match my roof
           </button>
         </div>
-        <div id="solar-map" aria-label="Google satellite property map"></div>
         <p id="solar-source" hidden>
           Source: Includes solar data from Google. Proposed panels are a
           preliminary concept, not an installation design.
         </p>
-        <p id="roof-details"></p>
         <section
           id="roof-results"
           hidden
           aria-labelledby="roof-results-heading"
         >
-          <h2 id="roof-results-heading">Preliminary rooftop estimate</h2>
+          <h2 id="roof-results-heading">Your solar preview</h2>
           <p class="google-attribution" translate="no">
             Includes data from <span>Google Maps</span>
           </p>
-          <label for="roof-configuration">Returned rooftop configuration</label>
-          <select id="roof-configuration"></select>
-          <p id="roof-comparison"></p>
           <p id="roof-limited" hidden>
             Not enough rooftop space for the estimated system. If you have other
             available space, please contact our office.
@@ -137,14 +108,6 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
               <dd id="result-capacity"></dd>
             </div>
             <div>
-              <dt>Google annual DC energy estimate</dt>
-              <dd id="result-dc"></dd>
-            </div>
-            <div>
-              <dt>Illustrative annual AC generation</dt>
-              <dd id="result-ac"></dd>
-            </div>
-            <div>
               <dt>Average monthly AC generation</dt>
               <dd id="result-monthly"></dd>
             </div>
@@ -154,17 +117,36 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
             </div>
           </dl>
           <p>
-            AC illustration = Google's annual DC estimate × 0.85, an
-            Incetekh-approved planning assumption (version 2026-10-18.1), not a
-            verified local efficiency. No second loss factor is applied.
+            Preliminary layout. Roof condition, access and installation
+            feasibility need a site visit.
           </p>
-          <p>
-            Value assumes all generation offsets use or earns ₹8/unit credit,
-            averaged over 12 months. This is not guaranteed bill reduction.
-            Fixed charges, actual export credit, consumption timing and seasonal
-            variation are not modeled.
-          </p>
-          <p id="panel-model"></p>
+          <details>
+            <summary>Layout and calculation details</summary>
+            <label for="roof-configuration">
+              Compare available system sizes
+            </label>
+            <select id="roof-configuration"></select>
+            <p id="roof-comparison"></p>
+            <p id="roof-details"></p>
+            <p>
+              Google annual DC estimate: <span id="result-dc"></span>.
+            </p>
+            <p>
+              Illustrative annual AC generation: <span id="result-ac"></span>.
+            </p>
+            <p>
+              AC illustration = Google's annual DC estimate × 0.85, an
+              Incetekh-approved planning assumption (version 2026-10-18.1), not
+              a verified local efficiency. No second loss factor is applied.
+            </p>
+            <p>
+              Value assumes all generation offsets use or earns ₹8/unit credit,
+              averaged over 12 months. This is not guaranteed bill reduction.
+              Fixed charges, actual export credit, consumption timing and
+              seasonal variation are not modeled.
+            </p>
+            <p id="panel-model"></p>
+          </details>
         </section>
       </div>
       <p class="preview-links">
@@ -184,14 +166,20 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
       </noscript>
     </div>
   </section>
-  <SiteVisitForm preview />
+  <details id="preview-enquiry" class="container">
+    <summary>Book a free site visit</summary>
+    <SiteVisitForm preview />
+  </details>
 </SiteLayout>
 <script>
   import '../scripts/solar-preview';
 </script>
 <style>
+  .preview-shell {
+    padding-block: 2.5rem;
+  }
   .preview-shell h1 {
-    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
     letter-spacing: -0.045em;
     margin-bottom: 1.5rem;
   }
@@ -211,23 +199,25 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
     opacity: 0.5;
     cursor: default;
   }
-  #coordinate-form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: 1rem;
+  details {
     margin-block: 1rem;
   }
-  #coordinate-form label {
-    display: grid;
-    gap: 0.25rem;
-    flex: 1 1 150px;
-  }
-  #coordinate-form input {
-    width: 100%;
-    box-sizing: border-box;
+  summary {
+    cursor: pointer;
     min-height: 44px;
-    padding: 0.5rem;
+    padding-block: 0.65rem;
+  }
+  #property-search {
+    max-width: 640px;
+  }
+  #open-map {
+    min-width: min(100%, 320px);
+    text-align: left;
+    background: white;
+    color: var(--color-ink);
+  }
+  #chosen-system {
+    font-weight: 600;
   }
   #solar-map {
     width: 100%;

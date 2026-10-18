@@ -82,6 +82,11 @@ class LocalCircle {
 class LocalPlace extends HTMLElement {
   connectedCallback() {
     if (this.childNodes.length) return;
+    const input = document.createElement('input');
+    input.setAttribute('aria-label', 'Enter your full address');
+    input.placeholder = 'Try the simulated example address';
+    input.style.cssText =
+      'padding:14px;width:100%;box-sizing:border-box;min-height:48px';
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = 'Select the simulated example roof';
@@ -95,7 +100,7 @@ class LocalPlace extends HTMLElement {
       };
       this.dispatchEvent(event);
     });
-    this.append(button);
+    this.append(input, button);
   }
 }
 customElements.define('local-owner-place', LocalPlace);

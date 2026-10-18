@@ -1,4 +1,10 @@
-import { createSolarMap, loadGoogleMaps, type MapsApi } from '../lib/solar-map';
+import {
+  createSolarMap,
+  loadGoogleMaps,
+  loadRoofImage,
+  type MapsApi,
+  type RoofImage,
+} from '../lib/solar-map';
 import type { SolarResult, Coordinates } from '../../worker/solar';
 import {
   readSolarSession,
@@ -30,6 +36,7 @@ interface PropertyMaps extends MapsApi {
 type Assessment = Extract<SolarResult, { status: 'available' }> & {
   reference: string;
   selectedLocation: Coordinates;
+  roofImage?: RoofImage;
 };
 const byId = <T extends HTMLElement = HTMLElement>(id: string) =>
   document.getElementById(id) as T;
@@ -41,6 +48,9 @@ const enquiryForm = document.querySelector<HTMLFormElement>(
   '[data-site-visit-form]',
 )!;
 const contextConsent = byId<HTMLInputElement>('preview-context-consent');
+byId('preview-visit').addEventListener('click', () => {
+  byId<HTMLDetailsElement>('preview-enquiry').open = true;
+});
 const journeyReference = crypto.randomUUID();
 const money = (value: number) =>
   new Intl.NumberFormat('en-IN', {
@@ -57,6 +67,8 @@ if (session && need) {
   enquiryForm.dataset.enquiryLanguage = session.language;
   (enquiryForm.elements.namedItem('plan') as HTMLSelectElement).value =
     planForTarget(targetKw!);
+  byId('chosen-system').textContent =
+    `${targetKw} kW ${session.requestedKw ? 'selected system' : 'bill-based estimate'}`;
   byId('bill-summary-text').textContent =
     `${money(session.bill)}/month · ${session.residential ? 'Residential' : 'Commercial'} · ${need.kw} kW bill-based target · approximately ${need.units} units used/month. Original calculator generation-value scenario: ${money(financialEstimate(need.kw, need.subsidy).monthlySavings)}/month, not guaranteed bill reduction.`;
   if (session.requestedKw)
@@ -64,16 +76,8 @@ if (session && need) {
       ` Your selected system: ${session.requestedKw} kW${session.requestedKw === 10 ? ' (starting point for 10+ kW)' : ''}. The rooftop preview will aim for this chosen size; your bill-based recommendation stays separate.`;
 }
 const assess = byId<HTMLButtonElement>('assess-property');
-const coordinateForm = byId<HTMLFormElement>('coordinate-form');
-const latInput = coordinateForm.elements.namedItem(
-  'latitude',
-) as HTMLInputElement;
-const lngInput = coordinateForm.elements.namedItem(
-  'longitude',
-) as HTMLInputElement;
 let view: ReturnType<typeof createSolarMap> | undefined;
 let selectedMarker: Marker | undefined;
-let returnedMarker: Marker | undefined;
 let selected: Coordinates | undefined;
 let assessment: Assessment | undefined;
 let pending = false,
@@ -88,12 +92,12 @@ function show(message: string, focus = false) {
   if (focus) status.focus();
 }
 function updateButton() {
-  assess.disabled = !selected || !token || pending || mapFailed;
+  assess.disabled = !selected || !token || pending || mapFailed || !!assessment;
+  assess.hidden = !!assessment;
 }
 function discardRoof() {
   assessment = undefined;
   view?.clear();
-  returnedMarker?.setMap(null);
   byId('returned-building').hidden = true;
   byId('roof-controls').hidden = true;
   byId('solar-source').hidden = true;
@@ -107,7 +111,13 @@ function discardRoof() {
     'Select a property to attach your bill-based estimate and selected coordinates. You can send an ordinary enquiry without them.';
 }
 function syncEnquiryContext() {
-  if (!session || !need || !selected) return;
+  if (
+    !session ||
+    !need ||
+    !selected ||
+    Date.now() - session.createdAt >= sessionLifetime
+  )
+    return;
   enquiryForm.dataset.previewContext = JSON.stringify({
     version: 1,
     consent: true,
@@ -127,7 +137,14 @@ function syncEnquiryContext() {
 function freshSession() {
   if (session && need && Date.now() - session.createdAt < sessionLifetime)
     return true;
+  generation++;
+  searchGeneration++;
+  controller?.abort();
+  pending = false;
+  selected = undefined;
+  token = '';
   discardRoof();
+  updateButton();
   byId('preview-intro').hidden = true;
   byId('property-controls').hidden = true;
   show(
@@ -162,8 +179,6 @@ function choose(point: Coordinates, recenter = true) {
   selected = point;
   token = '';
   if (widgetId) window.turnstile?.reset(widgetId);
-  latInput.value = String(point.latitude);
-  lngInput.value = String(point.longitude);
   const center = { lat: point.latitude, lng: point.longitude };
   selectedMarker?.setCenter(center);
   selectedMarker?.setMap(view?.map);
@@ -172,30 +187,11 @@ function choose(point: Coordinates, recenter = true) {
     view?.map.setZoom(20);
   }
   byId('selection-label').textContent =
-    `Selected marker: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}. Confirm the building visually.`;
-  show('Check the selected building, then request its rooftop assessment.');
+    'Is the pin on your roof? Tap the roof to adjust it.';
+  show('Check the pin, then confirm your roof.');
   syncEnquiryContext();
   updateButton();
 }
-coordinateForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  if (coordinateForm.reportValidity())
-    choose({
-      latitude: Number(latInput.value),
-      longitude: Number(lngInput.value),
-    });
-});
-coordinateForm.addEventListener('input', () => {
-  generation++;
-  searchGeneration++;
-  controller?.abort();
-  pending = false;
-  selected = undefined;
-  discardRoof();
-  updateButton();
-  byId('selection-label').textContent =
-    'Coordinates changed. Use Move selection, then confirm the building.';
-});
 window.addEventListener('incetekh:maps-unavailable', () => {
   mapFailed = true;
   generation++;
@@ -245,12 +241,24 @@ async function search(api: PropertyMaps) {
       includedRegionCodes: ['in'],
       locationRestriction: { south: 12, west: 75, north: 20, east: 85 },
     });
-    element.setAttribute('aria-label', 'Search address or business');
+    element.setAttribute('aria-label', 'Enter your full address');
+    element.setAttribute('placeholder', 'House number, street, city');
     byId('property-search').append(element);
+    element.focus();
+    element.addEventListener('input', () => {
+      searchGeneration++;
+      generation++;
+      controller?.abort();
+      pending = false;
+      selected = undefined;
+      selectedMarker?.setMap(null);
+      discardRoof();
+      updateButton();
+      byId('selection-label').textContent =
+        'Choose an address suggestion to locate your roof.';
+    });
     element.addEventListener('gmp-error', () =>
-      show(
-        'Address search is unavailable. Click the map or enter coordinates instead.',
-      ),
+      show('Address search is unavailable. Tap your roof on the map instead.'),
     );
     element.addEventListener('gmp-select', async (event) => {
       const revision = ++searchGeneration;
@@ -261,8 +269,6 @@ async function search(api: PropertyMaps) {
       selectedMarker?.setMap(null);
       discardRoof();
       updateButton();
-      latInput.value = '';
-      lngInput.value = '';
       byId('selection-label').textContent =
         'Locating the newly selected property…';
       show(
@@ -282,14 +288,12 @@ async function search(api: PropertyMaps) {
       } catch {
         if (revision === searchGeneration)
           show(
-            'Search could not locate this property. Click the map or enter coordinates instead.',
+            'Search could not locate this property. Tap your roof on the map instead.',
           );
       }
     });
   } catch {
-    show(
-      'Address search is unavailable. Click the map or enter coordinates instead.',
-    );
+    show('Address search is unavailable. Tap your roof on the map instead.');
   }
 }
 const messages: Record<string, string> = {
@@ -304,7 +308,7 @@ const messages: Record<string, string> = {
 };
 assess.addEventListener('click', async () => {
   if (!freshSession()) return;
-  if (!selected || !token || pending || mapFailed) return;
+  if (!selected || !token || pending || mapFailed || assessment) return;
   const revision = generation;
   const point = { ...selected };
   const submittedToken = token;
@@ -327,6 +331,7 @@ assess.addEventListener('click', async () => {
     const result = (await response.json()) as SolarResult & {
       reference: string;
       selectedLocation: Coordinates;
+      roofImage?: RoofImage;
     };
     if (revision !== generation || mapFailed) return;
     if (
@@ -341,25 +346,40 @@ assess.addEventListener('click', async () => {
       );
       return;
     }
+    // This rejects obvious mismatches; a bounding box is not a roof outline.
+    // Never translate Google's panel coordinates to make a neighbouring roof fit.
+    const bounds = result.roof.bounds;
+    if (
+      point.latitude < bounds.sw.latitude ||
+      point.latitude > bounds.ne.latitude ||
+      point.longitude < bounds.sw.longitude ||
+      point.longitude > bounds.ne.longitude
+    ) {
+      byId('returned-building').hidden = false;
+      byId('returned-location').textContent =
+        'No layout shown for this location.';
+      show(
+        'The returned roof does not match your pin. Choose your roof again.',
+        true,
+      );
+      return;
+    }
+    if (result.roofImage) {
+      const roofImage = await loadRoofImage(
+        result.roofImage,
+        result.roof,
+        attemptController.signal,
+      );
+      if (revision !== generation || mapFailed || !view) {
+        roofImage.release();
+        return;
+      }
+      view.setRoofImage(roofImage);
+    }
     assessment = result;
-    returnedMarker?.setCenter({
-      lat: result.roof.center.latitude,
-      lng: result.roof.center.longitude,
-    });
-    returnedMarker?.setMap(view?.map);
-    view?.map.fitBounds({
-      south: Math.min(point.latitude, result.roof.bounds.sw.latitude),
-      west: Math.min(point.longitude, result.roof.bounds.sw.longitude),
-      north: Math.max(point.latitude, result.roof.bounds.ne.latitude),
-      east: Math.max(point.longitude, result.roof.bounds.ne.longitude),
-    });
-    byId('returned-location').textContent =
-      `Returned building centre: ${result.roof.center.latitude.toFixed(6)}, ${result.roof.center.longitude.toFixed(6)}. Your selected marker is blue; the returned centre is orange.`;
-    byId('returned-building').hidden = false;
-    show(
-      'Confirm the returned building marked in orange before showing proposed panels.',
-      true,
-    );
+    selectedMarker?.setMap(null);
+    view?.fit(result.roof);
+    showAssessment();
   } catch {
     if (revision === generation && !mapFailed)
       show(
@@ -386,6 +406,9 @@ function renderResults(panelsCount?: number) {
     byId('returned-building').hidden = true;
     byId('roof-controls').hidden = false;
     byId('solar-source').hidden = false;
+    byId('solar-source').textContent = assessment.roofImage
+      ? `Source: Includes solar data from Google. Roof imagery: ${roof.imageryDate}. A site visit must confirm the roof's current condition.`
+      : 'Source: Includes solar data from Google. Map imagery may differ; panel alignment needs verification.';
     byId('roof-results').hidden = false;
     byId<HTMLSelectElement>('roof-configuration').value = String(
       result.panelsCount,
@@ -406,7 +429,6 @@ function renderResults(panelsCount?: number) {
       `${result.panelsCount} preliminary model panels. Solar imagery acquired ${roof.imageryDate}; processed ${roof.imageryProcessedDate ?? 'date unavailable'}. Data quality: ${roof.imageryQuality}. Map imagery may differ. Roof changes, obstacles, access and structure need physical inspection.`;
     show(
       'Preliminary rooftop concept. Check the layout and arrange a free site visit.',
-      true,
     );
   } catch {
     discardRoof();
@@ -416,7 +438,7 @@ function renderResults(panelsCount?: number) {
     );
   }
 }
-byId('accept-roof').addEventListener('click', () => {
+function showAssessment() {
   if (!assessment || !view || !freshSession()) return;
   byId('roof-configuration').replaceChildren(
     ...assessment.roof.configurations.map((config) => {
@@ -430,7 +452,7 @@ byId('accept-roof').addEventListener('click', () => {
   byId('before-solar').textContent = 'Show Before';
   byId('before-solar').setAttribute('aria-pressed', 'false');
   renderResults();
-});
+}
 byId('roof-configuration').addEventListener('change', () =>
   renderResults(Number(byId<HTMLSelectElement>('roof-configuration').value)),
 );
@@ -444,6 +466,8 @@ byId('before-solar').addEventListener('click', () => {
 for (const id of ['reject-roof', 'unusable-roof'])
   byId(id).addEventListener('click', () => {
     discardRoof();
+    selected = undefined;
+    updateButton();
     show(
       "We won't show a layout for an uncertain or changed roof. Select again or book a free manual site visit.",
       true,
@@ -469,14 +493,13 @@ async function initialize() {
     }
     if (!freshSession()) return;
     byId('preview-intro').hidden = false;
-    show(
-      'Start with your actual property. No account or phone number is needed to see a preliminary concept.',
-    );
+    show('Start with your address. No phone number needed.');
     byId<HTMLButtonElement>('open-map').addEventListener(
       'click',
       async (event) => {
         if (!freshSession()) return;
         (event.currentTarget as HTMLButtonElement).disabled = true;
+        byId('open-map').hidden = true;
         show('Loading Google satellite map…');
         try {
           // Recheck runtime shutoff immediately before a potentially billable load.
@@ -493,18 +516,9 @@ async function initialize() {
           view.map.setZoom(7);
           selectedMarker = new api.Circle({
             map: null,
-            radius: 3,
+            radius: 1.5,
             strokeColor: '#176b9c',
-            strokeWeight: 4,
-            fillColor: '#ffffff',
-            fillOpacity: 1,
-            clickable: false,
-          });
-          returnedMarker = new api.Circle({
-            map: null,
-            radius: 4,
-            strokeColor: '#ad5b14',
-            strokeWeight: 4,
+            strokeWeight: 2,
             fillColor: '#ffffff',
             fillOpacity: 1,
             clickable: false,
@@ -516,9 +530,7 @@ async function initialize() {
                 false,
               );
           });
-          show(
-            'Search, click the map, or enter coordinates to select your building.',
-          );
+          show('Enter your address and select a suggestion.');
           security(current.turnstileSiteKey);
           void search(api);
         } catch {
