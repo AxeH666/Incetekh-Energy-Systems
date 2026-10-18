@@ -169,6 +169,10 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
         '3 kW bill-based target',
       );
       await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+      await expect(page.locator('#module-unavailable')).toBeVisible();
+      await expect(page.locator('#module-unavailable')).toContainText(
+        'not a Waaree installation layout',
+      );
       await expect(page.locator('#result-dc')).toHaveText('4,800 kWh DC/year');
       await expect(page.locator('#result-ac')).toHaveText('4,080 kWh AC/year');
       await expect(page.locator('#result-value')).toHaveText('₹2,720/month');
@@ -355,11 +359,11 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await select(page);
     await page.locator('#assess-property').click();
     await expect(page.locator('#grouped-layout-note')).toBeVisible();
-    await expect(page.locator('#grouped-layout-note')).toContainText(
+    await expect(page.locator('#module-assumptions')).toContainText(
       'Energy and savings are not shown',
     );
     await expect(page.locator('#roof-results')).toBeHidden();
-    await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(5);
     await page
       .getByRole('button', { name: 'Closer view', exact: true })
       .click();
@@ -964,6 +968,10 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await select(page);
       await page.locator('#assess-property').click();
       await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+      await expect(page.locator('#module-unavailable')).toBeVisible();
+      await expect(page.locator('#module-unavailable')).toContainText(
+        'not a Waaree installation layout',
+      );
       await expect(page.locator('#roof-limited')).toBeVisible();
       await page.locator('#preview-visit').click();
       await page.locator('#visit-name').fill('Synthetic complete journey');

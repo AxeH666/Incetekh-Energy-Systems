@@ -7,14 +7,14 @@ computer only; no push, deployment, lead writes, email or WhatsApp messages.
 
 Open **http://127.0.0.1:4333/__owner/ss-mall/** while the local server is running.
 This page has Before/With Solar controls over saved map captures of the reviewed
-5 kW choice (12 model panels / 4.8 kW). It requires no calculator session, permits
+5 kW choice (nine Waaree-sized 550 W reference panels / 4.95 kWp). It includes a closer array view and a Whole roof option. It requires no calculator session, permits
 refreshing and makes no external requests. Google attribution remains embedded in
 the captures. It is explicitly a saved comparison, without address search or map
 navigation. It does not assess the user's current calculator choice.
 
 When the SS Mall Maps allowance is exhausted, the local `/solar-preview/` route
 redirects here instead of displaying an expired-session dead end. No budget is
-reset. The two ignored map-only captures share the existing evidence expiry;
+reset. The saved captures share the existing evidence expiry;
 the page and images fail closed after that deadline. A direct-open/reload/toggle
 browser check verifies zero external requests and unchanged counters.
 
@@ -129,22 +129,30 @@ Official references: [Places address widget](https://developers.google.com/maps/
 [GroundOverlay](https://developers.google.com/maps/documentation/javascript/groundoverlays),
 and [key restrictions](https://developers.google.com/maps/api-security-best-practices).
 
-## Grouped layout revision
+## Manufacturer-module review
 
-The website preview code now supports a grouped concept on a single roof section
-where the provider candidates support a complete interior rectangle. The old
-Google configuration remains available for comparison. Only that original
-configuration displays its energy/savings estimates; those estimates are hidden
-for the grouped concept. The roof-capacity warning remains visible in either mode.
-Closer view changes the map camera, never the physical dimensions of a panel.
+The owner authorized official manufacturer dimensions and one additional Maps load.
+The reference is Waaree AHNAY Bi-55-550, 550 W and 2.272 by 1.133 m, from its
+[official datasheet](https://waaree.com/upload/media/datasheet_bi_55_520_550_12_03012025_1756379026.pdf).
+For the selected 5 kW, nine modules give 4.95 kWp. The new centers form a 3 by 3 grid
+on one modeled roof section, with a disclosed 20 mm visual gap. These are newly
+constructed footprints, not Google's original 400 W candidates.
 
-SS Mall's current model panels are 400 W, 1.879 by 1.045 m. The selected group uses
-12 unchanged candidate positions and all 972 sampled footprint points were in the
-retained roof mask. The model has no verified mounting clearance, access, obstacle,
-structural or setback design. This is an engineer-review concept, not an engineered
-installation layout. A larger physical module needs the intended product model.
+The live check consumed exactly one Maps load under the separate ignored
+`module-review-budget.json`; Solar and Places counts remained zero. All previous
+counters remain unchanged. The retained source image and assessment were reused.
+The new footprints passed 729 sampled mask points; this does not establish obstacle,
+setback, structural, mounting or electrical feasibility. No Google yield is shown
+for the new layout. Physical design and actual equipment remain for an engineer.
 
-The saved comparison currently remains the earlier capture. Updating it requires
-one additional explicitly approved Maps load; no new Solar or Places request is
-needed. The original exhausted counters must remain unchanged. Public access stays
-disabled. See [grouping constraints](SOLAR-PREVIEW.md#grouped-concept-and-panel-visibility-private-revision).
+The private saved page now uses `module-close-before.png`, `module-close.png` and
+`module-whole.png`, loaded as a complete set only when `module-layout.json` matches
+the reviewed count, dimensions and imagery date. An incomplete set retains the
+explicitly labeled earlier 12-panel review. Captures are ignored, share the same
+existing retention deadline and never enter the public build. Direct opening,
+refresh and all three views need no external calls or calculator state.
+
+Geometry checks cover physical dimensions, non-overlap and gaps on rotated steep
+roofs, fixed module dimensions across capacity choices, provider-data preservation,
+no-fit fallback and bounded work. Browser tests cover hidden unrelated energy
+figures and refresh-safe saved views. Public activation remains disabled.

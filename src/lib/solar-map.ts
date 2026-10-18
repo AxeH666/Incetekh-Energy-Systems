@@ -207,6 +207,21 @@ export function createSolarMap(
       const paths = conceptIndices
         ? conceptIndices.map((i) => panelCorners(roof, i))
         : configurationPaths(roof, panelsCount);
+      this.showConcept(paths);
+    },
+    showConcept(paths: MapPoint[][]) {
+      if (
+        !paths.length ||
+        paths.length > 10000 ||
+        paths.some(
+          (path) =>
+            path.length !== 4 ||
+            path.some(
+              (p) => !Number.isFinite(p.lat) || !Number.isFinite(p.lng),
+            ),
+        )
+      )
+        throw new Error('Invalid layout geometry');
       clear();
       try {
         displayedPaths = paths;

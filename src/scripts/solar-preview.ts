@@ -14,7 +14,7 @@ import {
 } from '../lib/solar-session';
 import { loadTurnstile } from '../lib/turnstile';
 import { rooftopResults } from '../lib/solar-results';
-import { groupedLayout } from '../lib/solar-grouped-layout';
+import { moduleLayout, referenceModule } from '../lib/solar-module-layout';
 import { localPath } from '../i18n/languages';
 import { financialEstimate } from '../data/solar';
 
@@ -103,6 +103,8 @@ function discardRoof() {
   preferGrouped = true;
   closeView = false;
   byId('grouped-layout-note').hidden = true;
+  byId('module-details').hidden = true;
+  byId('module-unavailable').hidden = true;
   byId('roof-limited').hidden = true;
   byId('grouped-layout').hidden = true;
   byId('panel-view').textContent = 'Closer view';
@@ -412,16 +414,22 @@ function renderResults(panelsCount?: number) {
   try {
     const result = rooftopResults(roof, targetKw!, panelsCount);
     if (!result) throw new Error('Unavailable configuration');
-    const concept = groupedLayout(roof, result.panelsCount);
+    const concept = moduleLayout(roof, targetKw!);
     const grouped = preferGrouped && !!concept;
-    view.show(roof, result.panelsCount, grouped ? concept! : undefined);
+    if (grouped) view.showConcept(concept!.paths);
+    else view.show(roof, result.panelsCount);
     byId('grouped-layout').hidden = !concept;
     byId('grouped-layout').textContent = grouped
       ? 'Compare Google model'
       : 'Try grouped layout';
     byId('grouped-layout-note').hidden = !grouped;
-    byId('grouped-layout-note').textContent =
-      `${result.panelsCount} panels / ${number(result.capacityKw)} kW grouped concept on one roof section. Model panels remain ${number(roof.panelHeightMeters)} by ${number(roof.panelWidthMeters)} m. Access, setbacks, obstacles, drainage, structure and mounting need an engineer's site check. Energy and savings are not shown for this rearranged concept.`;
+    byId('grouped-layout-note').textContent = concept
+      ? `${concept.count} x ${referenceModule.watts} W = ${number(concept.capacityKw)} kWp for your ${targetKw} kW selection. ${concept.rows} rows, up to ${concept.columns} panels per row. Preliminary reference-module layout; engineer verification required.`
+      : '';
+    byId('module-details').hidden = !grouped;
+    byId('module-unavailable').hidden = !!concept;
+    byId('module-assumptions').textContent =
+      `Reference module: ${referenceModule.name}, ${referenceModule.lengthMeters} by ${referenceModule.widthMeters} m. Count is the nearest whole number to your selected capacity. A 20 mm gap is a visualization assumption, not an approved mounting clearance. The array follows the modeled roof plane; raised tilt and row shading are not modeled. Access, setbacks, obstacles, drainage, structure and mounting need an engineer's site check. Energy and savings are not shown for this rearranged concept. Product availability and final equipment are not confirmed.`;
     byId('returned-building').hidden = true;
     byId('roof-controls').hidden = false;
     byId('solar-source').hidden = false;
@@ -441,7 +449,7 @@ function renderResults(panelsCount?: number) {
     byId('result-value').textContent = `${money(result.monthlyValue)}/month`;
     byId('roof-comparison').textContent =
       `Bill-based target: ${need.kw} kW.${session?.requestedKw ? ` Your selected system: ${session.requestedKw} kW.` : ''} Selected returned configuration: ${number(result.capacityKw)} kW (${number(Math.abs(result.capacityKw - targetKw!))} kW ${result.capacityKw >= targetKw! ? 'above' : 'below'} ${session?.requestedKw ? 'your selected size' : 'target'}). Modeled roof maximum: ${number(result.maximumKw)} kW. Initial selection is the closest returned configuration, with ties toward the smaller size.`;
-    byId('roof-limited').hidden = !result.limited;
+    byId('roof-limited').hidden = grouped || !result.limited;
     byId('panel-model').textContent =
       `Model panel: ${number(roof.panelCapacityWatts)} W, ${number(roof.panelHeightMeters)} m × ${number(roof.panelWidthMeters)} m. Model hardware is not a committed Incetekh product. Physical inspection must confirm setbacks, access, mounting, tanks, existing installations and structure.`;
     byId('roof-details').textContent =

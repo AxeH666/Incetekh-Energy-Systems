@@ -68,6 +68,33 @@ if (ssMallMode) {
     image: await readFile(resolve(folder, 'map-rgb.png')),
   };
 }
+// Optional completed manufacturer-module capture; incomplete sets keep the old review.
+if (ssMall) {
+  try {
+    const folder = resolve(root, '.wrangler/solar-ss-mall');
+    const manifest = JSON.parse(
+      await readFile(resolve(folder, 'module-layout.json'), 'utf8'),
+    );
+    if (
+      manifest.targetKw !== 5 ||
+      manifest.count !== 9 ||
+      manifest.capacityKw !== 4.95 ||
+      manifest.imageryDate !== ssMall.result.roof.imageryDate ||
+      manifest.module?.watts !== 550 ||
+      manifest.module?.lengthMeters !== 2.272 ||
+      manifest.module?.widthMeters !== 1.133
+    )
+      throw new Error('Unmatched module review');
+    const [before, solar, whole] = await Promise.all(
+      ['module-close-before.png', 'module-close.png', 'module-whole.png'].map(
+        (file) => readFile(resolve(folder, file)),
+      ),
+    );
+    ssMall.moduleCaptures = { before, solar, whole };
+  } catch {
+    /* Fail back to the separately labeled older saved review. */
+  }
+}
 if (process.env.SOLAR_OWNER_LIVE === 'approved-2026-10-18' || ssMallMode) {
   let input = '';
   for await (const chunk of process.stdin) {
@@ -185,6 +212,14 @@ const server = http.createServer(async (request, response) => {
     if (url.pathname.startsWith('/__owner/ss-mall/')) {
       if (!ssMall || Date.now() >= ssMall.expires) return send(404, '{}');
       if (!['GET', 'HEAD'].includes(request.method)) return send(405, '{}');
+      const moduleCaptures = ssMall.moduleCaptures;
+      const moduleImage = {
+        '/__owner/ss-mall/before.png': moduleCaptures?.before,
+        '/__owner/ss-mall/with-solar.png': moduleCaptures?.solar,
+        '/__owner/ss-mall/whole.png': moduleCaptures?.whole,
+      };
+      if (Object.hasOwn(moduleImage, url.pathname) && moduleImage[url.pathname])
+        return send(200, moduleImage[url.pathname], 'image/png');
       const captures = {
         '/__owner/ss-mall/before.png': 'saved-before.png',
         '/__owner/ss-mall/with-solar.png': 'saved-with-solar.png',
@@ -198,6 +233,9 @@ const server = http.createServer(async (request, response) => {
           'image/png',
         );
       if (url.pathname !== '/__owner/ss-mall/') return send(404, '{}');
+      const summary = moduleCaptures
+        ? '5 kW selected / 9 x 550 W panels / 4.95 kWp / 3 x 3 rows'
+        : '5 kW selected / 12 model panels / 4.8 kW modeled capacity';
       const nonce = randomBytes(24).toString('base64');
       response.setHeader(
         'Content-Security-Policy',
@@ -206,8 +244,8 @@ const server = http.createServer(async (request, response) => {
       return send(
         200,
         `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SS Mall | Private saved review</title><style nonce="${nonce}">
-      *{box-sizing:border-box}body{margin:0;background:#f5f4ee;color:#202722;font:16px/1.6 system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:28px 20px}header{border-bottom:1px solid #c9cec6;padding:12px 20px;background:#202722;color:white}h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.1;margin:16px 0}p{max-width:800px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:12px}fieldset{border:0;padding:0;margin:24px 0 12px}legend{font-weight:600;margin-bottom:8px}label{display:inline-block;margin-right:20px;cursor:pointer}input{accent-color:#075e54;width:18px;height:18px;vertical-align:middle}figure{margin:16px 0}img{width:100%;height:auto;display:block}#before-image{display:none}main:has(#before:checked) #before-image{display:block}main:has(#before:checked) #solar-image{display:none}figcaption,footer{font-size:14px;color:#475147}a{color:inherit}
-      </style></head><body><header>INCETEKH SOLAR - Private review on this computer</header><main><p class="eyebrow">Saved rooftop preview</p><h1>SS Mall, Proddatur</h1><p>5 kW selected / 12 model panels / 4.8 kW modeled capacity</p><p>This saved view reopens without the calculator or another Google request. You can refresh this page. Address search and map navigation are unavailable in this saved review.</p><fieldset><legend>Compare the roof</legend><label><input id="before" type="radio" name="view"> Before</label><label><input id="solar" type="radio" name="view" checked> With solar</label></fieldset><figure><img id="solar-image" src="with-solar.png" alt="Saved Google map view of SS Mall with 12 preliminary model solar panels"><img id="before-image" src="before.png" alt="Saved Google map view of the same SS Mall roof without panel overlays"><figcaption>Saved Google Maps captures. Includes solar data from Google. Roof imagery: 14 January 2023. Map credits remain in each image.</figcaption></figure><footer>Preliminary model only. A site visit must confirm current obstacles, structure and installation layout. <a href="/#solar-planner">Return to calculator</a></footer></main></body></html>`,
+      *{box-sizing:border-box}body{margin:0;background:#f5f4ee;color:#202722;font:16px/1.6 system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:28px 20px}header{border-bottom:1px solid #c9cec6;padding:12px 20px;background:#202722;color:white}h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.1;margin:16px 0}p{max-width:800px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:12px}fieldset{border:0;padding:0;margin:24px 0 12px}legend{font-weight:600;margin-bottom:8px}label{display:inline-block;margin-right:20px;cursor:pointer}input{accent-color:#075e54;width:18px;height:18px;vertical-align:middle}figure{margin:16px 0}img{width:100%;height:auto;display:block}#before-image,#whole-image{display:none}main:has(#whole:checked) #whole-image{display:block}main:has(#whole:checked) #solar-image{display:none}main:has(#before:checked) #before-image{display:block}main:has(#before:checked) #solar-image{display:none}figcaption,footer{font-size:14px;color:#475147}a{color:inherit}
+      </style></head><body><header>INCETEKH SOLAR - Private review on this computer</header><main><p class="eyebrow">Saved rooftop preview</p><h1>SS Mall, Proddatur</h1><p>${summary}</p>${moduleCaptures ? '<p>Reference: Waaree AHNAY Bi-55-550, 2.272 by 1.133 m per panel. The close view preserves real scale.</p><details><summary>Layout assumptions</summary><p>New positions and dimensions form a preliminary module layout. The 20 mm mounting gap is a visual assumption, not an approved clearance. Roof-plane mounting only; no raised-tilt or row-shading calculation. Access, obstacles, setbacks and structure need an engineer. No energy or savings estimate is assigned to this layout, and equipment availability is unconfirmed.</p><a href="https://waaree.com/upload/media/datasheet_bi_55_520_550_12_03012025_1756379026.pdf" target="_blank" rel="noopener noreferrer">Official Waaree datasheet</a></details>' : ''}<p>This saved view reopens without the calculator or another Google request. You can refresh this page. Address search and map navigation are unavailable in this saved review.</p><fieldset><legend>Compare the roof</legend><label><input id="before" type="radio" name="view"> Before</label><label><input id="solar" type="radio" name="view" checked> With solar</label>${moduleCaptures ? '<label><input id="whole" type="radio" name="view"> Whole roof</label>' : ''}</fieldset><figure><img id="solar-image" src="with-solar.png" alt="Saved Google map view of SS Mall with ${moduleCaptures ? 9 : 12} preliminary model solar panels"><img id="before-image" src="before.png" alt="Saved Google map view of the same SS Mall roof without panel overlays">${moduleCaptures ? '<img id="whole-image" src="whole.png" alt="Whole-roof context for the nine-panel SS Mall layout">' : ''}<figcaption>Saved Google Maps captures. Source: Includes solar data from Google. Roof imagery: 14 January 2023. Map credits remain in each image.</figcaption></figure><footer>Preliminary model only. A site visit must confirm current obstacles, structure and installation layout. <a href="/#solar-planner">Return to calculator</a></footer></main></body></html>`,
         'text/html; charset=utf-8',
       );
     }
