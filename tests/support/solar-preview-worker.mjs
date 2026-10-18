@@ -4,12 +4,17 @@ import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 export function previewWorker(patch = {}) {
   return new Miniflare(
     convertV4MiniflareOptions({
-      modules: ['index', 'email', 'solar', 'solar-endpoint', 'solar-page'].map(
-        (name) => ({
-          type: 'ESModule',
-          path: `.wrangler/test-worker/${name}.js`,
-        }),
-      ),
+      modules: [
+        'index',
+        'email',
+        'solar',
+        'solar-endpoint',
+        'solar-page',
+        'preview-context',
+      ].map((name) => ({
+        type: 'ESModule',
+        path: `.wrangler/test-worker/${name}.js`,
+      })),
       compatibilityDate: '2026-09-30',
       cf: false,
       telemetry: { enabled: false },

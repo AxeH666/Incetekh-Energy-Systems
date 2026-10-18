@@ -1,6 +1,7 @@
 import { dispatchEmails, type EmailEnv } from './email.js';
 import { solarEndpoint, type SolarEnv } from './solar-endpoint.js';
 import { solarPage, solarConfig, type SolarPageEnv } from './solar-page.js';
+import { previewContext } from './preview-context.js';
 
 interface Env extends EmailEnv, SolarEnv, SolarPageEnv {
   ASSETS: Fetcher;
@@ -79,13 +80,24 @@ async function readBody(request: Request): Promise<unknown> {
 function validate(input: unknown) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return;
   const obj = input as Record<string, unknown>;
-  if (Object.keys(obj).some((key) => !fields.includes(key))) return;
+  if (
+    Object.keys(obj).some(
+      (key) => !fields.includes(key) && key !== 'previewContext',
+    )
+  )
+    return;
   if (fields.some((key) => typeof obj[key] !== 'string')) return;
   const value = obj as Record<(typeof fields)[number], string>;
   const fullName = value.fullName.trim();
   const location = value.location.trim();
   const email = value.email.trim();
   const phone = value.phone.trim();
+  const context =
+    obj.previewContext === undefined
+      ? undefined
+      : previewContext(obj.previewContext);
+  if (obj.previewContext !== undefined && !context) return;
+  if (context?.preferredContact === 'email' && !email) return;
   if (
     !uuid.test(value.id) ||
     !fullName ||
@@ -114,6 +126,7 @@ function validate(input: unknown) {
     plan: value.plan,
     language: value.language,
     token: value.token,
+    ...(context ? { previewContext: context } : {}),
   };
 }
 
@@ -231,6 +244,8 @@ export default {
         return existing.payload_hash === hash
           ? reply(200, 'received', id)
           : reply(409, 'conflict');
+      if (lead.previewContext && env.SOLAR_PREVIEW_ENABLED !== 'true')
+        return reply(503, 'unavailable');
       if (!token) return reply(422, 'security_check');
       let verified: { success?: boolean; hostname?: string; action?: string };
       try {
@@ -260,8 +275,8 @@ export default {
       // Bound SQL and a UNIQUE key make concurrent retries safe. Only this ID is deduplicated.
       const inserted = await env.LEADS_DB.prepare(
         `INSERT INTO site_visit_leads
-        (id, created_at, full_name, phone, email, location, plan, language, payload_hash, privacy_notice_version)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING`,
+        (id, created_at, full_name, phone, email, location, plan, language, payload_hash, privacy_notice_version${lead.previewContext ? ', preview_context' : ''})
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?${lead.previewContext ? ', ?' : ''}) ON CONFLICT(id) DO NOTHING`,
       )
         .bind(
           id,
@@ -273,7 +288,8 @@ export default {
           lead.plan,
           lead.language,
           hash,
-          privacyVersion,
+          lead.previewContext ? '2026-10-18.1' : privacyVersion,
+          ...(lead.previewContext ? [JSON.stringify(lead.previewContext)] : []),
         )
         .run();
       if (!inserted.success) return reply(503, 'unavailable');

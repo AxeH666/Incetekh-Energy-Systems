@@ -1,5 +1,6 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
+import SiteVisitForm from '../components/SiteVisitForm.astro';
 ---
 
 <SiteLayout
@@ -168,7 +169,7 @@ import SiteLayout from '../layouts/SiteLayout.astro';
           Return to calculator
         </a>{' '}
         ·{' '}
-        <a href="/#site-visit" id="preview-visit">
+        <a href="#site-visit" id="preview-visit">
           Book a free site visit
         </a>
       </p>
@@ -180,6 +181,7 @@ import SiteLayout from '../layouts/SiteLayout.astro';
       </noscript>
     </div>
   </section>
+  <SiteVisitForm preview />
 </SiteLayout>
 <script>
   import '../scripts/solar-preview';

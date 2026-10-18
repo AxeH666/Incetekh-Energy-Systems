@@ -66,3 +66,6 @@ export function billEstimate(session: SolarSession) {
     residential: session.residential,
   })!;
 }
+export function planForTarget(kw: number) {
+  return [3, 5, 7].includes(kw) ? `${kw}kw` : kw >= 10 ? '10plus' : 'advice';
+}

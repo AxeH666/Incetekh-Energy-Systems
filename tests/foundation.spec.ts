@@ -129,6 +129,10 @@ test('all local links and assets resolve without external browser requests', asy
 }) => {
   const failures: string[] = [];
   const external: string[] = [];
+  // Astro's static test server has no Worker endpoints; Worker tests cover the real gate.
+  await page.route('**/api/solar-preview-config', (route) =>
+    route.fulfill({ json: { enabled: false } }),
+  );
   page.on('pageerror', (error) => failures.push(error.message));
   page.on('response', (response) => {
     if (response.status() >= 400) failures.push(response.url());
@@ -243,8 +247,8 @@ test('static output keeps planning and motion scripts small and local', async ()
       .filter((file) => !previewScripts.includes(file))
       .map(async (file) => (await stat(file)).size),
   );
-  // Includes the shared, validated calculator session handoff (about 2.5 KB).
-  expect(scriptBytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(14_000);
+  // Includes shared calculator state, consent validation and the single widget loader.
+  expect(scriptBytes.reduce((sum, size) => sum + size, 0)).toBeLessThan(15_000);
   expect(previewScripts).toHaveLength(1);
   expect((await stat(previewScripts[0])).size).toBeLessThan(16_000);
   expect(await readFile('dist/index.html', 'utf8')).not.toContain(

@@ -4,7 +4,9 @@ import {
   readSolarSession,
   billEstimate,
   sessionLifetime,
+  planForTarget,
 } from '../lib/solar-session';
+import { loadTurnstile } from '../lib/turnstile';
 import { rooftopResults } from '../lib/solar-results';
 import { localPath } from '../i18n/languages';
 import { financialEstimate } from '../data/solar';
@@ -34,6 +36,11 @@ const byId = <T extends HTMLElement = HTMLElement>(id: string) =>
 const status = byId('preview-status');
 const session = readSolarSession();
 const need = session ? billEstimate(session) : null;
+const enquiryForm = document.querySelector<HTMLFormElement>(
+  '[data-site-visit-form]',
+)!;
+const contextConsent = byId<HTMLInputElement>('preview-context-consent');
+const journeyReference = crypto.randomUUID();
 const money = (value: number) =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -45,8 +52,10 @@ const number = (value: number) =>
 if (session && need) {
   byId<HTMLAnchorElement>('back-calculator').href =
     localPath('/', session.language) + '#solar-planner';
-  byId<HTMLAnchorElement>('preview-visit').href =
-    localPath('/', session.language) + '#site-visit';
+  byId<HTMLAnchorElement>('preview-visit').href = '#site-visit';
+  enquiryForm.dataset.enquiryLanguage = session.language;
+  (enquiryForm.elements.namedItem('plan') as HTMLSelectElement).value =
+    planForTarget(need.kw);
   byId('bill-summary-text').textContent =
     `${money(session.bill)}/month · ${session.residential ? 'Residential' : 'Commercial'} · ${need.kw} kW bill-based target · approximately ${need.units} units used/month. Original calculator generation-value scenario: ${money(financialEstimate(need.kw, need.subsidy).monthlySavings)}/month, not guaranteed bill reduction.`;
 }
@@ -87,6 +96,29 @@ function discardRoof() {
   byId('roof-details').textContent = '';
   byId('roof-results').hidden = true;
   byId('roof-configuration').replaceChildren();
+  delete enquiryForm.dataset.previewContext;
+  contextConsent.checked = false;
+  contextConsent.disabled = true;
+  enquiryForm.querySelector('[data-preview-context-summary]')!.textContent =
+    'Select a property to attach your bill-based estimate and selected coordinates. You can send an ordinary enquiry without them.';
+}
+function syncEnquiryContext() {
+  if (!session || !need || !selected) return;
+  enquiryForm.dataset.previewContext = JSON.stringify({
+    version: 1,
+    consent: true,
+    calculatorVersion: 'bill-v1',
+    bill: session.bill,
+    residential: session.residential,
+    targetKw: need.kw,
+    latitude: selected.latitude,
+    longitude: selected.longitude,
+    reference: assessment?.reference ?? journeyReference,
+    preferredContact: 'none',
+  });
+  contextConsent.disabled = enquiryForm.getAttribute('aria-busy') === 'true';
+  enquiryForm.querySelector('[data-preview-context-summary]')!.textContent =
+    `Optional context: ${money(session.bill)}/month, ${session.residential ? 'residential' : 'commercial'}, ${need.kw} kW bill-based target; selected coordinates ${selected.latitude}, ${selected.longitude}. Enter your own location description above. The journey reference does not restore a roof design.`;
 }
 function freshSession() {
   if (session && need && Date.now() - session.createdAt < sessionLifetime)
@@ -138,6 +170,7 @@ function choose(point: Coordinates, recenter = true) {
   byId('selection-label').textContent =
     `Selected marker: ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}. Confirm the building visually.`;
   show('Check the selected building, then request its rooftop assessment.');
+  syncEnquiryContext();
   updateButton();
 }
 coordinateForm.addEventListener('submit', (event) => {
@@ -199,17 +232,7 @@ function security(sitekey: string) {
       },
     });
   };
-  if (window.turnstile) return render();
-  const script = document.createElement('script');
-  script.src =
-    'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-  script.async = true;
-  const nonce =
-    document.querySelector<HTMLScriptElement>('script[nonce]')?.nonce;
-  if (nonce) script.nonce = nonce;
-  script.onload = render;
-  script.onerror = fail;
-  document.head.append(script);
+  void loadTurnstile().then(render).catch(fail);
 }
 async function search(api: PropertyMaps) {
   try {
@@ -343,6 +366,7 @@ assess.addEventListener('click', async () => {
     clearTimeout(timeout);
     if (revision === generation) {
       pending = false;
+      syncEnquiryContext();
       updateButton();
       if (widgetId) window.turnstile?.reset(widgetId);
     }

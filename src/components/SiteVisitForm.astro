@@ -1,5 +1,9 @@
 ---
 import WhatsAppLink from './WhatsAppLink.astro';
+interface Props {
+  preview?: boolean;
+}
+const { preview = false } = Astro.props;
 ---
 
 <section
@@ -119,6 +123,39 @@ import WhatsAppLink from './WhatsAppLink.astro';
           <option value="advice">Not sure — help me choose</option>
         </select>
       </div>
+      {preview && (
+        <fieldset data-preview-context-controls>
+          <legend>Optional preliminary context</legend>
+          <p data-preview-context-summary>
+            Select a property to attach your bill-based estimate and selected
+            coordinates. You can send an ordinary enquiry without them.
+          </p>
+          <label for="preview-preferred-contact">
+            Preferred contact method (optional; attached only with context
+            consent)
+          </label>
+          <select id="preview-preferred-contact" name="preferredContact">
+            <option value="none">No preference</option>
+            <option value="phone">Phone call</option>
+            <option value="email">
+              Email (provide an email address above)
+            </option>
+            <option value="whatsapp">WhatsApp</option>
+          </select>
+          <label class="context-consent" for="preview-context-consent">
+            <input
+              id="preview-context-consent"
+              name="previewConsent"
+              type="checkbox"
+              disabled
+            />
+            Attach my bill, connection type, bill-based estimate, selected
+            coordinates, preferred contact and journey reference to this enquiry
+            and staff email. This does not save a roof design or Google
+            estimates.
+          </label>
+        </fieldset>
+      )}
       <div data-visit-security></div>
       <button class="button" type="submit" disabled>
         Request free site visit
@@ -147,6 +184,24 @@ import WhatsAppLink from './WhatsAppLink.astro';
 </script>
 
 <style>
+  fieldset {
+    border: 1px solid var(--color-line);
+    padding: 1rem;
+    min-width: 0;
+  }
+  .context-consent {
+    display: flex;
+    align-items: start;
+    gap: 0.7rem;
+    margin-top: 1rem;
+  }
+  .context-consent input {
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    min-height: 20px;
+    padding: 0;
+  }
   .site-visit {
     background: #fff;
     border-top: 1px solid var(--color-line);
