@@ -19,6 +19,25 @@ export class SolarImageryError extends Error {
   }
 }
 
+export function imageryRadius(roof: SolarRoof) {
+  // Request the building plus a 5 m border instead of a fixed 200 m square.
+  // Keep the 100 m cap; larger roofs still face the decoder's coverage check.
+  const { center, bounds } = roof;
+  const north =
+    Math.max(
+      Math.abs(bounds.sw.latitude - center.latitude),
+      Math.abs(bounds.ne.latitude - center.latitude),
+    ) * 111320;
+  const east =
+    Math.max(
+      Math.abs(bounds.sw.longitude - center.longitude),
+      Math.abs(bounds.ne.longitude - center.longitude),
+    ) *
+    111320 *
+    Math.cos((center.latitude * Math.PI) / 180);
+  return Math.min(100, Math.max(20, Math.ceil(Math.hypot(north, east) + 5)));
+}
+
 function assetUrl(value: unknown) {
   if (typeof value !== 'string' || value.length > 16384)
     throw new Error('image');
@@ -104,7 +123,7 @@ export async function fetchSolarImagery(
     url.search = new URLSearchParams({
       'location.latitude': String(roof.center.latitude),
       'location.longitude': String(roof.center.longitude),
-      radiusMeters: '100',
+      radiusMeters: String(imageryRadius(roof)),
       view: 'IMAGERY_LAYERS',
       requiredQuality: roof.imageryQuality,
       exactQualityRequired: 'true',

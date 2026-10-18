@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   fetchSolarImagery,
   SolarImageryError,
+  imageryRadius,
 } from '../../.wrangler/test-worker/solar-imagery.js';
 import { normalizeSolar } from '../../.wrangler/test-worker/solar.js';
 import { solarFixture } from '../fixtures/solar.mjs';
@@ -10,6 +11,22 @@ import { solarFixture } from '../fixtures/solar.mjs';
 const roof = normalizeSolar(solarFixture()).roof;
 const originalFetch = globalThis.fetch;
 const tiff = new Uint8Array([73, 73, 42, 0, 0, 0, 0, 0]);
+test('imagery radius encloses building corners with a border and avoids a fixed neighbourhood download', () => {
+  const small = {
+    ...roof,
+    bounds: {
+      sw: { latitude: 14.9999, longitude: 78.9999 },
+      ne: { latitude: 15.0001, longitude: 79.0001 },
+    },
+  };
+  assert.equal(imageryRadius(small), 21);
+  const offset = {
+    ...small,
+    center: { latitude: 14.99995, longitude: 78.99995 },
+  };
+  assert.ok(imageryRadius(offset) > imageryRadius(small));
+  assert.equal(imageryRadius(roof), 100);
+});
 function metadata(patch = {}) {
   return {
     imageryDate: { year: 2021, month: 3, day: 2 },
