@@ -8,14 +8,14 @@
     "run_worker_first": ["/api/*", "/solar-preview", "/solar-preview/*"],
     "not_found_handling": "404-page",
   },
-  // Solar stays disabled until approved usage limits and live acceptance.
+  // Owner authorized public use without daily/monthly caps on 18 October 2026.
   "vars": {
-    "SOLAR_PREVIEW_ENABLED": "false",
-    "SOLAR_MATCHED_IMAGERY_ENABLED": "false",
+    "SOLAR_PREVIEW_ENABLED": "true",
+    "SOLAR_MATCHED_IMAGERY_ENABLED": "true",
     "SOLAR_ALLOWED_ORIGIN": "https://incetekhenergy.com",
-    // Proposed trial limits; inactive while SOLAR_PREVIEW_ENABLED is false.
-    "SOLAR_DAILY_LIMIT": "10",
-    "SOLAR_MONTHLY_LIMIT": "100",
+    // Counts are still recorded; bot/burst protection remains independent.
+    "SOLAR_DAILY_LIMIT": "unlimited",
+    "SOLAR_MONTHLY_LIMIT": "unlimited",
     "LEAD_CAPTURE_ENABLED": "true",
     "LEAD_CAPTURE_ENV": "production",
     "LEAD_ALLOWED_ORIGIN": "https://incetekhenergy.com",

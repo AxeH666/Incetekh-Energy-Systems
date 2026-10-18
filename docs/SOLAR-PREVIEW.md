@@ -7,6 +7,14 @@ normal Git-triggered deployments on 18 October 2026. Solar Preview must remain
 publicly disabled until separate approval. No billable Google calls, paid service
 creation or production enquiry changes are authorized by that deployment grant.
 
+**Subsequent owner direction (18 October 2026):** deploy and activate the public
+website flow, with no daily/monthly usage limits for now; defer Google quota and
+billing-alert configuration. This supersedes the initial disabled-release and
+finite-allowance instructions below. Current release details are in
+[production setup](SOLAR-PUBLIC-SETUP.md). Explicit `unlimited` limits retain
+atomic usage tracking, challenge checks, burst protection and fail-closed database
+behavior. Missing/malformed configuration still disables assessments.
+
 The supplied `Solar visual work/Incetekh_Solar_Preview_Product_Spec_v1.2.md` is
 the product authority. The approved sequence comes from the local owner plan at
 `.wrangler/solar-preview-planning/PLAN.md`; retain that original unchanged.
@@ -19,7 +27,7 @@ SolarCAD is excluded.
 | 3     | Property selector and confirmed assessment              | Merged #37 |
 | 4     | Existing calculator handoff and consistent results      | Merged #38 |
 | 5     | Consented enquiry context and compatible receipts/email | Merged #39 |
-| 6     | Release readiness and acceptance evidence               | PR 6       |
+| 6     | Release readiness and acceptance evidence               | Merged #40 |
 
 Exactly one component/PR is active. Each must pass self-review, independent
 review, relevant validation and deployment verification before the next branch.

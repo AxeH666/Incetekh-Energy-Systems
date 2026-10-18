@@ -14,7 +14,12 @@ PR42 added matched imagery and full roof-mask containment at merge
 references the raster chunk, public configuration remains false, ordinary pages
 return 200 and the private review path returns 404.
 
-## Credential status and remaining usage approval
+PR43 deployed disabled setup at merge `cb7c12bc008fe771617db52f1ce75cec00ff70c1`;
+Cloudflare build `56911db1-78b8-48ee-a3f6-90bf8fe6e194` succeeded. Runtime
+bindings, secrets, false flags and empty usage table were verified. All prior
+bindings remained unchanged. Its preview deployment had no secrets.
+
+## Credential status and owner usage decision
 
 1. **Saved; owner-confirmed restrictions.** A separate browser key with website restriction `https://incetekhenergy.com/*`
    and API restrictions **Maps JavaScript API** and **Places API (New)** only.
@@ -25,12 +30,11 @@ return 200 and the private review path returns 404.
 2. **Owner confirmed** the separate server credential is restricted to **Solar API only**.
    It must remain a runtime secret, never a browser/build value. Cloudflare's
    shared egress does not provide a dedicated IP to put in a static-IP restriction.
-3. **Pending:** approve ongoing usage limits. Proposed initial trial: **10 assessment bundles/day,
-   100/month**, each with at most one Insights, one Data Layers and two GeoTIFF
-   calls. A separate bounded live launch test and representative residential roof
-   are needed. Maps loads and Places searches are billed/controlled separately:
-   application assessment counters do not limit direct browser API use. Verify
-   applicable provider quotas and billing alerts before public enablement.
+3. **Owner-directed uncapped use:** the owner declined the proposed 10/day and
+   100/month allowance and said to configure limits later. Google quota and billing
+   alert setup is explicitly deferred. Each assessment still makes at most one
+   Insights, one Data Layers and two GeoTIFF calls. Google charges have no automatic
+   application spending cutoff; direct Maps/Places usage is separate.
 
 The production browser key's local readability was verified; Google Console
 restrictions are owner-reported, not independently dashboard-verified. No key is
@@ -54,28 +58,36 @@ passed. The separate real local-Worker routing check passed. Independent review
 found and resolved tiepoint ambiguity and undersampled roof-mask gaps. The final
 implementation uses full intersected-cell checks and strict matching image grids.
 
-## Deployment preparation
+Activation validation: lint, type checks, 145-page production build, all 90 Worker
+tests and seven focused browser raster/disabled/funnel tests passed. New cases
+cover uncapped tracking above former limits, concurrency, rollover, mixed finite
+limits, challenge rejection and database failure. Live acceptance is recorded
+separately after deployment; these automated results use synthetic providers.
 
-Keep both Solar flags false until usage approval and live checks are resolved.
-Production configuration prepares namespace `2026101801` at 3 attempts/minute,
+## Public activation
+
+Production configuration enables both Solar flags with `unlimited` daily/monthly
+limits, as explicitly directed by the owner. Usage is still counted before every
+assessment bundle, including failed attempts; failure to record usage blocks the
+provider call. Missing, zero or malformed limits fail closed. Finite positive
+limits remain supported for later configuration, without resetting counters.
+Namespace `2026101801` stays at 3 attempts/minute per IP for burst protection,
 separate from lead namespaces `2026101501`/`2026101502`. The account inventory
 contained one Worker with only the production lead rate binding; repository
 preview configuration contains only its separate lead binding. The exact allowed
-origin is `https://incetekhenergy.com`. Proposed limits 10/day and 100/month are
-inactive while the preview is disabled. Preview deployments remain disabled and
+origin is `https://incetekhenergy.com`. Preview deployments remain disabled and
 receive no production Solar credentials. Existing lead/email keys, limits, cron
 and cutoff stay fixed.
 
-Remaining usage decision: approve those trial limits and one bounded launch test
-(up to three Maps loads, two Places search sessions with at most five Autocomplete
+The launch verification will use up to three Maps loads, two Places search sessions
+with at most five Autocomplete
 requests and one Essentials detail lookup each, and one Solar assessment bundle
-on SS Mall). No new enquiry/email is part of that test. This approval must include
-the Data Layers/GeoTIFF requests; prior Maps/Solar allowances are exhausted.
-Provider quotas, billing alerts and a representative residential roof remain
-unverified. Direct Maps/Places billing is not hard-capped by the Worker.
+on SS Mall. No new enquiry/email is part of that test. This is part of the latest
+uncapped public-release direction, not a reuse of exhausted private-test budgets.
+Provider quotas/alerts are deferred; a representative residential roof remains
+unverified. No claim of universal coverage or survey-grade accuracy is made.
 
-Before public launch enable both `SOLAR_PREVIEW_ENABLED` and
-`SOLAR_MATCHED_IMAGERY_ENABLED` in the controlled acceptance environment. Verify
+After the reviewed activation deploy, verify
 the actual Maps/Places restrictions, matched imagery, roof identity, panel overlay,
 Before toggle, mobile layout and normal enquiry handoff. Do not claim this was
 done based on synthetic tests. A missing address, neighbour, missing coverage,
@@ -87,3 +99,5 @@ and retention requirements in SOLAR-PREVIEW.md remain applicable.
 
 Official guidance: [Google key restrictions](https://developers.google.com/maps/api-security-best-practices),
 [Solar coverage limitations](https://developers.google.com/maps/documentation/solar/coverage).
+Usage is pay-as-you-go; Google recommends daily quotas for cost control:
+[Solar usage and billing](https://developers.google.com/maps/documentation/solar/usage-and-billing).
