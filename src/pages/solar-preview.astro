@@ -10,12 +10,21 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
 >
   <section class="section preview-shell">
     <div class="container">
-      <p class="eyebrow">Preliminary rooftop preview</p>
-      <h1>See solar on your roof.</h1>
-      <p class="preview-steps">
-        1. Enter address &nbsp; → &nbsp; 2. Confirm roof &nbsp; → &nbsp; 3. See
-        solar
-      </p>
+      <header class="preview-heading">
+        <p class="eyebrow">Preliminary rooftop preview</p>
+        <h1>See solar on your roof.</h1>
+        <ol class="preview-steps" aria-label="Preview steps" role="list">
+          <li>
+            <span aria-hidden="true">01</span> Enter address
+          </li>
+          <li>
+            <span aria-hidden="true">02</span> Confirm roof
+          </li>
+          <li>
+            <span aria-hidden="true">03</span> See solar
+          </li>
+        </ol>
+      </header>
       <p id="preview-status" role="status" tabindex="-1">
         Solar Preview is currently unavailable. You can still use our calculator
         or arrange a free site visit.
@@ -34,7 +43,7 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
           Find your address, then check the pin is on your roof. Address search
           and the map share your search and location with Google.
         </p>
-        <p>
+        <p class="privacy-links">
           <a href="https://policies.google.com/privacy">
             Google Privacy Policy
           </a>{' '}
@@ -44,7 +53,7 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
           </a>{' '}
           · <a href="/privacy/">Our privacy notice</a>
         </p>
-        <button type="button" id="open-map">
+        <button type="button" id="open-map" class="button button-dark">
           Enter your address
         </button>
       </div>
@@ -60,29 +69,59 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
         <p id="selection-label">No property selected.</p>
         <div id="solar-map" aria-label="Google satellite property map"></div>
         <div id="solar-security"></div>
-        <button id="assess-property" type="button" disabled>
+        <button
+          id="assess-property"
+          class="button button-dark"
+          type="button"
+          disabled
+        >
           Confirm roof &amp; preview
         </button>
         <div id="returned-building" hidden>
           <p id="returned-location"></p>
-          <button id="confirm-detected-roof" type="button" hidden disabled>
+          <button
+            id="confirm-detected-roof"
+            class="button button-dark"
+            type="button"
+            hidden
+            disabled
+          >
             Yes, show solar here
           </button>
-          <button id="reject-roof" type="button">
+          <button id="reject-roof" class="button button-outline" type="button">
             No, choose another roof
           </button>
         </div>
         <div id="roof-controls" hidden>
-          <button id="before-solar" type="button" aria-pressed="false">
+          <button
+            id="before-solar"
+            class="button button-outline"
+            type="button"
+            aria-pressed="false"
+          >
             Show Before
           </button>
-          <button id="panel-view" type="button" aria-pressed="false">
+          <button
+            id="panel-view"
+            class="button button-outline"
+            type="button"
+            aria-pressed="false"
+          >
             Closer view
           </button>
-          <button id="grouped-layout" type="button" hidden>
+          <button
+            id="grouped-layout"
+            class="button button-outline"
+            type="button"
+            hidden
+          >
             Try grouped layout
           </button>
-          <button id="unusable-roof" type="button">
+          <button
+            id="unusable-roof"
+            class="button button-outline"
+            type="button"
+          >
             Panels don't match my roof
           </button>
         </div>
@@ -173,11 +212,10 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
         </section>
       </div>
       <p class="preview-links">
-        <a href="/#solar-planner" id="back-calculator">
+        <a href="/#solar-planner" id="back-calculator" class="text-link">
           Return to calculator
-        </a>{' '}
-        ·{' '}
-        <a href="#site-visit" id="preview-visit">
+        </a>
+        <a href="#site-visit" id="preview-visit" class="text-link">
           Book a free site visit
         </a>
       </p>
@@ -199,73 +237,189 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
 </script>
 <style>
   .preview-shell {
-    padding-block: 2.5rem;
+    padding-block: var(--section-space) var(--space-8);
+  }
+  .preview-heading {
+    margin-bottom: var(--space-8);
+  }
+  .preview-heading .eyebrow {
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
   }
   .preview-shell h1 {
-    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-size: var(--text-page-title);
+    line-height: 1.15;
     letter-spacing: -0.045em;
-    margin-bottom: 1.5rem;
+  }
+  .preview-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    list-style: none;
+    margin: var(--space-8) 0 0;
+    padding: 1.25rem 0;
+    border-block: 1px solid var(--color-line);
+    font-size: var(--text-small);
+    font-weight: 600;
+  }
+  .preview-steps li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+  .preview-steps span {
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
   }
   .preview-shell p {
     max-width: 75ch;
   }
-  .preview-shell button {
-    padding: 0.85rem 1.2rem;
-    min-height: 44px;
-    border: 1px solid var(--color-ink);
-    background: var(--color-ink);
-    color: white;
-    cursor: pointer;
-    margin: 0.4rem 0.5rem 0.4rem 0;
+  #preview-intro {
+    max-width: 52rem;
+    padding: var(--card-padding);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: var(--color-surface);
   }
-  .preview-shell button:disabled {
-    opacity: 0.5;
-    cursor: default;
+  #preview-intro > p + p {
+    margin-top: 1rem;
+  }
+  .privacy-links {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
   }
   details {
-    margin-block: 1rem;
+    margin-block: var(--space-6);
+    border-block: 1px solid var(--color-line);
+  }
+  details[open] {
+    padding-bottom: var(--space-4);
+  }
+  details p + p {
+    margin-top: var(--space-3);
+  }
+  details p {
+    font-size: var(--text-small);
+    color: var(--color-muted);
   }
   summary {
     cursor: pointer;
-    min-height: 44px;
-    padding-block: 0.65rem;
+    min-height: 3rem;
+    padding-block: 0.85rem;
+    font-size: var(--text-small);
+    font-weight: 600;
+  }
+  summary::marker {
+    color: var(--color-green);
   }
   #property-search {
     max-width: 640px;
+    margin-bottom: var(--space-3);
+  }
+  #property-search + p {
+    font-size: var(--text-small);
+    color: var(--color-muted);
+  }
+  #selection-label {
+    margin-top: var(--space-4);
+    font-weight: 600;
+    overflow-wrap: anywhere;
   }
   #open-map {
-    min-width: min(100%, 320px);
-    text-align: left;
-    background: white;
-    color: var(--color-ink);
+    margin-top: var(--space-6);
   }
   #chosen-system {
+    color: var(--color-green);
+    font-size: var(--text-lead);
     font-weight: 600;
   }
   #solar-map {
     width: 100%;
     height: min(65vh, 700px);
     min-height: 340px;
-    background: #e2e6e6;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-line);
     margin-block: 1rem;
   }
-  #preview-status {
-    padding-block: 1rem;
+  #solar-security {
+    margin-block: var(--space-4);
+  }
+  #preview-status:not(:empty) {
+    padding: 1rem 1.25rem;
+    margin-block: var(--space-4);
+    border-left: 3px solid var(--color-green);
+    background: var(--color-surface-soft);
+    font-size: var(--text-small);
+    overflow-wrap: anywhere;
   }
   #returned-building {
-    border-left: 3px solid #ad5b14;
-    padding-left: 1rem;
+    border: 1px solid #c4aa7b;
+    border-radius: var(--radius);
+    background: #faf5e9;
+    padding: var(--card-padding);
+    margin-block: var(--space-6);
+  }
+  #returned-building p {
+    margin-bottom: var(--space-4);
+  }
+  #returned-building .button {
+    margin: 0.25rem 0.5rem 0.25rem 0;
+  }
+  #roof-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-block: var(--space-6);
+  }
+  #roof-controls [aria-pressed='true'] {
+    background: var(--color-green);
+    color: #fff;
+  }
+  #solar-source,
+  #module-unavailable,
+  #grouped-layout-note,
+  #roof-limited {
+    margin-block: var(--space-4);
+    font-size: var(--text-small);
+    color: var(--color-muted);
+  }
+  #roof-results {
+    padding: var(--card-padding);
+    margin-top: var(--space-8);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+  #roof-results h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    margin-bottom: var(--space-3);
   }
   #roof-results dl {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     gap: 1.5rem;
     margin-block: 1.5rem;
   }
+  #roof-results dl > div {
+    border-top: 1px solid var(--color-line);
+    padding-top: var(--space-4);
+    min-width: 0;
+  }
+  #roof-results dt {
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
   #roof-results dd {
     margin: 0.4rem 0;
-    font-size: 1.4rem;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
     font-weight: 600;
+    letter-spacing: -0.035em;
+    color: var(--color-green);
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
   }
   .google-attribution {
     font-family: sans-serif;
@@ -280,11 +434,64 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
   }
   #roof-results select {
     max-width: 100%;
-    min-height: 44px;
-    padding: 0.5rem;
+    min-height: 3.25rem;
+    padding: 0.8rem 1rem;
+    margin-block: var(--space-3);
+    border: 1px solid var(--color-field-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  #roof-results label {
+    display: block;
+    font-size: var(--text-small);
+    font-weight: 600;
   }
   .preview-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
     margin-top: 2rem;
+  }
+  #preview-enquiry {
+    margin-block: 0 var(--section-space);
+  }
+  #preview-enquiry > summary {
+    font-size: 1rem;
+    padding-block: var(--space-6);
+  }
+  #preview-enquiry :global(.site-visit) {
+    background: transparent;
+    padding-bottom: 0;
+  }
+  #preview-enquiry :global(.visit-grid) {
+    width: 100%;
+  }
+  @media (max-width: 36rem) {
+    .preview-shell {
+      padding-top: var(--space-8);
+    }
+    .preview-heading {
+      margin-bottom: var(--space-6);
+    }
+    .preview-steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: var(--space-6);
+      padding-block: var(--space-4);
+      font-size: 0.75rem;
+    }
+    .preview-steps li,
+    .preview-steps span {
+      display: block;
+    }
+    .preview-steps span {
+      margin-bottom: 0.25rem;
+    }
+    #bill-summary {
+      margin-block: var(--space-4);
+    }
   }
   [hidden] {
     display: none !important;

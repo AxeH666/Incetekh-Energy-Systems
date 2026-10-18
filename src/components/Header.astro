@@ -71,6 +71,10 @@ const path = sourcePath(Astro.url.pathname);
   nav a:hover {
     text-decoration: underline;
   }
+  nav a[aria-current='page'] {
+    color: var(--color-green);
+    text-decoration-thickness: 2px;
+  }
   .header-actions {
     display: flex;
     align-items: center;
