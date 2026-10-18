@@ -12,14 +12,14 @@ the product authority. The approved sequence comes from the local owner plan at
 `.wrangler/solar-preview-planning/PLAN.md`; retain that original unchanged.
 SolarCAD is excluded.
 
-| Order | Component                                               | Status      |
-| ----- | ------------------------------------------------------- | ----------- |
-| 1     | Server adapter, safeguards and atomic usage allowance   | Merged #35  |
-| 2     | Geographic panel geometry and alignment proof           | Merged #36  |
-| 3     | Property selector and confirmed assessment              | Merged #37  |
-| 4     | Existing calculator handoff and consistent results      | Merged #38  |
-| 5     | Consented enquiry context and compatible receipts/email | In progress |
-| 6     | Release readiness and acceptance evidence               | Pending     |
+| Order | Component                                               | Status     |
+| ----- | ------------------------------------------------------- | ---------- |
+| 1     | Server adapter, safeguards and atomic usage allowance   | Merged #35 |
+| 2     | Geographic panel geometry and alignment proof           | Merged #36 |
+| 3     | Property selector and confirmed assessment              | Merged #37 |
+| 4     | Existing calculator handoff and consistent results      | Merged #38 |
+| 5     | Consented enquiry context and compatible receipts/email | Merged #39 |
+| 6     | Release readiness and acceptance evidence               | PR 6       |
 
 Exactly one component/PR is active. Each must pass self-review, independent
 review, relevant validation and deployment verification before the next branch.
@@ -319,3 +319,27 @@ remove existing enquiries. Verify old counts/receipts after migration. Roll back
 flags/code while retaining additive columns and new customer records. Live preview
 D1, controlled production enquiry/inbox confirmation and public activation remain
 separate acceptance gates; local mocks do not establish them.
+
+## PR 6 release readiness
+
+See [release evidence and activation gates](SOLAR-PREVIEW-RELEASE.md). The complete
+calculator-to-enquiry browser journey now runs through the real Worker and local
+D1 with synthetic Google, Turnstile and email providers. It verifies the exact bill
+target, roof limitation, consented persistence, receipt retry, one reserved Solar
+attempt and one accepted email outbox entry. Additional checks cover wrong-roof
+reselection, late Maps failure, manual enquiry availability and mobile/desktop
+automated accessibility. They do not establish real Google imagery or device
+acceptance.
+
+The offline `python scripts/solar-migration-rehearsal.py` command creates a unique
+ignored folder containing synthetic SQLite databases and a hash report. It checks
+backup/restore integrity, preserved enquiry fields/receipts/outbox, additive
+migrations and legacy inserts. It cannot connect to production and does not
+establish Cloudflare D1 recovery readiness. Retain its evidence until live recovery
+and acceptance are separately approved.
+
+Derived results include the current "Includes data from Google Maps" attribution
+alongside the Solar-specific source statement. Native map attribution must remain
+visible; final real-device review is still required. See Google's
+[Solar attribution policy](https://developers.google.com/maps/documentation/solar/policies),
+checked 18 October 2026.

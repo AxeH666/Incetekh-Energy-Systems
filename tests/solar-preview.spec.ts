@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { previewWorker } from './support/solar-preview-worker.mjs';
 import { solarFixture } from './fixtures/solar.mjs';
 import { normalizeSolar } from '../worker/solar';
+import AxeBuilder from '@axe-core/playwright';
 
 test.describe('property selector with real Worker CSP and mocked providers', () => {
   test.describe.configure({ mode: 'serial' });
@@ -167,6 +168,13 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await expect(page.locator('#result-capacity')).toHaveText('1.6 kW');
       await expect(page.locator('#result-ac')).toHaveText('2,040 kWh AC/year');
       await expect(page.locator('#result-value')).toHaveText('₹1,360/month');
+      expect(
+        (
+          await new AxeBuilder({ page })
+            .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+            .analyze()
+        ).violations,
+      ).toEqual([]);
       expect(calls.maps()).toBe(1);
       expect(calls.assessments()).toBe(1);
       await page.screenshot({
@@ -495,5 +503,213 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     expect(calls.securityLoads()).toBe(1);
     expect(calls.maps()).toBe(1);
     expect(calls.assessments()).toBe(1);
+  });
+  test('wrong roof and late Maps failure suppress layout while manual enquiry remains available', async ({
+    page,
+  }) => {
+    const calls = await setup(page);
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await page.locator('#reject-roof').click();
+    await expect(page.locator('#roof-results')).toBeHidden();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    await select(page);
+    await page.locator('#assess-property').click();
+    await page.locator('#accept-roof').click();
+    await page.evaluate(() =>
+      window.dispatchEvent(new Event('incetekh:maps-unavailable')),
+    );
+    await expect(page.locator('#roof-results')).toBeHidden();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    await expect(page.locator('#preview-status')).toContainText(
+      'Google Maps is unavailable',
+    );
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      '3 kW bill-based target',
+    );
+    await expect(page.locator('#assess-property')).toBeDisabled();
+    await expect(page.locator('[data-site-visit-form]')).toBeVisible();
+    expect(calls.maps()).toBe(1);
+  });
+  test('complete calculator-to-enquiry journey uses real Worker and D1 with synthetic providers', async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    let solarCalls = 0,
+      emailCalls = 0;
+    const actions: string[] = [];
+    const origin = 'https://incetekhenergy.com';
+    const funnel = previewWorker(
+      {
+        LEAD_CAPTURE_ENABLED: 'true',
+        LEAD_CAPTURE_ENV: 'production',
+        LEAD_ALLOWED_ORIGIN: origin,
+        EMAIL_NOTIFY_ENABLED: 'true',
+        EMAIL_NOTIFY_SINCE: '2026-10-01T00:00:00.000Z',
+        RESEND_API_KEY: 'synthetic-email-key',
+      },
+      {
+        modules: [
+          {
+            type: 'ESModule',
+            path: '.wrangler/test-worker/funnel-harness.js',
+            contents: `import worker from './index.js';export default {async fetch(request,env){if(new URL(request.url).pathname==='/local-test-tick'){await worker.scheduled({},env);return new Response('ok');}return worker.fetch(request,env);}};`,
+          },
+          ...[
+            'index',
+            'email',
+            'solar',
+            'solar-endpoint',
+            'solar-page',
+            'preview-context',
+          ].map((name) => ({
+            type: 'ESModule',
+            path: `.wrangler/test-worker/${name}.js`,
+          })),
+        ],
+        ratelimits: {
+          SOLAR_RATE_LIMIT: {
+            namespace_id: '1021',
+            simple: { limit: 3, period: 60 },
+          },
+          LEAD_RATE_LIMIT: {
+            namespace_id: '1022',
+            simple: { limit: 5, period: 60 },
+          },
+        },
+        outboundService: async (request: Request) => {
+          const url = new URL(request.url);
+          if (url.origin === 'https://challenges.cloudflare.com') {
+            const input = (await request.json()) as { response: string };
+            const action = input.response.replace('synthetic-', '');
+            actions.push(action);
+            return Response.json({
+              success: true,
+              hostname: 'incetekhenergy.com',
+              action,
+            });
+          }
+          if (
+            url.origin === 'https://solar.googleapis.com' &&
+            url.pathname === '/v1/buildingInsights:findClosest'
+          ) {
+            solarCalls++;
+            return Response.json(solarFixture());
+          }
+          if (url.href === 'https://api.resend.com/emails') {
+            emailCalls++;
+            return Response.json({ id: 'synthetic-delivery' });
+          }
+          throw new Error('Unexpected outbound provider');
+        },
+      },
+    );
+    try {
+      const db = await funnel.getD1Database('LEADS_DB');
+      for (const migration of [
+        '0001_site_visit_leads',
+        '0002_site_visit_email',
+        '0003_solar_usage',
+        '0004_solar_preview_context',
+      ]) {
+        const sql = (
+          await readFile(`migrations/${migration}.sql`, 'utf8')
+        ).replace(/^--.*$/gm, '');
+        await db.batch(
+          sql
+            .split(';')
+            .filter((s) => s.trim())
+            .map((s) => db.prepare(s)),
+        );
+      }
+      await setup(page, true, null);
+      let submitted: Record<string, any> | undefined;
+      for (const path of ['/api/solar-assessments', '/api/site-visits'])
+        await page.route('**' + path, async (route) => {
+          if (path.endsWith('site-visits'))
+            submitted = route.request().postDataJSON();
+          const response = await funnel.dispatchFetch(origin + path, {
+            method: 'POST',
+            headers: {
+              Origin: origin,
+              'Content-Type': 'application/json',
+              'CF-Connecting-IP': '192.0.2.41',
+            },
+            body: route.request().postData()!,
+          });
+          await route.fulfill({
+            status: response.status,
+            headers: Object.fromEntries(response.headers),
+            body: await response.text(),
+          });
+        });
+      await page.goto('/');
+      await page.locator('#solar-bill').fill('3000');
+      await page.locator('input[value="commercial"]').check();
+      await page.locator('[data-preview-link]').click();
+      await page.locator('#open-map').click();
+      await select(page);
+      await page.locator('#assess-property').click();
+      await page.locator('#accept-roof').click();
+      await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+      await expect(page.locator('#roof-limited')).toBeVisible();
+      await page.locator('#preview-visit').click();
+      await page.locator('#visit-name').fill('Synthetic complete journey');
+      await page.locator('#visit-phone').fill('9876543210');
+      await page
+        .locator('#visit-location')
+        .fill('Customer-entered synthetic location');
+      await page.locator('#preview-context-consent').check();
+      await page
+        .locator('[data-site-visit-form] button[type="submit"]')
+        .click();
+      await expect(page.locator('[data-visit-status]')).toContainText(
+        'enquiry has been received',
+      );
+      expect(submitted).toBeDefined();
+      const saved = await db.prepare('SELECT * FROM site_visit_leads').all();
+      expect(saved.results).toHaveLength(1);
+      expect(saved.results[0].plan).toBe('advice');
+      expect(
+        JSON.parse(saved.results[0].preview_context as string),
+      ).toMatchObject({
+        bill: 3000,
+        residential: false,
+        targetKw: 4,
+        latitude: 15,
+        longitude: 79,
+        consent: true,
+      });
+      const retry = await funnel.dispatchFetch(origin + '/api/site-visits', {
+        method: 'POST',
+        headers: {
+          Origin: origin,
+          'Content-Type': 'application/json',
+          'CF-Connecting-IP': '192.0.2.42',
+        },
+        body: JSON.stringify({ ...submitted, token: '' }),
+      });
+      expect(retry.status).toBe(200);
+      expect(
+        (await funnel.dispatchFetch(origin + '/local-test-tick')).status,
+      ).toBe(200);
+      expect(
+        (await funnel.dispatchFetch(origin + '/local-test-tick')).status,
+      ).toBe(200);
+      expect(
+        (await db.prepare('SELECT status FROM site_visit_email_outbox').first())
+          ?.status,
+      ).toBe('accepted');
+      expect(
+        (await db.prepare('SELECT daily_count FROM solar_usage').first())
+          ?.daily_count,
+      ).toBe(1);
+      expect(actions).toEqual(['solar_assessment', 'site_visit']);
+      expect(solarCalls).toBe(1);
+      expect(emailCalls).toBe(1);
+    } finally {
+      await funnel.dispose();
+    }
   });
 });
