@@ -95,7 +95,7 @@ before(async () => {
         bindings.SOLAR_API_KEY,
       );
       requests++;
-      return provider();
+      return provider(request);
     },
   };
   mf = new Miniflare(convertV4MiniflareOptions(options));
@@ -192,7 +192,10 @@ test('rejects method, origin, alias, query, content type, excessive/chunked body
     [{ latitude: '15' }, {}, 400],
     [{ latitude: null }, {}, 400],
     [{ longitude: 200 }, {}, 400],
-    [{ latitude: 30 }, {}, 400],
+    [{ latitude: 39 }, {}, 400],
+    [{ latitude: 5 }, {}, 400],
+    [{ longitude: 67 }, {}, 400],
+    [{ longitude: 99 }, {}, 400],
     [{ url: 'https://evil.example' }, {}, 400],
     [{ token: '' }, {}, 400],
   ])
@@ -206,6 +209,39 @@ test('rejects method, origin, alias, query, content type, excessive/chunked body
   assert.equal((await send({}, { body })).status, 413);
   assert.equal(requests, before);
 });
+test('India-wide coordinates reach the provider unchanged; coverage remains a separate result', async () => {
+  const points = [
+    { latitude: 13.33467, longitude: 74.74617 }, // Udupi: west of the old cutoff.
+    { latitude: 28.61, longitude: 77.21 }, // Delhi.
+    { latitude: 26.14, longitude: 91.74 }, // Guwahati.
+    { latitude: 11.62, longitude: 92.73 }, // Port Blair.
+    { latitude: 10.56, longitude: 72.64 }, // Kavaratti.
+    { latitude: 8.09, longitude: 77.54 }, // Kanyakumari.
+  ];
+  const previous = provider;
+  const sent = [];
+  const before = verificationRequests;
+  provider = (request) => {
+    const url = new URL(request.url);
+    sent.push({
+      latitude: Number(url.searchParams.get('location.latitude')),
+      longitude: Number(url.searchParams.get('location.longitude')),
+    });
+    return Response.json({ error: { code: 404 } }, { status: 404 });
+  };
+  try {
+    for (const point of points) {
+      const response = await send(point);
+      assert.equal(response.status, 200);
+      assert.equal((await response.json()).status, 'no_coverage');
+    }
+    assert.deepEqual(sent, points);
+    assert.equal(verificationRequests - before, points.length);
+  } finally {
+    provider = previous;
+  }
+});
+
 test('wrong Turnstile hostname/action and failed security check cannot spend Solar allowance', async () => {
   const before = requests;
   for (const patch of [

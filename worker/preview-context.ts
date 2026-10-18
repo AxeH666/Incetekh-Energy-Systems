@@ -1,3 +1,5 @@
+import { inSolarRegion } from './solar.js';
+
 // Persist only consented customer inputs. No provider address, layout or energy.
 export interface PreviewContext {
   version: 1;
@@ -29,13 +31,8 @@ export function previewContext(input: unknown): PreviewContext | undefined {
     // Versioned existing calculator: INR8/unit,120units/kW/month,whole-kW ceiling.
     v.targetKw !== Math.max(1, Math.ceil(v.bill / 8 / 120)) ||
     typeof v.latitude !== 'number' ||
-    !Number.isFinite(v.latitude) ||
-    v.latitude < 12 ||
-    v.latitude > 20 ||
     typeof v.longitude !== 'number' ||
-    !Number.isFinite(v.longitude) ||
-    v.longitude < 75 ||
-    v.longitude > 85 ||
+    !inSolarRegion({ latitude: v.latitude, longitude: v.longitude }) ||
     typeof v.preferredContact !== 'string' ||
     !['none', 'phone', 'email', 'whatsapp'].includes(v.preferredContact) ||
     typeof v.reference !== 'string' ||

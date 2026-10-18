@@ -53,10 +53,23 @@ are unchanged. There is no new frontend in this PR.
 
 An enabled request requires one exact allowed origin, JSON, a bounded 4 KB body,
 numeric latitude/longitude and a Turnstile token with action `solar_assessment`.
-The initial service envelope is 12–20 degrees north and 75–85 degrees east:
-a coarse Andhra Pradesh/neighbouring-region bound, not an exact state boundary
-or promise of service. A separate 3/minute rate namespace is required before
+The original 12–20 degrees north / 75–85 degrees east envelope excluded locations
+such as Udupi. Following owner approval on 18 October 2026, selection, assessment
+and consented enquiry context share a wider 6–38 degrees north / 68–98 degrees east
+envelope covering India and its islands. This rectangle also includes nearby
+foreign territory; it is an input guard, not an exact national border or a promise
+of Solar coverage or site-visit availability. Places suggestions are restricted to
+India, with a soft Andhra Pradesh-area bias instead of a hard regional restriction.
+A separate 3/minute rate namespace is required before
 activation. Rate keys are daily, Solar-specific HMACs; raw IPs are never persisted.
+
+Address-details lookup stops waiting after 15 seconds without retrying. Failure or
+invalid coordinates replace the locating label with recovery guidance. Users can
+zoom and tap their roof directly without a successful address search. Changing the
+search, selecting a map point, session expiry or a map failure invalidates the old
+lookup; late results cannot restore an old selection. Google does not expose
+request cancellation here: aborting ends our wait, not the provider's network call.
+Roof matching, masks, geometry and the existing no-coverage fallback are unchanged.
 
 After security verification, one SQLite statement reserves both daily and monthly
 allowance in an additive `solar_usage` table. Its UTC periods come from SQLite,

@@ -7,6 +7,7 @@ import {
 } from '../lib/solar-map';
 import {
   roofSelection,
+  inSolarRegion,
   type SolarResult,
   type Coordinates,
 } from '../../worker/solar';
@@ -101,7 +102,17 @@ let pending = false,
   challengeUsed = false,
   widgetId: string | undefined;
 let controller: AbortController | undefined;
+let lookupController: AbortController | undefined;
 let mapFailed = false;
+function cancelLookup() {
+  searchGeneration++;
+  lookupController?.abort();
+  lookupController = undefined;
+}
+function locationMessage(message: string) {
+  byId('selection-label').textContent = message;
+  show(message);
+}
 function show(message: string, focus = false) {
   status.textContent = message;
   if (focus) status.focus();
@@ -174,7 +185,7 @@ function freshSession() {
   if (session && need && Date.now() - session.createdAt < sessionLifetime)
     return true;
   generation++;
-  searchGeneration++;
+  cancelLookup();
   controller?.abort();
   pending = false;
   selected = undefined;
@@ -196,24 +207,20 @@ function choose(point: Coordinates, recenter = true) {
     show('The map is unavailable. Please arrange a free manual site visit.');
     return;
   }
-  if (
-    !Number.isFinite(point.latitude) ||
-    !Number.isFinite(point.longitude) ||
-    point.latitude < 12 ||
-    point.latitude > 20 ||
-    point.longitude < 75 ||
-    point.longitude > 85
-  ) {
-    show(
-      'Choose a property within our assessment region, or arrange a free manual site visit.',
-    );
-    return;
-  }
   generation++;
-  searchGeneration++;
+  cancelLookup();
   controller?.abort();
   pending = false;
   discardRoof();
+  selected = undefined;
+  selectedMarker?.setMap(null);
+  if (!inSolarRegion(point)) {
+    updateButton();
+    locationMessage(
+      'Choose a location in India. Search again or tap your roof on the map.',
+    );
+    return;
+  }
   selected = point;
   // Verification is for this action, not a coordinate. Moving an unsubmitted
   // pin must not repeatedly restart a challenge already in progress or passed.
@@ -237,11 +244,13 @@ function choose(point: Coordinates, recenter = true) {
 }
 window.addEventListener('incetekh:maps-unavailable', () => {
   mapFailed = true;
+  cancelLookup();
   generation++;
   controller?.abort();
   pending = false;
   discardRoof();
   updateButton();
+  byId('selection-label').textContent = 'The property map is unavailable.';
   show(
     'Google Maps is unavailable. We can assess your property during a free site visit.',
     true,
@@ -287,14 +296,14 @@ async function search(api: PropertyMaps) {
     const { PlaceAutocompleteElement } = await api.importLibrary('places');
     const element = new PlaceAutocompleteElement({
       includedRegionCodes: ['in'],
-      locationRestriction: { south: 12, west: 75, north: 20, east: 85 },
+      locationBias: { south: 12, west: 75, north: 20, east: 85 },
     });
     element.setAttribute('aria-label', 'Enter your full address');
     element.setAttribute('placeholder', 'House number, street, city');
     byId('property-search').append(element);
     element.focus();
     element.addEventListener('input', () => {
-      searchGeneration++;
+      cancelLookup();
       generation++;
       controller?.abort();
       pending = false;
@@ -306,11 +315,20 @@ async function search(api: PropertyMaps) {
         'Choose an address suggestion to locate your roof.';
       show('Choose an address suggestion to locate your roof.');
     });
-    element.addEventListener('gmp-error', () =>
-      show('Address search is unavailable. Tap your roof on the map instead.'),
-    );
+    element.addEventListener('gmp-error', () => {
+      if (selected || assessment || candidate || pending || mapFailed) return;
+      cancelLookup();
+      locationMessage(
+        'Address search is unavailable. Tap your roof on the map instead.',
+      );
+    });
     element.addEventListener('gmp-select', async (event) => {
-      const revision = ++searchGeneration;
+      if (mapFailed || !freshSession()) return;
+      cancelLookup();
+      const revision = searchGeneration;
+      const lookup = new AbortController();
+      lookupController = lookup;
+      const deadline = setTimeout(() => lookup.abort(), 15000);
       generation++;
       controller?.abort();
       pending = false;
@@ -327,18 +345,25 @@ async function search(api: PropertyMaps) {
         const place = (
           event as Event & { placePrediction: { toPlace(): Place } }
         ).placePrediction.toPlace();
-        await place.fetchFields({ fields: ['location'] });
+        await abortable(
+          place.fetchFields({ fields: ['location'] }),
+          lookup.signal,
+        );
         if (revision !== searchGeneration || mapFailed) return;
+        if (!freshSession()) return;
         if (!place.location) throw new Error('No location');
         choose({
           latitude: place.location.lat(),
           longitude: place.location.lng(),
         });
       } catch {
-        if (revision === searchGeneration)
-          show(
+        if (revision === searchGeneration && !mapFailed)
+          locationMessage(
             'Search could not locate this property. Tap your roof on the map instead.',
           );
+      } finally {
+        clearTimeout(deadline);
+        if (lookupController === lookup) lookupController = undefined;
       }
     });
   } catch {

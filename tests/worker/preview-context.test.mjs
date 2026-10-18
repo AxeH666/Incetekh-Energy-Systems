@@ -16,8 +16,10 @@ test('preview context is strictly bounded, consented customer input only', () =>
     { targetKw: 5 },
     { residential: 'yes' },
     { latitude: NaN },
-    { longitude: 86 },
-    { latitude: 11 },
+    { longitude: 99 },
+    { longitude: 67 },
+    { latitude: 5 },
+    { latitude: 39 },
     { preferredContact: ['phone'] },
     { preferredContact: 'sms' },
     { reference: 'not-a-reference' },
@@ -40,4 +42,20 @@ test('preview context is strictly bounded, consented customer input only', () =>
   const email = contextEmail(JSON.stringify(contextFixture())).join('\n');
   assert.match(email, /Bill-based target: 3 kW/);
   assert.doesNotMatch(email, /annual|DC|AC generation|geometry|solarPanels/);
+});
+
+test('consented context accepts wider India locations without changing existing receipt values', () => {
+  for (const point of [
+    { latitude: 13.33467, longitude: 74.74617 },
+    { latitude: 28.61, longitude: 77.21 },
+    { latitude: 11.62, longitude: 92.73 },
+    { latitude: 26.14, longitude: 91.74 },
+  ]) {
+    const context = { ...contextFixture(), ...point };
+    assert.deepEqual(previewContext(context), context);
+    assert.match(
+      contextEmail(JSON.stringify(context)).join('\n'),
+      new RegExp(String(point.latitude)),
+    );
+  }
 });

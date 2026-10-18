@@ -1,5 +1,6 @@
 import {
   coordinates,
+  inSolarRegion,
   fetchSolar,
   readBoundedJson,
   unavailable,
@@ -170,15 +171,7 @@ export async function solarEndpoint(
       )
         throw new Error('invalid');
       point = coordinates(input);
-      // Broad Andhra Pradesh / neighbouring service-area envelope. Not a claim of
-      // exact state boundaries or service eligibility; a physical visit confirms it.
-      if (
-        point.latitude < 12 ||
-        point.latitude > 20 ||
-        point.longitude < 75 ||
-        point.longitude > 85
-      )
-        throw new Error('invalid');
+      if (!inSolarRegion(point)) throw new Error('invalid');
       token = input.token;
       if (typeof token !== 'string' || !token || token.length > 2048)
         throw new Error('invalid');
