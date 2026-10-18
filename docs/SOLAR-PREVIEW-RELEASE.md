@@ -134,7 +134,9 @@ One subsequent imagery diagnostic used one Data Layers and two TIFF calls, with
 no new Insights or Maps request. A 50 m radius retained the same date and 0.25 m
 pixel-size request, reducing the two-image payload by about 75%. Its replay still
 rendered nine panels with all footprint mask checks and no browser errors. The
-owner's live post-PR48 result remains pending. Fresh diagnostic artifacts expire
+owner confirmed the live post-PR48 result: "Yes—panels appear correctly" after
+refreshing and testing SS Mall. This closes the reported SS Mall rendering failure;
+it does not establish residential coverage or engineering approval. Fresh diagnostic artifacts expire
 25 October 2026 and remain private.
 
 The reference module is Waaree AHNAY Bi-55-550, 2.272 × 1.133 m. A 5 kW request
@@ -148,7 +150,7 @@ safety, setbacks, mounting suitability or an engineer-approved design.
 | Requirement                      | Established evidence                                                                                                                              | Remaining acceptance or limitation                                                                                                                   |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Six sequential components        | PR35–40, exact-head self/independent review, validation and verified disabled deployments above                                                   | No implementation PR outstanding from the six-part sequence                                                                                          |
-| Bill → property → roof → enquiry | Real calculator/map/address handoff; synthetic complete Worker/D1 journey; session, language, capacity, consent and retry tests                   | Latest live candidate identity/result; separately approved genuine enquiry, receipt and inbox confirmation                                           |
+| Bill → property → roof → enquiry | Real calculator/map/address handoff; owner-confirmed post-PR48 SS Mall panels; synthetic complete Worker/D1 journey; session, language, capacity, consent and retry tests | Separately approved genuine enquiry, receipt and inbox confirmation |
 | Geographic panels and comparison | Geometry tests; complete raster-mask intersection; real saved roof replay; Before toggles panels without a new assessment                         | Human review of actual residential/commercial roofs and real Maps anchoring during pan/zoom/resize; no survey-accuracy claim                         |
 | Calculations                     | Bill need distinct from roof configuration; consistent count/watts/DC; owner-approved disclosed 0.85 AC factor; INR 8/unit illustration           | Hardware, consumption/export credit and local losses require site-specific confirmation; no energy estimate assigned to rearranged reference modules |
 | Failures                         | No coverage, wrong/distant building, changed selection, stale session, imagery/projection/mask failure, provider failure, rate/cap and Maps tests | Representative residential coverage and actual restricted-key failure checks remain unverified                                                       |
@@ -156,7 +158,7 @@ safety, setbacks, mounting suitability or an engineer-approved design.
 | Existing enquiries/email         | Legacy receipt/schema tests, real export/rehearsal, unchanged row hashes and runtime bindings                                                     | No new live enquiry or inbox acceptance claimed                                                                                                      |
 | Credentials/cost                 | Protected separated keys, owner-confirmed restrictions, exact origin, Turnstile, burst protection, usage counters                                 | Google restrictions/billing eligibility not independently inspected; quotas/alerts explicitly deferred; daily/monthly limits explicitly unlimited    |
 | Privacy/SEO                      | Noindex/no-store, sitemap exclusion, preview-only CSP, intent before Maps, session-only state and optional enquiry context                        | Real-device attribution and final policy acceptance; private fresh provider artifacts expire 25 October 2026 and must not become fixtures            |
-| Production release               | Owner authorized activation; PR44 enabled; latest PR48 successful build and exact live artifact verified                                          | Publicly enabled does not mean production-accepted; latest owner result and broader real-roof/device gates remain open                               |
+| Production release               | Owner authorized activation; PR44 enabled; latest PR48 successful build, exact live artifact verified and SS Mall result confirmed by owner | Broader real-roof/device gates remain open; SS Mall acceptance does not establish universal coverage |
 
 The preview entry budget is explicitly 30 KB (29,512 bytes at PR48); its complete
 dependency graph remains below 500 KB. Other scripts retain 15 KB and shared
