@@ -7,6 +7,18 @@ export interface SolarRaster {
   mask: string;
 }
 
+export class SolarImageryError extends Error {
+  constructor(
+    readonly stage: 'metadata' | 'rgb' | 'mask',
+    readonly httpStatus?: number,
+    readonly reason: 'http' | 'data_mismatch' | 'invalid_data' = httpStatus
+      ? 'http'
+      : 'invalid_data',
+  ) {
+    super('Matching imagery unavailable');
+  }
+}
+
 function assetUrl(value: unknown) {
   if (typeof value !== 'string' || value.length > 16384)
     throw new Error('image');
@@ -24,7 +36,12 @@ function assetUrl(value: unknown) {
   return url;
 }
 
-async function raster(url: URL, key: string, signal: AbortSignal) {
+async function raster(
+  url: URL,
+  key: string,
+  signal: AbortSignal,
+  stage: 'rgb' | 'mask',
+) {
   const response = await fetch(url, {
     headers: { 'X-Goog-Api-Key': key },
     redirect: 'manual',
@@ -32,7 +49,7 @@ async function raster(url: URL, key: string, signal: AbortSignal) {
   });
   if (!response.ok || !response.body) {
     await response.body?.cancel();
-    throw new Error('image');
+    throw new SolarImageryError(stage, response.status);
   }
   const reader = response.body.getReader();
   const parts: Uint8Array[] = [];
@@ -80,44 +97,53 @@ export async function fetchSolarImagery(
   roof: SolarRoof,
   key: string,
 ): Promise<SolarRaster> {
-  const signal = AbortSignal.timeout(20000);
-  const url = new URL('https://solar.googleapis.com/v1/dataLayers:get');
-  url.search = new URLSearchParams({
-    'location.latitude': String(roof.center.latitude),
-    'location.longitude': String(roof.center.longitude),
-    radiusMeters: '100',
-    view: 'IMAGERY_LAYERS',
-    requiredQuality: roof.imageryQuality,
-    exactQualityRequired: 'true',
-    pixelSizeMeters: '0.25',
-  }).toString();
-  const response = await fetch(url, {
-    headers: { 'X-Goog-Api-Key': key },
-    redirect: 'manual',
-    signal,
-  });
-  if (!response.ok) {
-    await response.body?.cancel();
-    throw new Error('image');
+  let stage: 'metadata' | 'rgb' | 'mask' = 'metadata';
+  try {
+    const signal = AbortSignal.timeout(20000);
+    const url = new URL('https://solar.googleapis.com/v1/dataLayers:get');
+    url.search = new URLSearchParams({
+      'location.latitude': String(roof.center.latitude),
+      'location.longitude': String(roof.center.longitude),
+      radiusMeters: '100',
+      view: 'IMAGERY_LAYERS',
+      requiredQuality: roof.imageryQuality,
+      exactQualityRequired: 'true',
+      pixelSizeMeters: '0.25',
+    }).toString();
+    const response = await fetch(url, {
+      headers: { 'X-Goog-Api-Key': key },
+      redirect: 'manual',
+      signal,
+    });
+    if (!response.ok) {
+      await response.body?.cancel();
+      throw new SolarImageryError(stage, response.status);
+    }
+    const data = (await readBoundedJson(response.body, 32768)) as Record<
+      string,
+      unknown
+    >;
+    const date = data?.imageryDate as
+      { year?: unknown; month?: unknown; day?: unknown } | undefined;
+    const formatted =
+      date &&
+      `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+    if (
+      formatted !== roof.imageryDate ||
+      data.imageryQuality !== roof.imageryQuality
+    )
+      throw new SolarImageryError(stage, undefined, 'data_mismatch');
+    // Validate BOTH URLs before any download; never send the server key elsewhere.
+    const rgbUrl = assetUrl(data.rgbUrl),
+      maskUrl = assetUrl(data.maskUrl);
+    stage = 'rgb';
+    const rgb = await raster(rgbUrl, key, signal, stage);
+    stage = 'mask';
+    const mask = await raster(maskUrl, key, signal, stage);
+    return { kind: 'geotiff', imageryDate: roof.imageryDate, rgb, mask };
+  } catch (error) {
+    throw error instanceof SolarImageryError
+      ? error
+      : new SolarImageryError(stage);
   }
-  const data = (await readBoundedJson(response.body, 32768)) as Record<
-    string,
-    unknown
-  >;
-  const date = data?.imageryDate as
-    { year?: unknown; month?: unknown; day?: unknown } | undefined;
-  const formatted =
-    date &&
-    `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
-  if (
-    formatted !== roof.imageryDate ||
-    data.imageryQuality !== roof.imageryQuality
-  )
-    throw new Error('image');
-  // Validate BOTH URLs before any download; never send the server key elsewhere.
-  const rgbUrl = assetUrl(data.rgbUrl),
-    maskUrl = assetUrl(data.maskUrl);
-  const rgb = await raster(rgbUrl, key, signal);
-  const mask = await raster(maskUrl, key, signal);
-  return { kind: 'geotiff', imageryDate: roof.imageryDate, rgb, mask };
 }

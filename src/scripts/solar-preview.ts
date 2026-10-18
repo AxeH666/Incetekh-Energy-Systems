@@ -334,6 +334,10 @@ async function search(api: PropertyMaps) {
   }
 }
 const messages: Record<string, string> = {
+  roof_mismatch:
+    "The pin is outside Google's returned roof. Tap the middle of your roof, then confirm again.",
+  imagery_unavailable:
+    'Matching roof imagery is unavailable. Please try later or arrange a free site visit.',
   no_coverage:
     "Solar data is unavailable for this property. We'll assess it during a free site visit.",
   unusable_geometry:

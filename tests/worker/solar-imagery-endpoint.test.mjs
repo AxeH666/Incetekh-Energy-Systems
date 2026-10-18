@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises';
 import { previewWorker } from '../support/solar-preview-worker.mjs';
 import { solarFixture } from '../fixtures/solar.mjs';
 
-for (const failImage of [false, true])
-  test(`assessment reserves one bounded bundle before imagery; image failure=${failImage}`, async () => {
+for (const scenario of ['available', 'imagery_unavailable', 'roof_mismatch'])
+  test(`assessment reserves one bounded bundle and distinguishes ${scenario}`, async () => {
     const calls = [];
     const mf = previewWorker(
       {
@@ -38,7 +38,7 @@ for (const failImage of [false, true])
               maskUrl: 'https://solar.googleapis.com/v1/geoTiff:get?id=mask',
             });
           if (url.pathname.endsWith('geoTiff:get'))
-            return failImage
+            return scenario === 'imagery_unavailable'
               ? new Response(null, { status: 503 })
               : new Response(new Uint8Array([73, 73, 42, 0, 0, 0, 0, 0]));
           throw new Error('Unexpected outbound request');
@@ -59,17 +59,26 @@ for (const failImage of [false, true])
             'CF-Connecting-IP': '192.0.2.1',
           },
           body: JSON.stringify({
-            latitude: 15,
+            latitude: scenario === 'roof_mismatch' ? 15.01 : 15,
             longitude: 79,
             token: 'synthetic-token',
           }),
         });
       const data = await (await send()).json();
-      assert.equal(data.status, failImage ? 'unusable_geometry' : 'available');
-      assert.equal(!!data.roofRaster, !failImage);
+      assert.equal(data.status, scenario);
+      assert.equal(!!data.roofRaster, scenario === 'available');
+      assert.equal(data.imageryStage, undefined);
+      assert.equal(data.imageryReason, undefined);
+      assert.equal(data.providerHttpStatus, undefined);
+      if (scenario === 'roof_mismatch')
+        assert.ok(!calls.some((p) => p.endsWith('dataLayers:get')));
       assert.equal(
         calls.filter((p) => p.endsWith('geoTiff:get')).length,
-        failImage ? 1 : 2,
+        scenario === 'available'
+          ? 2
+          : scenario === 'imagery_unavailable'
+            ? 1
+            : 0,
       );
       assert.deepEqual(
         await db

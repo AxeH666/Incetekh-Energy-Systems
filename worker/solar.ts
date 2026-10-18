@@ -27,6 +27,8 @@ export type SolarResult =
       status:
         | 'no_coverage'
         | 'unusable_geometry'
+        | 'roof_mismatch'
+        | 'imagery_unavailable'
         | 'invalid_input'
         | 'throttled'
         | 'budget_exhausted'
