@@ -3,6 +3,7 @@ import {
   fetchSolar,
   readBoundedJson,
   unavailable,
+  roofSelection,
   type SolarResult,
 } from './solar.js';
 import {
@@ -219,6 +220,10 @@ export async function solarEndpoint(
     const started = Date.now();
     let result = await fetchSolar(point, env.SOLAR_API_KEY);
     let roofRaster: SolarRaster | undefined;
+    const selection =
+      result.status === 'available'
+        ? roofSelection(result.roof, point)
+        : 'unmatched';
     let imageryFailure:
       | {
           imageryStage: string;
@@ -230,13 +235,7 @@ export async function solarEndpoint(
       result.status === 'available' &&
       env.SOLAR_MATCHED_IMAGERY_ENABLED === 'true'
     ) {
-      const bounds = result.roof.bounds;
-      if (
-        point.latitude < bounds.sw.latitude ||
-        point.latitude > bounds.ne.latitude ||
-        point.longitude < bounds.sw.longitude ||
-        point.longitude > bounds.ne.longitude
-      ) {
+      if (selection === 'unmatched') {
         result = unavailable('roof_mismatch');
       } else {
         try {
@@ -273,6 +272,9 @@ export async function solarEndpoint(
       {
         reference: crypto.randomUUID(),
         selectedLocation: point,
+        ...(result.status === 'available' && selection === 'candidate'
+          ? { confirmationRequired: true }
+          : {}),
         ...(roofRaster ? { roofRaster } : {}),
       },
     );

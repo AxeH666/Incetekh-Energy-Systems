@@ -523,7 +523,112 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       page.getByRole('button', { name: 'Confirm roof & preview' }),
     ).toBeEnabled();
   });
-  test('a different returned building shows no panels and a successful preview cannot be requested twice', async ({
+  for (const action of [
+    'accept',
+    'reject',
+    'edit',
+    'expire',
+    'map-failure',
+    'off-roof',
+  ] as const)
+    test(`nearby detected building requires explicit confirmation: ${action}`, async ({
+      page,
+    }) => {
+      await setup(page);
+      let attempts = 0;
+      await page.route('**/api/solar-assessments', (route) => {
+        attempts++;
+        return route.fulfill({ json: rasterFixture(action !== 'off-roof') });
+      });
+      await page.locator('#open-map').click();
+      await select(page, '15.0003');
+      await page.locator('#assess-property').click();
+      await expect(page.locator('#confirm-detected-roof')).toBeEnabled();
+      await expect(page.locator('#returned-location')).toContainText(
+        'Is this your property?',
+      );
+      await expect(page.locator('[data-mock-building-area]')).toHaveCount(1);
+      await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+      await expect(page.locator('#roof-results')).toBeHidden();
+      await expect(page.locator('#solar-security')).toHaveAttribute(
+        'hidden',
+        '',
+      );
+      await expect(page.locator('#preview-context-consent')).toBeDisabled();
+      await expect(page.locator('[data-site-visit-form]')).not.toHaveAttribute(
+        'data-preview-context',
+      );
+      await page.evaluate(() =>
+        (
+          window as unknown as {
+            syntheticMapClick(e: {
+              latLng: { lat(): number; lng(): number };
+            }): void;
+          }
+        ).syntheticMapClick({ latLng: { lat: () => 15.0003, lng: () => 79 } }),
+      );
+      await expect(page.locator('#confirm-detected-roof')).toBeEnabled();
+      if (action === 'reject') await page.locator('#reject-roof').click();
+      else if (action === 'edit')
+        await page.locator('synthetic-place-search').dispatchEvent('input');
+      else if (action === 'map-failure')
+        await page.evaluate(() =>
+          window.dispatchEvent(new Event('incetekh:maps-unavailable')),
+        );
+      else {
+        if (action === 'expire')
+          await page.clock.setFixedTime(new Date(Date.now() + 31 * 60 * 1000));
+        await page.locator('#confirm-detected-roof').click();
+      }
+      expect(attempts).toBe(1);
+      await expect(page.locator('[data-mock-building-area]')).toHaveCount(0);
+      await expect(page.locator('[data-mock-panel]')).toHaveCount(
+        action === 'accept' ? 8 : 0,
+      );
+      if (action === 'accept') {
+        const context = await page
+          .locator('[data-site-visit-form]')
+          .getAttribute('data-preview-context');
+        expect(JSON.parse(context!)).toMatchObject({
+          latitude: 15,
+          longitude: 79,
+        });
+        await expect(
+          page.locator('#preview-context-consent'),
+        ).not.toBeChecked();
+      } else {
+        await expect(page.locator('[data-mock-roof-image]')).toHaveCount(0);
+        await page.locator('#confirm-detected-roof').dispatchEvent('click');
+        await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+      }
+    });
+  test('failed building highlight clears the candidate and permits a fresh assessment', async ({
+    page,
+  }) => {
+    await setup(page);
+    await page.route('**/api/solar-assessments', (route) =>
+      route.fulfill({ json: rasterFixture() }),
+    );
+    await page.locator('#open-map').click();
+    await select(page, '15.0003');
+    await page.evaluate(() =>
+      Object.assign(window, { syntheticBuildingAreaFailure: true }),
+    );
+    await page.locator('#assess-property').click();
+    await expect(page.locator('#preview-status')).toContainText(
+      'could not finish',
+    );
+    await expect(page.locator('#confirm-detected-roof')).toBeHidden();
+    await expect(page.locator('[data-mock-roof-image]')).toHaveCount(0);
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    await expect(page.locator('#assess-property')).toBeEnabled();
+    await page.evaluate(() =>
+      Object.assign(window, { syntheticBuildingAreaFailure: false }),
+    );
+    await page.locator('#assess-property').click();
+    await expect(page.locator('#confirm-detected-roof')).toBeEnabled();
+  });
+  test('a distant returned building shows no panels and a successful preview cannot be requested twice', async ({
     page,
   }) => {
     const calls = await setup(page);

@@ -290,7 +290,7 @@ test('static output keeps planning and motion scripts small and local', async ()
   expect(previewScripts).toHaveLength(1);
   // Isolated rooftop geometry, reference-module packing and matched-image checks.
   // This entry is never loaded by the homepage; raster decoders are lazy imports.
-  expect((await stat(previewScripts[0])).size).toBeLessThan(27_000);
+  expect((await stat(previewScripts[0])).size).toBeLessThan(29_000);
   expect(shared.has(previewScripts[0])).toBe(false);
   expect([...shared].some((file) => file.includes('solar-raster.'))).toBe(
     false,

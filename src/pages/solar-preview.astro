@@ -65,12 +65,11 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
         </button>
         <div id="returned-building" hidden>
           <p id="returned-location"></p>
-          <p>
-            We could not confidently match the roof data to your pin. Tap the
-            middle of your roof and try again, or arrange a site visit.
-          </p>
+          <button id="confirm-detected-roof" type="button" hidden disabled>
+            Yes, show solar here
+          </button>
           <button id="reject-roof" type="button">
-            Choose roof again
+            No, choose another roof
           </button>
         </div>
         <div id="roof-controls" hidden>

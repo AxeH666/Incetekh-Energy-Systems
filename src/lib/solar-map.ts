@@ -154,17 +154,43 @@ export function createSolarMap(
     gestureHandling: 'cooperative',
   });
   let polygons: PolygonHandle[] = [];
+  let buildingArea: PolygonHandle | undefined;
   let roofImage: PolygonHandle | undefined;
   let releaseRoofImage: (() => void) | undefined;
   let visible = true;
   let displayedPaths: MapPoint[][] = [];
   function clear() {
+    buildingArea?.setMap(null);
+    buildingArea = undefined;
     for (const polygon of polygons) polygon.setMap(null);
     polygons = [];
     displayedPaths = [];
   }
   return {
     map,
+    showBuildingArea(roof: SolarRoof, selected: MapPoint) {
+      clear();
+      const { sw, ne } = roof.bounds;
+      buildingArea = new api.Polygon({
+        map,
+        paths: [
+          { lat: sw.latitude, lng: sw.longitude },
+          { lat: sw.latitude, lng: ne.longitude },
+          { lat: ne.latitude, lng: ne.longitude },
+          { lat: ne.latitude, lng: sw.longitude },
+        ],
+        strokeColor: '#ad5b14',
+        strokeWeight: 3,
+        fillOpacity: 0,
+        clickable: false,
+      });
+      map.fitBounds({
+        south: Math.min(sw.latitude, selected.lat),
+        north: Math.max(ne.latitude, selected.lat),
+        west: Math.min(sw.longitude, selected.lng),
+        east: Math.max(ne.longitude, selected.lng),
+      });
+    },
     clear() {
       clear();
       roofImage?.setMap(null);
