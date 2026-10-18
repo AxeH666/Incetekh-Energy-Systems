@@ -66,8 +66,10 @@ by an API does not prove delivery to the mailbox.
 Privacy notice version `2026-10-17.1` identifies the new conditional disclosure
 in all six languages; existing receipt retries retain their stored notice version.
 The form still validates Turnstile, rate limits, saves the lead, and returns its
-receipt. It makes no email calls or queue writes. Identical receipt retries use
-the existing row and never generate another notification.
+receipt. After a new row is committed, `ctx.waitUntil()` starts a background
+email dispatch for that specific lead immediately. Email work does not delay or
+change the successful receipt. Identical receipt retries use the existing row
+and never start another notification.
 
 The scheduled handler discovers up to ten committed leads per run using an
 indexed `email_enqueued = 0` marker and an explicit UTC activation cutoff. A D1
@@ -79,10 +81,15 @@ approved PR #33 release after a verified recovery snapshot and in-memory
 migration rehearsal. Both existing enquiries survived unchanged. The legacy
 `notification_status` column stays inert; use the new outbox.
 
-One email is attempted per run with an atomic two-minute lease. The approved
-five-minute schedule yields a normal queue-free delay of up to five minutes,
-plus provider delivery time. Bursts wait in D1. This uses the existing Worker
-and D1, with no new service binding or package dependency.
+One email is attempted per invocation with an atomic two-minute lease shared by
+the immediate and scheduled paths. New leads do not wait for the five-minute
+schedule or older queued enquiries. The schedule remains a recovery path for
+missed or failed immediate attempts. Provider processing, throttling and inbox
+filtering can still delay delivery; immediate dispatch is not an inbox guarantee.
+This uses the existing Worker and D1, with no new binding, dependency or schema.
+The existing ten-second provider timeout fits within Cloudflare's thirty-second
+background execution window; interruption leaves the saved lead/outbox recoverable.
+See [Cloudflare waitUntil](https://developers.cloudflare.com/workers/runtime-apis/context/#waituntil).
 
 - Sender: `Incetekh Energy <site-visits@notify.incetekhenergy.com>`.
 - Fixed recipient: `info@incetekhenergy.com`; customers are not emailed.
@@ -187,7 +194,7 @@ internal email processing conditionally. Customer details, credentials and raw
 provider errors are never logged.
 
 For an approved privacy/retention deletion, pause the dispatcher first and wait
-for in-flight scheduled invocations to finish. Verify no active sends remain.
+for in-flight immediate and scheduled invocations to finish. Verify no active sends remain.
 Delete only the approved references' outbox rows **before** their lead rows in
 one D1 transaction/batch with bound IDs; the foreign key intentionally blocks
 parent-only deletion. Confirm both copies are gone and unrelated leads remain.

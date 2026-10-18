@@ -162,7 +162,11 @@ export default {
       throw new Error('site_visit_email_dispatch_failed');
     }
   },
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === '/solar-preview/' || url.pathname === '/solar-preview')
       return solarPage(request, env);
@@ -293,7 +297,16 @@ export default {
         )
         .run();
       if (!inserted.success) return reply(503, 'unavailable');
-      if (inserted.meta.changes === 1) return reply(201, 'received', id);
+      if (inserted.meta.changes === 1) {
+        // Save first, then send without delaying the receipt. Cron recovers any
+        // interrupted/failed attempt through the same durable, deduplicated outbox.
+        ctx.waitUntil(
+          dispatchEmails(env, id).catch(() => {
+            console.error('site_visit_email_dispatch_failed');
+          }),
+        );
+        return reply(201, 'received', id);
+      }
       const saved = await env.LEADS_DB.prepare(
         'SELECT payload_hash FROM site_visit_leads WHERE id = ?',
       )

@@ -32,13 +32,14 @@ const input = (overrides = {}) => ({
   token: 'synthetic-token',
   ...overrides,
 });
-async function submit(lead = input()) {
+async function submit(lead = input(), immediate = false) {
   return mf.dispatchFetch(origin + '/api/site-visits', {
     method: 'POST',
     headers: {
       Origin: origin,
       'Content-Type': 'application/json',
       'CF-Connecting-IP': `192.0.2.${++requestCounter}`,
+      ...(immediate ? { 'X-Test-Immediate': 'true' } : {}),
     },
     body: JSON.stringify(lead),
   });
@@ -52,6 +53,15 @@ async function row(id) {
     .prepare('SELECT * FROM site_visit_email_outbox WHERE lead_id = ?')
     .bind(id)
     .first();
+}
+async function eventually(check) {
+  for (let attempt = 0; attempt < 100; attempt++) {
+    if (await check()) return;
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  assert.fail(
+    'Expected background email work to complete without a scheduled tick',
+  );
 }
 async function due(id) {
   await db
@@ -90,12 +100,15 @@ before(async () => {
         path: '.wrangler/test-worker/email-harness.js',
         contents: `
         import worker from './index.js';
-        export default { async fetch(request, env) {
+        export default { async fetch(request, env, ctx) {
           if (new URL(request.url).pathname === '/local-test-tick') {
             try { await worker.scheduled({}, env); return new Response('ok'); }
             catch { return new Response('failed', { status: 500 }); }
           }
-          return worker.fetch(request, env);
+          // Existing scheduler tests deliberately simulate a missed immediate
+          // attempt. Immediate tests use the production env and execution context.
+          return worker.fetch(request, request.headers.has('X-Test-Immediate')
+            ? env : { ...env, EMAIL_NOTIFY_ENABLED: 'false' }, ctx);
         } };`,
       },
       { type: 'ESModule', path: '.wrangler/test-worker/index.js' },
@@ -183,7 +196,94 @@ after(async () => {
   await mf?.dispose();
 });
 
-test('save and receipt precede email; repeated receipt and repeated tick send once', async () => {
+test('new enquiry starts sending immediately while the receipt does not wait for the provider', async () => {
+  const lead = input();
+  let release;
+  const gate = new Promise((resolve) => {
+    release = resolve;
+  });
+  const original = provider;
+  provider = async (call) => {
+    await gate;
+    return original(call);
+  };
+  let response;
+  const submission = submit(lead, true).then((value) => {
+    response = value;
+  });
+  try {
+    await eventually(() => requests.length === 1 && Boolean(response));
+    assert.equal(response.status, 201);
+    assert.equal((await row(lead.id)).status, 'pending');
+    assert.equal(
+      delivered.size,
+      0,
+      'provider still blocked while receipt has returned',
+    );
+    assert.equal((await submit({ ...lead, token: '' }, true)).status, 200);
+    assert.equal(await tick(), 200, 'overlapping cron must respect the lease');
+    assert.equal(requests.length, 1);
+  } finally {
+    release();
+    await submission;
+  }
+  await eventually(async () => (await row(lead.id))?.status === 'accepted');
+  assert.equal((await row(lead.id)).attempts, 1);
+  await tick();
+  assert.equal(requests.length, 1);
+});
+
+test('immediate send targets the newly saved lead even with a backlog', async () => {
+  const old = [];
+  for (let i = 0; i < 12; i++) {
+    const lead = input();
+    old.push(lead.id);
+    await submit(lead);
+  }
+  const fresh = input();
+  assert.equal((await submit(fresh, true)).status, 201);
+  await eventually(async () => (await row(fresh.id))?.status === 'accepted');
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0].key, `site-visit/${fresh.id}`);
+  for (const id of old) assert.equal(await row(id), null);
+});
+
+test('failed immediate send remains durable and cron retries the same payload and key', async () => {
+  const lead = input();
+  const original = provider;
+  provider = () => new Response('unavailable', { status: 503 });
+  assert.equal((await submit(lead, true)).status, 201);
+  await eventually(async () => (await row(lead.id))?.last_code === 'http_503');
+  assert.equal((await row(lead.id)).status, 'pending');
+  const first = requests[0];
+  assert.equal((await submit({ ...lead, token: '' }, true)).status, 200);
+  await tick();
+  assert.equal(
+    requests.length,
+    1,
+    'receipt retry and cron cannot bypass backoff',
+  );
+  provider = original;
+  await due(lead.id);
+  await tick();
+  assert.equal((await row(lead.id)).status, 'accepted');
+  assert.deepEqual(requests[1], first);
+});
+
+test('immediate submission respects disabled email settings', async () => {
+  await setBindings({ EMAIL_NOTIFY_ENABLED: 'false' });
+  try {
+    const lead = input();
+    assert.equal((await submit(lead, true)).status, 201);
+    await tick();
+    assert.equal(await row(lead.id), null);
+    assert.equal(requests.length, 0);
+  } finally {
+    await setBindings();
+  }
+});
+
+test('scheduled fallback and repeated receipt send once after a missed immediate attempt', async () => {
   const lead = input({ email: 'synthetic@example.invalid' });
   assert.equal((await submit(lead)).status, 201);
   assert.equal(requests.length, 0);
@@ -264,13 +364,13 @@ test('overlapping schedules atomically discover and claim one lead', async () =>
   assert.equal((await row(lead.id)).attempts, 1);
 });
 
-test('queue write failure never changes the receipt; next tick repairs the queue', async () => {
+test('immediate queue write failure never changes the receipt; next tick repairs the queue', async () => {
   await db.exec(
     "CREATE TRIGGER fail_queue BEFORE INSERT ON site_visit_email_outbox BEGIN SELECT RAISE(ABORT, 'synthetic'); END",
   );
   const lead = input();
   try {
-    assert.equal((await submit(lead)).status, 201);
+    assert.equal((await submit(lead, true)).status, 201);
     assert.equal(await tick(), 500);
     assert.equal((await submit({ ...lead, token: '' })).status, 200);
     assert.equal(

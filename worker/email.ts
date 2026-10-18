@@ -63,7 +63,10 @@ function payload(lead: Lead) {
   });
 }
 
-export async function dispatchEmails(env: EmailEnv): Promise<void> {
+export async function dispatchEmails(
+  env: EmailEnv,
+  leadId?: string,
+): Promise<void> {
   const since = env.EMAIL_NOTIFY_SINCE || '';
   // Fail closed, including all previews. Configuration is intentionally incomplete
   // in source control; an approved activation must supply the UTC cutoff and key.
@@ -81,16 +84,16 @@ export async function dispatchEmails(env: EmailEnv): Promise<void> {
   )
     return;
   const db = env.LEADS_DB;
-  // Discover committed leads separately from the request path. The partial index
-  // avoids rescanning previously queued leads; a failed batch is safe to repeat.
+  // A new submission targets only its saved lead; cron discovers missed work.
+  // The partial index avoids rescanning queued leads; failed batches are retryable.
   const leads = await db
     .prepare(
       // SELECT * tolerates the pre-migration schema; formatting allowlists fields.
       `SELECT *
-       FROM site_visit_leads WHERE email_enqueued = 0 AND created_at >= ?
+       FROM site_visit_leads WHERE email_enqueued = 0 AND created_at >= ?${leadId ? ' AND id = ?' : ''}
        ORDER BY created_at, id LIMIT 10`,
     )
-    .bind(since)
+    .bind(since, ...(leadId ? [leadId] : []))
     .all<Lead>();
   if (leads.results.length) {
     await db.batch(
@@ -115,12 +118,12 @@ export async function dispatchEmails(env: EmailEnv): Promise<void> {
     .prepare(
       `UPDATE site_visit_email_outbox SET status = 'uncertain',
        last_code = 'retry_window_expired', updated_at = ?
-       WHERE status = 'pending' AND first_attempt_at <= ? AND next_attempt_at <= ?`,
+       WHERE status = 'pending' AND first_attempt_at <= ? AND next_attempt_at <= ?${leadId ? ' AND lead_id = ?' : ''}`,
     )
-    .bind(now, now - retryWindow, now)
+    .bind(now, now - retryWindow, now, ...(leadId ? [leadId] : []))
     .run();
   const claim = crypto.randomUUID();
-  // One send per scheduled invocation. Atomic claim also covers overlapping runs.
+  // One send per invocation. Atomic claim covers overlapping immediate/cron runs.
   const delivery = await db
     .prepare(
       `UPDATE site_visit_email_outbox SET claim_token = ?, next_attempt_at = ?,
@@ -128,11 +131,19 @@ export async function dispatchEmails(env: EmailEnv): Promise<void> {
        updated_at = ? WHERE lead_id = (
          SELECT lead_id FROM site_visit_email_outbox
          WHERE status = 'pending' AND next_attempt_at <= ?
-           AND (first_attempt_at IS NULL OR first_attempt_at > ?)
+           AND (first_attempt_at IS NULL OR first_attempt_at > ?)${leadId ? ' AND lead_id = ?' : ''}
          ORDER BY next_attempt_at, lead_id LIMIT 1
        ) RETURNING lead_id, payload, attempts, first_attempt_at`,
     )
-    .bind(claim, now + 120_000, now, now, now, now - retryWindow)
+    .bind(
+      claim,
+      now + 120_000,
+      now,
+      now,
+      now,
+      now - retryWindow,
+      ...(leadId ? [leadId] : []),
+    )
     .first<Delivery>();
   if (!delivery) return;
 
