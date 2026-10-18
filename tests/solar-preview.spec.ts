@@ -102,10 +102,11 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     latitude = '15',
     longitude = '79',
   ) {
-    await page.locator('synthetic-place-search').evaluate(
+    await expect(page.locator('#address-input')).toBeEnabled();
+    await page.locator('#property-search').evaluate(
       (element, point) => {
         element.dispatchEvent(
-          Object.assign(new Event('gmp-select'), {
+          Object.assign(new Event('address-select'), {
             placePrediction: {
               toPlace: () => ({
                 location: {
@@ -135,6 +136,10 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       });
     });
     await page.locator('#open-map').click();
+    await page.locator('#address-input').fill('Udupi');
+    await expect(
+      page.locator('#property-search').getByRole('option'),
+    ).toHaveCount(1);
     const options = await page.evaluate(
       () => (window as any).syntheticAutocompleteOptions,
     );
@@ -173,30 +178,28 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await page.clock.install();
       const calls = await setup(page);
       await page.locator('#open-map').click();
-      await page
-        .locator('synthetic-place-search')
-        .evaluate((element, failure) => {
-          element.dispatchEvent(
-            Object.assign(new Event('gmp-select'), {
-              placePrediction: {
-                toPlace: () => ({
-                  location:
-                    failure === 'missing'
-                      ? undefined
-                      : { lat: () => 40, lng: () => 79 },
-                  fetchFields: () =>
-                    failure === 'timeout'
-                      ? new Promise<void>((resolve) => {
-                          (window as any).finishOldLookup = resolve;
-                        })
-                      : failure === 'rejected'
-                        ? Promise.reject(new Error('Synthetic lookup failure'))
-                        : Promise.resolve(),
-                }),
-              },
-            }),
-          );
-        }, failure);
+      await page.locator('#property-search').evaluate((element, failure) => {
+        element.dispatchEvent(
+          Object.assign(new Event('address-select'), {
+            placePrediction: {
+              toPlace: () => ({
+                location:
+                  failure === 'missing'
+                    ? undefined
+                    : { lat: () => 40, lng: () => 79 },
+                fetchFields: () =>
+                  failure === 'timeout'
+                    ? new Promise<void>((resolve) => {
+                        (window as any).finishOldLookup = resolve;
+                      })
+                    : failure === 'rejected'
+                      ? Promise.reject(new Error('Synthetic lookup failure'))
+                      : Promise.resolve(),
+              }),
+            },
+          }),
+        );
+      }, failure);
       if (failure === 'timeout') {
         await expect(page.locator('#selection-label')).toContainText(
           'Locating',
@@ -233,7 +236,6 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     'manual',
     'new-address',
     'edit',
-    'search-error',
     'map-failure',
   ] as const)
     test(`late address lookup cannot overwrite ${recovery}`, async ({
@@ -242,9 +244,9 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await page.clock.install();
       await setup(page);
       await page.locator('#open-map').click();
-      await page.locator('synthetic-place-search').evaluate((element) => {
+      await page.locator('#property-search').evaluate((element) => {
         element.dispatchEvent(
-          Object.assign(new Event('gmp-select'), {
+          Object.assign(new Event('address-select'), {
             placePrediction: {
               toPlace: () => ({
                 location: { lat: () => 15, lng: () => 79 },
@@ -267,9 +269,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       else if (recovery === 'new-address')
         await select(page, '13.33467', '74.74617');
       else if (recovery === 'edit')
-        await page.locator('synthetic-place-search').dispatchEvent('input');
-      else if (recovery === 'search-error')
-        await page.locator('synthetic-place-search').dispatchEvent('gmp-error');
+        await page.locator('#property-search').dispatchEvent('address-input');
       else
         await page.evaluate(() =>
           window.dispatchEvent(new Event('incetekh:maps-unavailable')),
@@ -296,9 +296,9 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
   }) => {
     const calls = await setup(page);
     await page.locator('#open-map').click();
-    await page.locator('synthetic-place-search').evaluate((element) => {
+    await page.locator('#property-search').evaluate((element) => {
       element.dispatchEvent(
-        Object.assign(new Event('gmp-select'), {
+        Object.assign(new Event('address-select'), {
           placePrediction: {
             toPlace: () => ({
               location: { lat: () => 13.33467, lng: () => 74.74617 },
@@ -324,6 +324,255 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
     expect(calls.assessments()).toBe(0);
   });
+  for (const width of [320, 1440])
+    test(`empty address results offer direct contact inside the search box at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      const calls = await setup(page);
+      await page.locator('#open-map').click();
+      await page.evaluate(() => {
+        (window as any).syntheticSearch = async () => ({ suggestions: [] });
+      });
+      await page.locator('#address-input').fill('Unlisted home address');
+      const search = page.locator('#property-search');
+      await expect(search.getByRole('status')).toHaveText('No results found.');
+      await expect(
+        search.getByRole('link', { name: 'Chat on WhatsApp' }),
+      ).toHaveAttribute('href', 'https://wa.me/919441259786');
+      await expect(
+        search.getByRole('link', { name: 'Call Incetekh' }),
+      ).toHaveAttribute('href', 'tel:+919441259786');
+      await expect(page.locator('#address-input')).toHaveValue(
+        'Unlisted home address',
+      );
+      await expect(page.locator('#assess-property')).toBeDisabled();
+      expect(calls.assessments()).toBe(0);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      expect(
+        (await new AxeBuilder({ page }).include('#property-search').analyze())
+          .violations,
+      ).toEqual([]);
+      await search.screenshot({
+        path: `.wrangler/address-search/empty-${width}.png`,
+      });
+      await search
+        .getByRole('button', { name: 'Clear address search' })
+        .click();
+      await expect(page.locator('#address-input')).toBeEmpty();
+      await expect(search.getByRole('status')).toBeHidden();
+      await page.evaluate(() =>
+        (window as any).syntheticMapClick({
+          latLng: { lat: () => 13.33467, lng: () => 74.74617 },
+        }),
+      );
+      await expect(page.locator('#assess-property')).toBeEnabled();
+    });
+  test('address keyboard selection retains session tokens until selection and uses safe text', async ({
+    page,
+  }) => {
+    await setup(page);
+    await page.locator('#open-map').click();
+    const input = page.locator('#address-input');
+    await input.fill('Example');
+    await expect(
+      page.locator('#property-search').getByRole('option'),
+    ).toHaveCount(1);
+    await input.fill('Example Street');
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as any).syntheticSearchRequests.length),
+      )
+      .toBe(2);
+    expect(
+      await page.evaluate(
+        () =>
+          (window as any).syntheticSearchRequests[0].sessionToken ===
+          (window as any).syntheticSearchRequests[1].sessionToken,
+      ),
+    ).toBe(true);
+    expect(
+      (await new AxeBuilder({ page }).include('#property-search').analyze())
+        .violations,
+    ).toEqual([]);
+    await input.press('ArrowDown');
+    await expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      'address-option-0',
+    );
+    await input.press('Enter');
+    await expect(page.locator('#assess-property')).toBeEnabled();
+    await expect(input).toHaveAttribute('aria-expanded', 'false');
+    await input.fill('Next address');
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as any).syntheticSearchRequests.length),
+      )
+      .toBe(3);
+    expect(
+      await page.evaluate(
+        () =>
+          (window as any).syntheticSearchRequests[1].sessionToken !==
+          (window as any).syntheticSearchRequests[2].sessionToken,
+      ),
+    ).toBe(true);
+    await input.press('Escape');
+    await expect(page.getByRole('listbox')).toBeHidden();
+  });
+  test('ArrowUp starts at the last result and suggestion text cannot inject markup', async ({
+    page,
+  }) => {
+    await setup(page);
+    await page.locator('#open-map').click();
+    await page.evaluate(() => {
+      (window as any).syntheticSearch = async () => ({
+        suggestions: ['<img src=x onerror=alert(1)>', 'Second address'].map(
+          (text) => ({
+            placePrediction: {
+              text: { toString: () => text },
+              toPlace: () => ({
+                location: { lat: () => 15, lng: () => 79 },
+                fetchFields: async () => {},
+              }),
+            },
+          }),
+        ),
+      });
+    });
+    const input = page.locator('#address-input');
+    await input.fill('Some address');
+    await expect(page.locator('#address-options [role=option]')).toHaveCount(2);
+    await expect(page.locator('#address-options img')).toHaveCount(0);
+    await input.press('ArrowUp');
+    await expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      'address-option-1',
+    );
+    await input.press('ArrowDown');
+    await expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      'address-option-0',
+    );
+    await input.press('ArrowUp');
+    await input.press('Enter');
+    await expect(input).toHaveValue('Second address');
+    await expect(page.locator('#assess-property')).toBeEnabled();
+  });
+  for (const outcome of ['resolve', 'reject'] as const)
+    test(`delayed Places import ${outcome} preserves a manually selected roof and focus`, async ({
+      page,
+    }) => {
+      await page.addInitScript(() => {
+        (window as any).syntheticLibraryGate = new Promise(
+          (resolve, reject) => {
+            (window as any).finishLibrary = resolve;
+            (window as any).failLibrary = reject;
+          },
+        );
+      });
+      await setup(page);
+      await page.locator('#open-map').click();
+      await expect(page.locator('#property-controls')).toBeVisible();
+      await page.evaluate(() =>
+        (window as any).syntheticMapClick({
+          latLng: { lat: () => 15, lng: () => 79 },
+        }),
+      );
+      await expect(page.locator('#assess-property')).toBeEnabled();
+      await page.locator('#assess-property').focus();
+      const status = await page.locator('#preview-status').textContent();
+      await page.evaluate((mode) => {
+        if (mode === 'resolve') (window as any).finishLibrary();
+        else
+          (window as any).failLibrary(new Error('Synthetic library failure'));
+      }, outcome);
+      if (outcome === 'resolve')
+        await expect(page.locator('#address-input')).toBeEnabled();
+      else
+        await expect(
+          page
+            .locator('#property-search')
+            .getByRole('link', { name: 'Call Incetekh' }),
+        ).toBeVisible();
+      await expect(page.locator('#preview-status')).toHaveText(status!);
+      await expect(page.locator('#assess-property')).toBeFocused();
+      await expect(page.locator('#assess-property')).toBeEnabled();
+    });
+  for (const failure of ['rejected', 'timeout'] as const)
+    test(`suggestion ${failure} offers contact without falsely saying no results`, async ({
+      page,
+    }) => {
+      await page.clock.install();
+      await setup(page);
+      await page.locator('#open-map').click();
+      await page.evaluate((mode) => {
+        (window as any).syntheticSearch = () =>
+          mode === 'rejected'
+            ? Promise.reject(new Error('Offline'))
+            : new Promise(() => {});
+      }, failure);
+      await page.locator('#address-input').fill('Some address');
+      await page.clock.runFor(15400);
+      await expect(
+        page.locator('#property-search').getByRole('status'),
+      ).toContainText('Address search is unavailable');
+      await expect(
+        page.locator('#property-search').getByRole('status'),
+      ).not.toContainText('No results');
+      await expect(
+        page
+          .locator('#property-search')
+          .getByRole('link', { name: 'Call Incetekh' }),
+      ).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => (window as any).syntheticSearchRequests.length,
+        ),
+      ).toBe(1);
+    });
+  for (const recovery of ['typing', 'manual', 'expiry', 'map-failure'] as const)
+    test(`late suggestion results cannot overwrite ${recovery}`, async ({
+      page,
+    }) => {
+      await setup(page);
+      await page.locator('#open-map').click();
+      await page.evaluate(() => {
+        (window as any).syntheticSearch = () =>
+          new Promise((resolve) => {
+            (window as any).finishSuggestions = resolve;
+          });
+      });
+      await page.locator('#address-input').fill('Old address');
+      await expect
+        .poll(() =>
+          page.evaluate(() => Boolean((window as any).finishSuggestions)),
+        )
+        .toBe(true);
+      if (recovery === 'typing') await page.locator('#address-input').fill('');
+      else if (recovery === 'manual')
+        await page.evaluate(() =>
+          (window as any).syntheticMapClick({
+            latLng: { lat: () => 15, lng: () => 79 },
+          }),
+        );
+      else if (recovery === 'expiry')
+        await page.clock.setFixedTime(new Date(Date.now() + 31 * 60 * 1000));
+      else
+        await page.evaluate(() =>
+          window.dispatchEvent(new Event('incetekh:maps-unavailable')),
+        );
+      await page.evaluate(() =>
+        (window as any).finishSuggestions({ suggestions: [] }),
+      );
+      await expect(page.locator('[data-address-panel]')).toBeHidden();
+      if (recovery === 'manual')
+        await expect(page.locator('#assess-property')).toBeEnabled();
+      else await expect(page.locator('#assess-property')).toBeDisabled();
+    });
   test('disabled page makes no provider calls and has no nonexistent locale links', async ({
     page,
     request,
@@ -372,10 +621,10 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       );
       await page.getByRole('button', { name: 'Enter your address' }).click();
       await page
-        .getByRole('textbox', { name: 'Enter your full address' })
+        .getByRole('combobox', { name: 'Enter your full address' })
         .fill('15 Example Street');
       await page
-        .getByRole('button', {
+        .getByRole('option', {
           name: '15 Example Street, Proddatur (test address)',
         })
         .click();
@@ -446,10 +695,10 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await page.getByRole('button', { name: 'Enter your address' }).click();
       await expect(page.locator('#property-controls')).toBeVisible();
       await page
-        .getByRole('textbox', { name: 'Enter your full address' })
+        .getByRole('combobox', { name: 'Enter your full address' })
         .fill('15 Example Street, Proddatur');
       await page
-        .getByRole('button', {
+        .getByRole('option', {
           name: '15 Example Street, Proddatur (test address)',
         })
         .click();
@@ -554,7 +803,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     finish();
     await expect(page.locator('#returned-building')).toBeHidden();
     await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
-    await page.locator('synthetic-place-search').dispatchEvent('input');
+    await page.locator('#property-search').dispatchEvent('address-input');
     await expect(page.locator('#preview-status')).toHaveText(
       'Choose an address suggestion to locate your roof.',
     );
@@ -715,14 +964,14 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await select(page);
     await page.getByRole('button', { name: 'Confirm roof & preview' }).click();
     await expect(page.locator('#roof-results')).toBeVisible();
-    await page.locator('synthetic-place-search').evaluate((element) => {
+    await page.locator('#property-search').evaluate((element) => {
       let done!: () => void;
       const fields = new Promise<void>((resolve) => {
         done = resolve;
       });
       (window as unknown as { completePlace(): void }).completePlace = done;
       element.dispatchEvent(
-        Object.assign(new Event('gmp-select'), {
+        Object.assign(new Event('address-select'), {
           placePrediction: {
             toPlace: () => ({
               fetchFields: () => fields,
@@ -794,7 +1043,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await expect(page.locator('#confirm-detected-roof')).toBeEnabled();
       if (action === 'reject') await page.locator('#reject-roof').click();
       else if (action === 'edit')
-        await page.locator('synthetic-place-search').dispatchEvent('input');
+        await page.locator('#property-search').dispatchEvent('address-input');
       else if (action === 'map-failure')
         await page.evaluate(() =>
           window.dispatchEvent(new Event('incetekh:maps-unavailable')),
@@ -1017,7 +1266,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await expect(page.locator('#roof-results')).toBeHidden();
     expect(assessments).toBe(1);
     await page
-      .getByRole('textbox', { name: 'Enter your full address' })
+      .getByRole('combobox', { name: 'Enter your full address' })
       .fill('Changed address');
     await expect(page.locator('#grouped-layout-note')).toBeHidden();
     await expect(page.locator('#roof-controls')).toBeHidden();
@@ -1131,7 +1380,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await page.locator('#assess-property').click();
     await started;
     await page
-      .getByRole('textbox', { name: 'Enter your full address' })
+      .getByRole('combobox', { name: 'Enter your full address' })
       .fill('Another address');
     release();
     await expect(page.locator('#assess-property')).toBeDisabled();
@@ -1372,7 +1621,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     });
     await form.locator('button[type="submit"]').click();
     await expect(form).toHaveAttribute('aria-busy', 'true');
-    await page.locator('synthetic-place-search').dispatchEvent('input');
+    await page.locator('#property-search').dispatchEvent('address-input');
     await expect(consent).toBeDisabled();
     finish();
     await expect(form).not.toHaveAttribute('aria-busy', 'true');

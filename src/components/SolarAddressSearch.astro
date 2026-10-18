@@ -1,0 +1,165 @@
+---
+import { site } from '../data/site';
+---
+
+<div id="property-search" aria-label="Search for an address or business">
+  <label for="address-input">Enter your full address</label>
+  <div class="address-field">
+    <input
+      id="address-input"
+      type="text"
+      role="combobox"
+      aria-label="Enter your full address"
+      aria-autocomplete="list"
+      aria-expanded="false"
+      aria-controls="address-options"
+      aria-describedby="address-guidance"
+      placeholder="House number, street, city"
+      autocomplete="off"
+      maxlength="250"
+      disabled
+    />
+    <button type="button" data-address-clear aria-label="Clear address search">
+      ×
+    </button>
+  </div>
+  <div data-address-panel hidden>
+    <div class="address-results">
+      <p role="status"></p>
+      <ul
+        id="address-options"
+        role="listbox"
+        aria-label="Address suggestions"
+      ></ul>
+      <div data-address-attribution hidden>
+        <img
+          src="/brand/google-maps.svg"
+          width="98"
+          height="18"
+          alt="Google Maps"
+        />
+      </div>
+    </div>
+    <div data-address-help hidden>
+      <p>
+        Try a nearby landmark, tap your roof on the map, or speak with our team.
+      </p>
+      <div class="address-contact">
+        <a href={site.whatsapp}>Chat on WhatsApp</a>
+        <a href={`tel:${site.phone}`}>Call Incetekh</a>
+      </div>
+    </div>
+  </div>
+  <p id="address-guidance">
+    Select a suggestion, or zoom in and tap your roof directly on the map.
+  </p>
+</div>
+
+<style>
+  #property-search {
+    max-width: 640px;
+    margin-bottom: var(--space-3);
+  }
+  label {
+    display: block;
+    font-size: var(--text-small);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .address-field {
+    display: flex;
+    background: #fff;
+    border: 1px solid var(--color-line);
+  }
+  .address-field:focus-within {
+    outline: 2px solid var(--color-green);
+    outline-offset: 2px;
+  }
+  input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    padding: 1rem;
+    font: inherit;
+    color: var(--color-ink);
+  }
+  input:focus {
+    outline: none;
+  }
+  button {
+    flex: none;
+    min-width: 48px;
+    min-height: 48px;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  [data-address-panel] {
+    border: 1px solid var(--color-line);
+    border-top: 0;
+    background: #fff;
+  }
+  .address-results > p {
+    margin: 0;
+    padding: 1rem;
+    font-size: var(--text-small);
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 20rem;
+    overflow-y: auto;
+  }
+  ul :global([role='option']) {
+    padding: 1rem;
+    min-height: 48px;
+    border-top: 1px solid var(--color-line);
+    cursor: pointer;
+    overflow-wrap: anywhere;
+  }
+  ul :global([role='option']:hover),
+  ul :global([aria-selected='true']) {
+    background: var(--color-surface-soft);
+    color: var(--color-green);
+  }
+  [data-address-attribution] {
+    padding: 10px 16px 8px;
+  }
+  img {
+    height: 18px;
+    width: auto;
+  }
+  [data-address-help] {
+    border-top: 1px solid var(--color-line);
+    padding: 1rem;
+    background: var(--color-surface-soft);
+  }
+  [data-address-help] p,
+  #address-guidance {
+    font-size: var(--text-small);
+    color: var(--color-muted);
+    margin: 0;
+  }
+  #address-guidance {
+    margin-top: 0.75rem;
+  }
+  .address-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 0.5rem;
+  }
+  .address-contact a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--color-green);
+    font-weight: 600;
+    text-underline-offset: 0.2em;
+  }
+</style>

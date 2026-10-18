@@ -1,36 +1,4 @@
 // Test-only Google substitute. Never real imagery, never network access.
-class SyntheticPlace extends HTMLElement {
-  constructor(options) {
-    super();
-    window.syntheticAutocompleteOptions = options;
-  }
-  connectedCallback() {
-    if (this.childNodes.length) return;
-    const input = document.createElement('input');
-    input.setAttribute('aria-label', 'Enter your full address');
-    const suggestion = document.createElement('button');
-    suggestion.textContent = '15 Example Street, Proddatur (test address)';
-    suggestion.hidden = true;
-    input.addEventListener('input', () => {
-      suggestion.hidden = !input.value.trim();
-    });
-    suggestion.addEventListener('click', () => {
-      this.dispatchEvent(
-        Object.assign(new Event('gmp-select'), {
-          placePrediction: {
-            toPlace: () => ({
-              location: { lat: () => 15, lng: () => 79 },
-              fetchFields: async () => {},
-            }),
-          },
-        }),
-      );
-      suggestion.hidden = true;
-    });
-    this.append(input, suggestion);
-  }
-}
-customElements.define('synthetic-place-search', SyntheticPlace);
 window.google = {
   maps: {
     Map: class {
@@ -76,7 +44,35 @@ window.google = {
         if (map) map.element.append(this.node);
       }
     },
-    importLibrary: async () => ({ PlaceAutocompleteElement: SyntheticPlace }),
+    importLibrary: async () => {
+      if (window.syntheticLibraryGate) await window.syntheticLibraryGate;
+      return {
+        AutocompleteSessionToken: class {},
+        AutocompleteSuggestion: {
+          fetchAutocompleteSuggestions: async (request) => {
+            window.syntheticAutocompleteOptions = request;
+            (window.syntheticSearchRequests ??= []).push(request);
+            if (window.syntheticSearch) return window.syntheticSearch(request);
+            return {
+              suggestions: [
+                {
+                  placePrediction: {
+                    text: {
+                      toString: () =>
+                        '15 Example Street, Proddatur (test address)',
+                    },
+                    toPlace: () => ({
+                      location: { lat: () => 15, lng: () => 79 },
+                      fetchFields: async () => {},
+                    }),
+                  },
+                },
+              ],
+            };
+          },
+        },
+      };
+    },
   },
 };
 window.incetekhMapsReady();

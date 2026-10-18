@@ -26,22 +26,15 @@ import type { SolarRaster } from '../../worker/solar-imagery';
 import type { MatchedRoofImage } from '../lib/solar-raster';
 import { localPath } from '../i18n/languages';
 import { financialEstimate } from '../data/solar';
+import type { AddressPlace, AddressLibrary } from '../lib/solar-address-search';
 
 interface Marker {
   setCenter(point: { lat: number; lng: number }): void;
   setMap(map: unknown): void;
 }
-interface Place {
-  location?: { lat(): number; lng(): number };
-  fetchFields(options: { fields: string[] }): Promise<void>;
-}
 interface PropertyMaps extends MapsApi {
   Circle: new (options: Record<string, unknown>) => Marker;
-  importLibrary(name: string): Promise<{
-    PlaceAutocompleteElement: new (
-      options: Record<string, unknown>,
-    ) => HTMLElement;
-  }>;
+  importLibrary(name: string): Promise<AddressLibrary>;
 }
 type Assessment = Extract<SolarResult, { status: 'available' }> & {
   reference: string;
@@ -103,8 +96,12 @@ let pending = false,
   widgetId: string | undefined;
 let controller: AbortController | undefined;
 let lookupController: AbortController | undefined;
+let addressSearch:
+  | ReturnType<typeof import('../lib/solar-address-search').createAddressSearch>
+  | undefined;
 let mapFailed = false;
 function cancelLookup() {
+  addressSearch?.cancel();
   searchGeneration++;
   lookupController?.abort();
   lookupController = undefined;
@@ -293,16 +290,20 @@ function security(sitekey: string) {
 }
 async function search(api: PropertyMaps) {
   try {
-    const { PlaceAutocompleteElement } = await api.importLibrary('places');
-    const element = new PlaceAutocompleteElement({
-      includedRegionCodes: ['in'],
-      locationBias: { south: 12, west: 75, north: 20, east: 85 },
-    });
-    element.setAttribute('aria-label', 'Enter your full address');
-    element.setAttribute('placeholder', 'House number, street, city');
-    byId('property-search').append(element);
-    element.focus();
-    element.addEventListener('input', () => {
+    const [places, { createAddressSearch }] = await Promise.all([
+      api.importLibrary('places'),
+      import('../lib/solar-address-search'),
+    ]);
+    if (mapFailed || !freshSession()) return;
+    const element = byId('property-search');
+    addressSearch = createAddressSearch(
+      element,
+      places,
+      () => !mapFailed && freshSession(),
+    );
+    if (!selected && !pending && !assessment && !candidate)
+      byId('address-input').focus();
+    element.addEventListener('address-input', () => {
       cancelLookup();
       generation++;
       controller?.abort();
@@ -315,14 +316,7 @@ async function search(api: PropertyMaps) {
         'Choose an address suggestion to locate your roof.';
       show('Choose an address suggestion to locate your roof.');
     });
-    element.addEventListener('gmp-error', () => {
-      if (selected || assessment || candidate || pending || mapFailed) return;
-      cancelLookup();
-      locationMessage(
-        'Address search is unavailable. Tap your roof on the map instead.',
-      );
-    });
-    element.addEventListener('gmp-select', async (event) => {
+    element.addEventListener('address-select', async (event) => {
       if (mapFailed || !freshSession()) return;
       cancelLookup();
       const revision = searchGeneration;
@@ -343,7 +337,7 @@ async function search(api: PropertyMaps) {
       );
       try {
         const place = (
-          event as Event & { placePrediction: { toPlace(): Place } }
+          event as Event & { placePrediction: { toPlace(): AddressPlace } }
         ).placePrediction.toPlace();
         await abortable(
           place.fetchFields({ fields: ['location'] }),
@@ -357,17 +351,30 @@ async function search(api: PropertyMaps) {
           longitude: place.location.lng(),
         });
       } catch {
-        if (revision === searchGeneration && !mapFailed)
+        if (revision === searchGeneration && !mapFailed && freshSession()) {
+          addressSearch?.unavailable(
+            'We could not locate this address. Try again or contact us.',
+          );
           locationMessage(
             'Search could not locate this property. Tap your roof on the map instead.',
           );
+        }
       } finally {
         clearTimeout(deadline);
         if (lookupController === lookup) lookupController = undefined;
       }
     });
   } catch {
-    show('Address search is unavailable. Tap your roof on the map instead.');
+    if (mapFailed || !freshSession()) return;
+    const panel = byId('property-search').querySelector<HTMLElement>(
+      '[data-address-panel]',
+    )!;
+    panel.hidden = false;
+    panel.querySelector('[role="status"]')!.textContent =
+      'Address search is unavailable. Contact us for help.';
+    panel.querySelector<HTMLElement>('[data-address-help]')!.hidden = false;
+    if (!selected && !pending && !assessment && !candidate)
+      show('Address search is unavailable. Tap your roof on the map instead.');
   }
 }
 const messages: Record<string, string> = {
