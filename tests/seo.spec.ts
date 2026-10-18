@@ -28,6 +28,10 @@ test('every public page has unique metadata, working local resources and safe co
   request,
 }) => {
   // Never contact a real analytics service from this test, including launch-mode tests.
+  // The static Astro test server substitutes the independently tested Worker gate.
+  await page.route('**/api/solar-preview-config', (route) =>
+    route.fulfill({ json: { enabled: false } }),
+  );
   let beaconRequests = 0;
   await page.route(
     'https://static.cloudflareinsights.com/**',

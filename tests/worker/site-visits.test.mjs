@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { readFile, mkdir, mkdtemp } from 'node:fs/promises';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import { contextFixture } from '../fixtures/preview-context.mjs';
 
 // The real workerd runtime and persisted D1 run locally. All outbound traffic is
 // replaced here, never in application code; no real tokens, accounts or people.
@@ -70,6 +71,7 @@ before(async () => {
       { type: 'ESModule', path: '.wrangler/test-worker/solar.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/solar-endpoint.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/solar-page.js' },
+      { type: 'ESModule', path: '.wrangler/test-worker/preview-context.js' },
     ],
     compatibilityDate: '2026-09-30',
     bindings,
@@ -108,7 +110,7 @@ before(async () => {
         hostname:
           data.response === 'wrong-host'
             ? 'evil.example'
-            : data.response === 'preview-token'
+            : data.response.startsWith('preview-token')
               ? 'synthetic-preview.incetekhenergy.workers.dev'
               : new URL(origin).hostname,
         action: data.response === 'wrong-action' ? 'other_form' : 'site_visit',
@@ -386,6 +388,7 @@ test('an exact preview origin uses separate local D1 without writing production'
         ...bindings,
         LEAD_CAPTURE_ENV: 'preview',
         LEAD_ALLOWED_ORIGIN: previewOrigin,
+        SOLAR_PREVIEW_ENABLED: 'true',
       },
       d1Databases: { LEADS_DB: 'separate-local-preview-leads' },
       ratelimits: {
@@ -412,6 +415,43 @@ test('an exact preview origin uses separate local D1 without writing production'
     });
     assert.equal(response.status, 201);
     assert.equal(await count(input.id), 1);
+    const contextMigration = await readFile(
+      'migrations/0004_solar_preview_context.sql',
+      'utf8',
+    );
+    await db.batch(
+      contextMigration
+        .split(';')
+        .filter((s) => s.trim())
+        .map((s) => db.prepare(s)),
+    );
+    const contextual = lead({
+      token: 'preview-token-context',
+      previewContext: contextFixture(),
+    });
+    const previewOptions = {
+      url: previewOrigin + '/api/site-visits',
+      headers: { Origin: previewOrigin },
+    };
+    assert.equal((await send(contextual, previewOptions)).status, 201);
+    assert.equal(
+      (await send({ ...contextual, token: '' }, previewOptions)).status,
+      200,
+    );
+    assert.equal(await count(contextual.id), 1);
+    assert.deepEqual(
+      JSON.parse(
+        (
+          await db
+            .prepare(
+              'SELECT preview_context FROM site_visit_leads WHERE id = ?',
+            )
+            .bind(contextual.id)
+            .first()
+        ).preview_context,
+      ),
+      contextFixture(),
+    );
     assert.equal((await send()).status, 403);
     assert.equal(
       (

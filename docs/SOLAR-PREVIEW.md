@@ -17,8 +17,8 @@ SolarCAD is excluded.
 | 1     | Server adapter, safeguards and atomic usage allowance   | Merged #35  |
 | 2     | Geographic panel geometry and alignment proof           | Merged #36  |
 | 3     | Property selector and confirmed assessment              | Merged #37  |
-| 4     | Existing calculator handoff and consistent results      | In progress |
-| 5     | Consented enquiry context and compatible receipts/email | Pending     |
+| 4     | Existing calculator handoff and consistent results      | Merged #38  |
+| 5     | Consented enquiry context and compatible receipts/email | In progress |
 | 6     | Release readiness and acceptance evidence               | Pending     |
 
 Exactly one component/PR is active. Each must pass self-review, independent
@@ -236,6 +236,13 @@ These checks establish flow/state behavior, not real map or device acceptance.
 
 ## PR 4 calculator handoff and results
 
+Released as PR #38, merge `a7f43cd1bdde64fd263116347d93c15e4efe29ea`.
+Self-review and independent exact-head review passed. Lint/types/build and 17
+focused tests passed; synthetic mobile results were inspected. Production build
+`2b0a89c2-0ce3-4416-95fd-06656e10387a` succeeded. Homepage/contact/preview stayed
+healthy, the preview remained noindex, enquiry GET stayed 405, runtime config
+returned `enabled:false`, and Solar POST stayed 503 `disabled`. Branch retired.
+
 The existing calculator gets a runtime-gated English preview CTA; it remains
 hidden while the feature is disabled. No Google payload loads on ordinary pages.
 The handoff stores only a strict versioned bill, connection type, originating
@@ -269,3 +276,46 @@ maximum commercial input, consistent count/energy/value and no extra provider
 requests during configuration changes. Synthetic results are not real-roof evidence.
 See Google's [non-US calculation guidance](https://developers.google.com/maps/documentation/solar/calculate-costs-non-us)
 for the distinction between returned DC energy and a locally chosen AC factor.
+
+## PR 5 consented enquiry context
+
+The preview reuses SiteVisitForm and the existing receipt endpoint. Contact details
+are requested only at the final enquiry step. The editable location description
+is customer-entered; Google addresses are never copied into it. Bill-target plan
+prefill uses only exact3/5/7kW options,10plus for at least10kW, and advice otherwise.
+Customers can change it. Enquiries preserve the originating site language.
+
+A separate unchecked consent box attaches a strictly allowlisted/versioned object:
+customer bill, residential/commercial type, validated bill-based target/version,
+selected coordinates, optional preferred contact, consent and internal UUID.
+Google geometry, addresses and energy estimates are rejected. The reference is
+not a saved/replayable design. Unchecking consent excludes the entire object.
+Selecting another property invalidates consent. Email preference requires an email.
+Ordinary enquiries remain available without any context. Maps and the enquiry use
+one Turnstile loader with separate widgets and actions; no token is shared.
+
+Migration0004 adds one nullable preview_context column. It has NOT been applied
+remotely. Context-free inserts do not mention this column, and email discovery
+works with both schema versions; its formatter allowlists fields. Thus the
+disabled deployment does not depend on migrating production. Existing receipt
+hashes and privacy versions remain exact for requests without context. New hashes
+cover canonical context/consent, so identical retries acknowledge the same receipt
+and changed inputs conflict. New context requires the Solar flag; existing
+receipts can still be acknowledged after shutoff. No email scheduling, cutoff,
+recipient, idempotency, lease or delivery behavior changes.
+
+Local workerd/D1 tests cover pre-migration ordinary traffic/email, exact legacy
+hash compatibility, additive-column preservation, concurrent consented retries,
+changed-context conflicts, one outbox/email, invalid context and shutoff isolation.
+All external calls are mocked. Browser tests cover two isolated security actions,
+one script load, exact target prefill, origin language, explicit consent, receipt
+retry identity and omission after consent withdrawal. Privacy/terms explain Google
+processing, temporary state and optional sharing; the detailed English-preview
+notice is language-marked, and the calculator notice is updated in all languages.
+
+Before any approved remote migration, verify a recovery export/point and rehearse
+against a local copy. Apply only additive migrations0003/0004; never rewrite or
+remove existing enquiries. Verify old counts/receipts after migration. Roll back
+flags/code while retaining additive columns and new customer records. Live preview
+D1, controlled production enquiry/inbox confirmation and public activation remain
+separate acceptance gates; local mocks do not establish them.

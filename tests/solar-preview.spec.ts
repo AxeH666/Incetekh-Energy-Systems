@@ -31,6 +31,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
           }),
         );
       }, bill);
+    let securityLoads = 0;
     let maps = 0,
       assessments = 0;
     await page.route('**/solar-preview/', async (route) => {
@@ -40,7 +41,10 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await route.fulfill({
         status: response.status,
         headers: Object.fromEntries(response.headers),
-        body: await response.text(),
+        body: (await response.text()).replace(
+          'data-site-key=""',
+          'data-site-key="synthetic-enquiry-widget"',
+        ),
       });
     });
     await page.route('**/api/solar-preview-config', (route) =>
@@ -63,9 +67,10 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       } else if (
         url.startsWith('https://challenges.cloudflare.com/turnstile/')
       ) {
+        securityLoads++;
         await route.fulfill({
           contentType: 'application/javascript',
-          body: `window.turnstile={render:(el,options)=>{window.syntheticChallenge=options;options.callback('synthetic-token');return 'synthetic-widget';},reset:()=>window.syntheticChallenge.callback('synthetic-token')};`,
+          body: `window.syntheticWidgets={};window.turnstile={render:(el,options)=>{window.syntheticWidgets[options.action]=options;options.callback('synthetic-'+options.action);return options.action;},reset:(id)=>window.syntheticWidgets[id].callback('synthetic-'+id)};`,
         });
       } else {
         await route.abort();
@@ -83,7 +88,11 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       });
     });
     await page.goto('/solar-preview/');
-    return { maps: () => maps, assessments: () => assessments };
+    return {
+      maps: () => maps,
+      assessments: () => assessments,
+      securityLoads: () => securityLoads,
+    };
   }
   async function select(
     page: import('@playwright/test').Page,
@@ -368,5 +377,123 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     );
     await page.locator('#solar-bill').fill('3000');
     await expect(page.locator('[data-result="kw"]')).toHaveText('4');
+  });
+  test('consent readiness follows property changes during a pending enquiry', async ({
+    page,
+  }) => {
+    await setup(page);
+    let finish!: () => void;
+    let waiting = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    await page.route('**/api/site-visits', async (route) => {
+      const { id } = route.request().postDataJSON();
+      await waiting;
+      await route.fulfill({ status: 201, json: { code: 'received', id } });
+    });
+    await page.locator('#open-map').click();
+    await page.locator('#visit-name').fill('Synthetic pending visitor');
+    await page.locator('#visit-phone').fill('9876543210');
+    await page.locator('#visit-location').fill('Customer-entered location');
+    const consent = page.locator('#preview-context-consent');
+    const form = page.locator('[data-site-visit-form]');
+    await form.locator('button[type="submit"]').click();
+    await expect(form).toHaveAttribute('aria-busy', 'true');
+    await select(page);
+    await expect(consent).toBeDisabled();
+    finish();
+    await expect(form).not.toHaveAttribute('aria-busy', 'true');
+    await expect(consent).toBeEnabled();
+    await consent.check();
+    waiting = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    await form.locator('button[type="submit"]').click();
+    await expect(form).toHaveAttribute('aria-busy', 'true');
+    await page.getByLabel('Latitude', { exact: true }).fill('15.1');
+    await expect(consent).toBeDisabled();
+    finish();
+    await expect(form).not.toHaveAttribute('aria-busy', 'true');
+    await expect(consent).toBeDisabled();
+    await expect(consent).not.toBeChecked();
+  });
+  test('optional enquiry context preserves language, safe plan, consent and retry identity', async ({
+    page,
+  }) => {
+    const calls = await setup(page, true, 3000);
+    const submissions: Record<string, any>[] = [];
+    await page.route('**/api/site-visits', async (route) => {
+      const data = route.request().postDataJSON();
+      submissions.push(data);
+      if (submissions.length === 1) return route.abort();
+      return route.fulfill({
+        status: 201,
+        json: { code: 'received', id: data.id },
+      });
+    });
+    await expect(page.locator('#visit-plan')).toHaveValue('advice');
+    await expect(page.locator('#preview-context-consent')).toBeDisabled();
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await page.locator('#accept-roof').click();
+    await page.locator('#preview-visit').click();
+    await page.locator('#visit-name').fill('Synthetic Visitor');
+    await page.locator('#visit-phone').fill('9876543210');
+    await page
+      .locator('#visit-location')
+      .fill('Customer-entered test location');
+    await page.locator('#preview-context-consent').check();
+    await page.locator('#preview-preferred-contact').selectOption('email');
+    await page.locator('[data-site-visit-form] button[type="submit"]').click();
+    await expect(page.locator('[data-visit-status]')).toContainText(
+      'enter your email',
+    );
+    expect(submissions).toHaveLength(0);
+    await page.locator('#preview-preferred-contact').selectOption('phone');
+    await page.locator('[data-site-visit-form] button[type="submit"]').click();
+    await expect(page.locator('[data-visit-status]')).toContainText(
+      'could not confirm receipt',
+    );
+    await page.locator('[data-site-visit-form] button[type="submit"]').click();
+    await expect(page.locator('[data-visit-status]')).toContainText(
+      'enquiry has been received',
+    );
+    expect(submissions).toHaveLength(2);
+    expect(submissions[0].id).toBe(submissions[1].id);
+    expect(submissions[0]).toMatchObject({
+      language: 'te',
+      plan: 'advice',
+      token: 'synthetic-site_visit',
+      location: 'Customer-entered test location',
+      previewContext: {
+        bill: 3000,
+        targetKw: 4,
+        consent: true,
+        preferredContact: 'phone',
+        latitude: 15,
+        longitude: 79,
+      },
+    });
+    expect(Object.keys(submissions[0].previewContext).sort()).toEqual([
+      'bill',
+      'calculatorVersion',
+      'consent',
+      'latitude',
+      'longitude',
+      'preferredContact',
+      'reference',
+      'residential',
+      'targetKw',
+      'version',
+    ]);
+    await page.locator('#preview-context-consent').uncheck();
+    await page.locator('[data-site-visit-form] button[type="submit"]').click();
+    await expect.poll(() => submissions.length).toBe(3);
+    expect(submissions[2]).not.toHaveProperty('previewContext');
+    expect(submissions[2].id).not.toBe(submissions[0].id);
+    expect(calls.securityLoads()).toBe(1);
+    expect(calls.maps()).toBe(1);
+    expect(calls.assessments()).toBe(1);
   });
 });

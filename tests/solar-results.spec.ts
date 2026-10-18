@@ -4,6 +4,7 @@ import {
   parseSolarSession,
   sessionLifetime,
   billEstimate,
+  planForTarget,
 } from '../src/lib/solar-session';
 import { solarFixture } from './fixtures/solar.mjs';
 import { normalizeSolar } from '../worker/solar';
@@ -56,6 +57,21 @@ test('returned configurations select nearest capacity, tie down and use one mode
       2.4,
     )?.panelsCount,
   ).toBe(4);
+});
+test('enquiry prefill never rounds an unsupported bill target into a sold plan', () => {
+  expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 53].map(planForTarget)).toEqual([
+    'advice',
+    'advice',
+    '3kw',
+    'advice',
+    '5kw',
+    'advice',
+    '7kw',
+    'advice',
+    'advice',
+    '10plus',
+    '10plus',
+  ]);
 });
 test('session accepts only current bounded calculator inputs and recomputes existing target', () => {
   const now = Date.now();

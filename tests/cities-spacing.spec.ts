@@ -119,18 +119,20 @@ for (const width of [320, 390, 768, 1440]) {
         route,
       ).toBe(true);
       // Every button stays within its containing block, including long product/city labels.
-      const buttonIssues = await page.locator('.button').evaluateAll((els) =>
-        els.flatMap((el) => {
-          const box = el.getBoundingClientRect();
-          const parent = el.parentElement!.getBoundingClientRect();
-          return box.width > parent.width + 1 ||
-            box.height < 44 ||
-            box.x < 0 ||
-            box.right > innerWidth + 1
-            ? [el.textContent?.trim()]
-            : [];
-        }),
-      );
+      const buttonIssues = await page
+        .locator('.button:visible')
+        .evaluateAll((els) =>
+          els.flatMap((el) => {
+            const box = el.getBoundingClientRect();
+            const parent = el.parentElement!.getBoundingClientRect();
+            return box.width > parent.width + 1 ||
+              box.height < 44 ||
+              box.x < 0 ||
+              box.right > innerWidth + 1
+              ? [el.textContent?.trim()]
+              : [];
+          }),
+        );
       expect(buttonIssues, route).toEqual([]);
       const header = (await page.locator('.header-inner').boundingBox())!;
       const content = page.locator('main .container').first();

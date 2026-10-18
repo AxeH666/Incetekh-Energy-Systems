@@ -1,6 +1,7 @@
 import { after, before, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
+import { contextFixture } from '../fixtures/preview-context.mjs';
 import { readFile, mkdir, mkdtemp } from 'node:fs/promises';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 
@@ -102,6 +103,7 @@ before(async () => {
       { type: 'ESModule', path: '.wrangler/test-worker/solar.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/solar-endpoint.js' },
       { type: 'ESModule', path: '.wrangler/test-worker/solar-page.js' },
+      { type: 'ESModule', path: '.wrangler/test-worker/preview-context.js' },
     ],
     compatibilityDate: '2026-09-30',
     bindings,
@@ -450,5 +452,123 @@ test('one invocation sends only one email and bounds discovery work', async () =
         .first()
     ).n,
     12,
+  );
+});
+
+test('additive preview context preserves legacy hashes and sends one consented notification under retries', async () => {
+  const legacy = input();
+  assert.equal((await submit(legacy)).status, 201);
+  const saved = (id) =>
+    db.prepare('SELECT * FROM site_visit_leads WHERE id = ?').bind(id).first();
+  const before = await saved(legacy.id);
+  const legacyPayload = {
+    fullName: legacy.fullName,
+    phone: '+919000000000',
+    email: '',
+    location: legacy.location,
+    plan: legacy.plan,
+    language: legacy.language,
+  };
+  assert.equal(
+    before.payload_hash,
+    createHash('sha256').update(JSON.stringify(legacyPayload)).digest('hex'),
+  );
+  const lead = input({ previewContext: contextFixture() });
+  await setBindings({ SOLAR_PREVIEW_ENABLED: 'true' });
+  assert.equal(
+    (await submit(lead)).status,
+    503,
+    'missing context migration fails only the new request',
+  );
+  assert.equal((await submit({ ...legacy, token: '' })).status, 200);
+  await migrate('migrations/0004_solar_preview_context.sql');
+  const { preview_context, ...afterRow } = await saved(legacy.id);
+  assert.equal(preview_context, null);
+  assert.deepEqual(afterRow, before);
+  const receipts = await Promise.all([submit(lead), submit(lead)]);
+  assert.deepEqual(receipts.map((r) => r.status).sort(), [200, 201]);
+  assert.deepEqual(
+    JSON.parse((await saved(lead.id)).preview_context),
+    contextFixture(),
+  );
+  assert.equal((await saved(lead.id)).privacy_notice_version, '2026-10-18.1');
+  assert.equal(
+    (
+      await submit({
+        ...lead,
+        token: '',
+        previewContext: {
+          ...lead.previewContext,
+          preferredContact: 'whatsapp',
+        },
+      })
+    ).status,
+    409,
+  );
+  assert.equal(
+    (
+      await submit({
+        ...lead,
+        token: '',
+        previewContext: Object.fromEntries(
+          Object.entries(lead.previewContext).reverse(),
+        ),
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await submit(
+        input({ previewContext: { ...contextFixture(), consent: false } }),
+      )
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await submit(
+        input({
+          previewContext: { ...contextFixture(), preferredContact: 'email' },
+        }),
+      )
+    ).status,
+    400,
+  );
+  await tick();
+  await tick();
+  await tick();
+  const notifications = requests.filter(
+    (r) => r.key === `site-visit/${lead.id}`,
+  );
+  assert.equal(notifications.length, 1);
+  const text = JSON.parse(notifications[0].body).text;
+  assert.match(text, /Consented preliminary customer context/);
+  assert.match(text, /Bill-based target: 3 kW/);
+  assert.doesNotMatch(text, /yearlyEnergy|solarPanels|annual DC|geometry/);
+  assert.equal((await row(lead.id)).status, 'accepted');
+  assert.equal(
+    (await db.prepare('SELECT COUNT(*) n FROM site_visit_leads').first()).n,
+    2,
+  );
+  assert.equal(
+    (await db.prepare('SELECT COUNT(*) n FROM site_visit_email_outbox').first())
+      .n,
+    2,
+  );
+  await setBindings();
+  assert.equal(
+    (await submit({ ...lead, token: '' })).status,
+    200,
+    'existing receipt survives shutoff',
+  );
+  assert.equal(
+    (await submit(input({ previewContext: contextFixture() }))).status,
+    503,
+  );
+  assert.equal(
+    (await submit(input())).status,
+    201,
+    'ordinary enquiry survives shutoff',
   );
 });

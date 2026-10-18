@@ -1,3 +1,4 @@
+import { contextEmail } from './preview-context.js';
 export interface EmailEnv {
   LEADS_DB?: D1Database;
   LEAD_CAPTURE_ENABLED?: string;
@@ -17,6 +18,7 @@ interface Lead {
   location: string;
   plan: string;
   language: string;
+  preview_context?: string | null;
 }
 
 interface Delivery {
@@ -54,6 +56,7 @@ function payload(lead: Lead) {
       `Location: ${lead.location}`,
       `Plan: ${plans[lead.plan] || lead.plan}`,
       `Website language: ${lead.language}`,
+      ...contextEmail(lead.preview_context),
       '',
       'This is an internal notification. The enquiry is retained in D1.',
     ].join('\n'),
@@ -82,7 +85,8 @@ export async function dispatchEmails(env: EmailEnv): Promise<void> {
   // avoids rescanning previously queued leads; a failed batch is safe to repeat.
   const leads = await db
     .prepare(
-      `SELECT id, created_at, full_name, phone, email, location, plan, language
+      // SELECT * tolerates the pre-migration schema; formatting allowlists fields.
+      `SELECT *
        FROM site_visit_leads WHERE email_enqueued = 0 AND created_at >= ?
        ORDER BY created_at, id LIMIT 10`,
     )

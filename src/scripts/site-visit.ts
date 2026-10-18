@@ -1,4 +1,6 @@
 import { t } from '../i18n/text';
+import { previewContext } from '../../worker/preview-context';
+import { loadTurnstile } from '../lib/turnstile';
 
 interface Turnstile {
   render(element: HTMLElement, options: Record<string, unknown>): string;
@@ -37,31 +39,26 @@ if (form) {
   };
   button.disabled = false;
   if (sitekey) {
-    // Load only on pages with a configured form, exactly once. No analytics script.
-    const script = document.createElement('script');
-    script.src =
-      'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-    script.async = true;
-    script.onerror = securityError;
-    script.onload = () => {
-      if (!window.turnstile) return securityError();
-      widgetId = window.turnstile.render(widget, {
-        sitekey,
-        action: 'site_visit',
-        size: 'flexible',
-        callback: (value: string) => {
-          token = value;
-        },
-        'expired-callback': () => {
-          token = '';
-        },
-        'error-callback': () => {
-          securityError();
-          return true;
-        },
-      });
-    };
-    document.head.append(script);
+    void loadTurnstile()
+      .then(() => {
+        if (!window.turnstile) return securityError();
+        widgetId = window.turnstile.render(widget, {
+          sitekey,
+          action: 'site_visit',
+          size: 'flexible',
+          callback: (value: string) => {
+            token = value;
+          },
+          'expired-callback': () => {
+            token = '';
+          },
+          'error-callback': () => {
+            securityError();
+            return true;
+          },
+        });
+      })
+      .catch(securityError);
   }
   form.addEventListener('input', () => {
     if (!pending) status.hidden = true;
@@ -82,8 +79,29 @@ if (form) {
       email: String(data.get('email') ?? '').trim(),
       location: String(data.get('location') ?? '').trim(),
       plan: String(data.get('plan') ?? ''),
-      language: document.documentElement.lang,
+      language: form.dataset.enquiryLanguage || document.documentElement.lang,
+      ...(data.get('previewConsent') === 'on' && form.dataset.previewContext
+        ? {
+            previewContext: {
+              ...JSON.parse(form.dataset.previewContext),
+              preferredContact: String(data.get('preferredContact') || 'none'),
+            },
+          }
+        : {}),
     };
+    if (
+      data.get('previewConsent') === 'on' &&
+      !previewContext(values.previewContext)
+    ) {
+      show(
+        'Please select your property again before attaching preview context.',
+      );
+      return;
+    }
+    if (values.previewContext?.preferredContact === 'email' && !values.email) {
+      show('Please enter your email address or choose another contact method.');
+      return;
+    }
     const payload = JSON.stringify(values);
     if (attempt?.payload !== payload)
       attempt = { payload, id: crypto.randomUUID(), received: false };
@@ -99,6 +117,9 @@ if (form) {
     button.disabled = true;
     const inputs = form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
       'input, select',
+    );
+    const disabled = new Map(
+      [...inputs].map((input) => [input, input.disabled]),
     );
     inputs.forEach((input) => {
       input.disabled = true;
@@ -144,7 +165,10 @@ if (form) {
       pending = false;
       button.disabled = false;
       inputs.forEach((input) => {
-        input.disabled = false;
+        input.disabled =
+          input.name === 'previewConsent'
+            ? !form.dataset.previewContext
+            : (disabled.get(input) ?? false);
       });
       form.removeAttribute('aria-busy');
       token = '';
