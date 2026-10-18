@@ -7,6 +7,13 @@ returned 200, the new module markup was present, runtime configuration was false
 and the private saved-review URL returned 404. The unrestricted Google key must
 not be installed in a public browser. No new Google calls were made for this release.
 
+PR42 added matched imagery and full roof-mask containment at merge
+`4e35e207e24d232d7d29ede7ddf4ef69a35bd5b6`. Independent review approved
+`dad8583554f9815f87c0e768a4e11417aa64eac0`; Cloudflare production build
+`a5cd26a6-a00b-4a57-92ed-8596e8c1e765` succeeded. The deployed preview entry
+references the raster chunk, public configuration remains false, ordinary pages
+return 200 and the private review path returns 404.
+
 ## Credential status and remaining usage approval
 
 1. **Saved; owner-confirmed restrictions.** A separate browser key with website restriction `https://incetekhenergy.com/*`
@@ -30,7 +37,15 @@ restrictions are owner-reported, not independently dashboard-verified. No key is
 printed or committed. The production D1 export was restored locally with integrity
 `ok`; rehearsing migrations 0003/0004 preserved all three existing enquiries and
 the one email-outbox row. The protected export and hash evidence remain ignored
-locally. The remote migrations have not yet been applied.
+locally. Remote migrations 0003/0004 were applied on 18 October at 11:04 UTC.
+Hashes verified all three existing enquiries and the email-outbox row unchanged;
+the new usage table is empty. No test enquiry was submitted.
+
+The separate browser key, server key and existing production Turnstile public
+key are installed as runtime secrets. The widget's production domain was verified
+through Cloudflare. Existing bindings were compared before/after and preserved;
+the public config still returns only `{ "enabled": false }`. No Google request
+was made. Protected installation and migration evidence is retained locally.
 
 Shared-imagery verification: lint, 126-file type check, production build and 88
 Worker tests passed. The full browser run passed 185 cases; its single synthetic
@@ -41,13 +56,23 @@ implementation uses full intersected-cell checks and strict matching image grids
 
 ## Deployment preparation
 
-Keep both Solar flags false until the above inputs and live checks are resolved.
-Use existing authorized Cloudflare access; install only verified credentials.
-Verify a recoverable D1 export/point and rehearse the existing additive migrations
-0003/0004 before applying them. Preserve existing enquiries/receipts/outbox and
-compare their hashes before/after. Install a verified-unused Solar rate namespace
-(3/minute), exact allowed origin and explicit limits, plus the existing production
-Turnstile public key. Existing lead/email keys, limits, cron and cutoff stay fixed.
+Keep both Solar flags false until usage approval and live checks are resolved.
+Production configuration prepares namespace `2026101801` at 3 attempts/minute,
+separate from lead namespaces `2026101501`/`2026101502`. The account inventory
+contained one Worker with only the production lead rate binding; repository
+preview configuration contains only its separate lead binding. The exact allowed
+origin is `https://incetekhenergy.com`. Proposed limits 10/day and 100/month are
+inactive while the preview is disabled. Preview deployments remain disabled and
+receive no production Solar credentials. Existing lead/email keys, limits, cron
+and cutoff stay fixed.
+
+Remaining usage decision: approve those trial limits and one bounded launch test
+(up to three Maps loads, two Places search sessions with at most five Autocomplete
+requests and one Essentials detail lookup each, and one Solar assessment bundle
+on SS Mall). No new enquiry/email is part of that test. This approval must include
+the Data Layers/GeoTIFF requests; prior Maps/Solar allowances are exhausted.
+Provider quotas, billing alerts and a representative residential roof remain
+unverified. Direct Maps/Places billing is not hard-capped by the Worker.
 
 Before public launch enable both `SOLAR_PREVIEW_ENABLED` and
 `SOLAR_MATCHED_IMAGERY_ENABLED` in the controlled acceptance environment. Verify

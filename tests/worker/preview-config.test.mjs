@@ -37,6 +37,11 @@ test('production activation keeps preview disabled and separates data and rate n
   assert.equal(app.vars.LEAD_CAPTURE_ENABLED, 'true');
   assert.equal(app.vars.SOLAR_PREVIEW_ENABLED, 'false');
   assert.equal(app.previews.vars.SOLAR_PREVIEW_ENABLED, 'false');
+  assert.equal(app.vars.SOLAR_MATCHED_IMAGERY_ENABLED, 'false');
+  assert.equal(app.previews.vars.SOLAR_MATCHED_IMAGERY_ENABLED, 'false');
+  assert.equal(app.vars.SOLAR_ALLOWED_ORIGIN, 'https://incetekhenergy.com');
+  assert.equal(app.vars.SOLAR_DAILY_LIMIT, '10');
+  assert.equal(app.vars.SOLAR_MONTHLY_LIMIT, '100');
   assert.equal(app.vars.WHATSAPP_NOTIFY_ENABLED, 'false');
   assert.equal(app.vars.WHATSAPP_WEBHOOK_ENABLED, 'false');
   assert.equal(app.vars.LEAD_CAPTURE_ENV, 'production');
@@ -52,13 +57,21 @@ test('production activation keeps preview disabled and separates data and rate n
     app.d1_databases[0].database_id,
     app.previews.d1_databases[0].database_id,
   );
-  assert.equal(app.ratelimits.length, 1);
+  assert.equal(app.ratelimits.length, 2);
   assert.equal(app.ratelimits[0].name, 'LEAD_RATE_LIMIT');
   assert.notEqual(
     app.ratelimits[0].namespace_id,
     app.previews.ratelimits[0].namespace_id,
   );
   assert.deepEqual(app.ratelimits[0].simple, { limit: 5, period: 60 });
+  const solarLimiter = app.ratelimits.find(
+    (r) => r.name === 'SOLAR_RATE_LIMIT',
+  );
+  assert.deepEqual(solarLimiter.simple, { limit: 3, period: 60 });
+  const namespaces = [...app.ratelimits, ...app.previews.ratelimits].map(
+    (r) => r.namespace_id,
+  );
+  assert.equal(new Set(namespaces).size, namespaces.length);
   assert.equal(app.previews.vars.LEAD_CAPTURE_ENV, 'preview');
   assert.equal(
     app.previews.vars.LEAD_ALLOWED_ORIGIN,
@@ -73,6 +86,8 @@ test('production activation keeps preview disabled and separates data and rate n
     assert.equal(vars.RESEND_API_KEY, undefined);
     assert.equal(vars.TURNSTILE_SECRET_KEY, undefined);
     assert.equal(vars.RATE_LIMIT_KEY_SECRET, undefined);
+    assert.equal(vars.SOLAR_API_KEY, undefined);
+    assert.equal(vars.SOLAR_MAPS_BROWSER_KEY, undefined);
   }
   assert.equal(app.vars.EMAIL_NOTIFY_ENABLED, 'true');
   assert.equal(
