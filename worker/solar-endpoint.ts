@@ -36,6 +36,8 @@ function reply(result: SolarResult, status: number, extra = {}) {
   );
 }
 function limit(value: string | undefined, max: number) {
+  // Explicit owner-selected mode; missing or malformed limits still fail closed.
+  if (value === 'unlimited') return null;
   if (!value || !/^[1-9][0-9]*$/.test(value)) return 0;
   const parsed = Number(value);
   return Number.isSafeInteger(parsed) && parsed <= max ? parsed : 0;
@@ -54,8 +56,8 @@ export function solarConfigured(
     >
   > {
   return Boolean(
-    limit(env.SOLAR_DAILY_LIMIT, 50) &&
-    limit(env.SOLAR_MONTHLY_LIMIT, 300) &&
+    limit(env.SOLAR_DAILY_LIMIT, 50) !== 0 &&
+    limit(env.SOLAR_MONTHLY_LIMIT, 300) !== 0 &&
     env.LEADS_DB &&
     env.SOLAR_RATE_LIMIT &&
     env.SOLAR_API_KEY &&
@@ -70,8 +72,8 @@ export function solarConfigured(
 // intentionally not refunded. This table contains no locations or Google data.
 export async function reserveSolar(
   db: D1Database,
-  daily: number,
-  monthly: number,
+  daily: number | null,
+  monthly: number | null,
 ) {
   const result = await db
     .prepare(
@@ -82,11 +84,11 @@ export async function reserveSolar(
       day = excluded.day, month = excluded.month,
       daily_count = CASE WHEN solar_usage.day = excluded.day THEN solar_usage.daily_count + 1 ELSE 1 END,
       monthly_count = CASE WHEN solar_usage.month = excluded.month THEN solar_usage.monthly_count + 1 ELSE 1 END
-    WHERE (solar_usage.day <> excluded.day OR solar_usage.daily_count < ?)
-      AND (solar_usage.month <> excluded.month OR solar_usage.monthly_count < ?)
+    WHERE (? IS NULL OR solar_usage.day <> excluded.day OR solar_usage.daily_count < ?)
+      AND (? IS NULL OR solar_usage.month <> excluded.month OR solar_usage.monthly_count < ?)
   `,
     )
-    .bind(daily, monthly)
+    .bind(daily, daily, monthly, monthly)
     .run();
   if (!result.success) throw new Error('unavailable');
   return result.meta.changes === 1;

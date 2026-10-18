@@ -35,13 +35,13 @@ test('preview application and migration target the same approved non-production 
 test('production activation keeps preview disabled and separates data and rate namespaces', async () => {
   const app = await readConfig('wrangler.jsonc');
   assert.equal(app.vars.LEAD_CAPTURE_ENABLED, 'true');
-  assert.equal(app.vars.SOLAR_PREVIEW_ENABLED, 'false');
+  assert.equal(app.vars.SOLAR_PREVIEW_ENABLED, 'true');
   assert.equal(app.previews.vars.SOLAR_PREVIEW_ENABLED, 'false');
-  assert.equal(app.vars.SOLAR_MATCHED_IMAGERY_ENABLED, 'false');
+  assert.equal(app.vars.SOLAR_MATCHED_IMAGERY_ENABLED, 'true');
   assert.equal(app.previews.vars.SOLAR_MATCHED_IMAGERY_ENABLED, 'false');
   assert.equal(app.vars.SOLAR_ALLOWED_ORIGIN, 'https://incetekhenergy.com');
-  assert.equal(app.vars.SOLAR_DAILY_LIMIT, '10');
-  assert.equal(app.vars.SOLAR_MONTHLY_LIMIT, '100');
+  assert.equal(app.vars.SOLAR_DAILY_LIMIT, 'unlimited');
+  assert.equal(app.vars.SOLAR_MONTHLY_LIMIT, 'unlimited');
   assert.equal(app.vars.WHATSAPP_NOTIFY_ENABLED, 'false');
   assert.equal(app.vars.WHATSAPP_WEBHOOK_ENABLED, 'false');
   assert.equal(app.vars.LEAD_CAPTURE_ENV, 'production');

@@ -324,6 +324,8 @@ test('disabled flag and missing configuration never make an outbound request', a
     { SOLAR_PREVIEW_ENABLED: 'false' },
     { SOLAR_API_KEY: '' },
     { SOLAR_DAILY_LIMIT: '' },
+    { SOLAR_DAILY_LIMIT: 'Unlimited' },
+    { SOLAR_MONTHLY_LIMIT: '0' },
     { SOLAR_MONTHLY_LIMIT: '301' },
     { RATE_LIMIT_KEY_SECRET: 'short' },
     { TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA' },
