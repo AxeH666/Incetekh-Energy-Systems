@@ -123,7 +123,7 @@ test('system choices and product enquiries carry the selected context', async ({
   page,
 }) => {
   await page.goto('/');
-  const choices = page.locator('.size-options a');
+  const choices = page.locator('.size-options a[href^="https://wa.me/"]');
   await expect(choices).toHaveCount(4);
   for (const [index, kw] of [3, 5, 7, 10].entries()) {
     expect(

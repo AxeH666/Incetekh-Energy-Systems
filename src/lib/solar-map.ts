@@ -1,5 +1,10 @@
 import type { SolarRoof } from '../../worker/solar';
-import { configurationPaths, type MapPoint } from './solar-geometry.js';
+import {
+  configurationPaths,
+  panelCorners,
+  offsetPoint,
+  type MapPoint,
+} from './solar-geometry.js';
 
 export interface MapHandle {
   setCenter(point: MapPoint): void;
@@ -18,12 +23,113 @@ export interface MapHandle {
 export interface PolygonHandle {
   setMap(map: MapHandle | null): void;
 }
+export interface RoofImage {
+  url: string;
+  imageryDate: string;
+  bounds: { south: number; west: number; north: number; east: number };
+}
+export interface LoadedRoofImage extends RoofImage {
+  release(): void;
+}
+export async function loadRoofImage(
+  value: RoofImage,
+  roof: SolarRoof,
+  signal: AbortSignal,
+): Promise<LoadedRoofImage> {
+  if (
+    !value ||
+    !/^\/api\/solar-imagery\/[a-z0-9-]+\.png$/.test(value.url) ||
+    value.imageryDate !== roof.imageryDate ||
+    !value.bounds
+  )
+    throw new Error('Unmatched roof imagery');
+  const { south, west, north, east } = value.bounds;
+  if (
+    ![south, west, north, east].every(Number.isFinite) ||
+    south >= north ||
+    west >= east ||
+    north - south > 0.02 ||
+    east - west > 0.02 ||
+    south > roof.bounds.sw.latitude ||
+    west > roof.bounds.sw.longitude ||
+    north < roof.bounds.ne.latitude ||
+    east < roof.bounds.ne.longitude
+  )
+    throw new Error('Invalid roof image coverage');
+  const response = await fetch(value.url, { signal, cache: 'no-store' });
+  if (
+    !response.ok ||
+    !response.headers.get('Content-Type')?.startsWith('image/png') ||
+    !response.body
+  ) {
+    await response.body?.cancel();
+    throw new Error('Roof imagery unavailable');
+  }
+  const reader = response.body.getReader();
+  const parts: Uint8Array[] = [];
+  let length = 0;
+  for (;;) {
+    const part = await reader.read();
+    if (part.done) break;
+    length += part.value.byteLength;
+    if (length > 8_000_000) {
+      await reader.cancel();
+      throw new Error('Roof imagery too large');
+    }
+    parts.push(part.value);
+  }
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const part of parts) {
+    bytes.set(part, offset);
+    offset += part.byteLength;
+  }
+  const imageUrl = URL.createObjectURL(
+    new Blob([bytes.buffer], { type: 'image/png' }),
+  );
+  const release = () => URL.revokeObjectURL(imageUrl);
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const image = new Image();
+      const finish = (error?: Error) => {
+        image.onload = null;
+        image.onerror = null;
+        signal.removeEventListener('abort', abort);
+        if (error) {
+          image.src = '';
+          reject(error);
+        } else resolve();
+      };
+      const abort = () => finish(new Error('Roof imagery cancelled'));
+      image.onload = () =>
+        image.naturalWidth && image.naturalHeight
+          ? finish()
+          : finish(new Error('Empty roof imagery'));
+      image.onerror = () => finish(new Error('Roof imagery unavailable'));
+      signal.addEventListener('abort', abort, { once: true });
+      if (signal.aborted) {
+        abort();
+        return;
+      }
+      image.src = imageUrl;
+    });
+  } catch (error) {
+    release();
+    throw error;
+  }
+  return { ...value, url: imageUrl, release };
+}
 export interface MapsApi {
   Map: new (
     element: HTMLElement,
     options: Record<string, unknown>,
   ) => MapHandle;
   Polygon: new (options: Record<string, unknown>) => PolygonHandle;
+  GroundOverlay?: new (
+    url: string,
+    bounds: RoofImage['bounds'],
+    options: Record<string, unknown>,
+  ) => PolygonHandle;
 }
 let mapsUnavailable = false;
 
@@ -48,22 +154,77 @@ export function createSolarMap(
     gestureHandling: 'cooperative',
   });
   let polygons: PolygonHandle[] = [];
+  let roofImage: PolygonHandle | undefined;
+  let releaseRoofImage: (() => void) | undefined;
   let visible = true;
+  let displayedPaths: MapPoint[][] = [];
   function clear() {
     for (const polygon of polygons) polygon.setMap(null);
     polygons = [];
+    displayedPaths = [];
   }
   return {
     map,
-    clear,
+    clear() {
+      clear();
+      roofImage?.setMap(null);
+      roofImage = undefined;
+      releaseRoofImage?.();
+      releaseRoofImage = undefined;
+    },
+    setRoofImage(image: LoadedRoofImage) {
+      roofImage?.setMap(null);
+      releaseRoofImage?.();
+      roofImage = undefined;
+      releaseRoofImage = undefined;
+      try {
+        if (!api.GroundOverlay) throw new Error('Roof imagery unsupported');
+        roofImage = new api.GroundOverlay(image.url, image.bounds, {
+          clickable: false,
+          opacity: 1,
+        });
+        roofImage.setMap(map);
+        releaseRoofImage = image.release;
+      } catch (error) {
+        roofImage?.setMap(null);
+        roofImage = undefined;
+        image.release();
+        throw error;
+      }
+    },
     setVisible(value: boolean) {
       visible = value;
       for (const polygon of polygons) polygon.setMap(value ? map : null);
     },
-    show(roof: SolarRoof, panelsCount: number) {
-      const paths = configurationPaths(roof, panelsCount); // Validate before replacing.
+    show(roof: SolarRoof, panelsCount: number, conceptIndices?: number[]) {
+      if (
+        conceptIndices &&
+        (conceptIndices.length !== panelsCount ||
+          new Set(conceptIndices).size !== panelsCount ||
+          conceptIndices.some((i) => !Number.isSafeInteger(i) || i < 0))
+      )
+        throw new Error('Invalid grouped concept');
+      const paths = conceptIndices
+        ? conceptIndices.map((i) => panelCorners(roof, i))
+        : configurationPaths(roof, panelsCount);
+      this.showConcept(paths);
+    },
+    showConcept(paths: MapPoint[][]) {
+      if (
+        !paths.length ||
+        paths.length > 10000 ||
+        paths.some(
+          (path) =>
+            path.length !== 4 ||
+            path.some(
+              (p) => !Number.isFinite(p.lat) || !Number.isFinite(p.lng),
+            ),
+        )
+      )
+        throw new Error('Invalid layout geometry');
       clear();
       try {
+        displayedPaths = paths;
         for (const path of paths)
           polygons.push(
             new api.Polygon({
@@ -82,6 +243,22 @@ export function createSolarMap(
         clear();
         throw error;
       }
+    },
+    focusPanels() {
+      const points = displayedPaths.flat();
+      if (!points.length) return;
+      const south = Math.min(...points.map((p) => p.lat)),
+        north = Math.max(...points.map((p) => p.lat));
+      const west = Math.min(...points.map((p) => p.lng)),
+        east = Math.max(...points.map((p) => p.lng));
+      const sw = offsetPoint({ lat: south, lng: west }, -3, -3),
+        ne = offsetPoint({ lat: north, lng: east }, 3, 3);
+      map.fitBounds({
+        south: sw.lat,
+        west: sw.lng,
+        north: ne.lat,
+        east: ne.lng,
+      });
     },
     fit(roof: SolarRoof) {
       map.fitBounds({

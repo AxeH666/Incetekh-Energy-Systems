@@ -64,8 +64,9 @@ limit. Redirects are returned manually and treated as failures; there are no
 automatic retries. The adapter retains original panel order, model dimensions,
 segment orientation, returned bounds, dates and configurations. Invalid geometry
 or missing configurations produces a fallback; no replacement panels are made up.
-The selected pin and returned building are distinct. Later UI must confirm the
-returned building; a bounding box is not a surveyed roof outline.
+The selected pin and returned building are distinct. The private simplified UI
+rejects a returned bounding box that excludes the pin. This is only an obvious
+mismatch check: a bounding box is not a surveyed roof outline or alignment proof.
 
 Results are a discriminated `available`/fallback contract with `data_available`.
 Provider configuration failure, throttling, no coverage and transient errors are
@@ -215,12 +216,14 @@ Before each map initialization the client rechecks the runtime shutoff.
 The enabled route alone receives a fresh per-response script/style nonce and
 Google-compatible CSP through HTMLRewriter. Other routes retain their existing
 policy. Maps loads only after the visitor sees the privacy notice and explicitly
-opens it. Search requests only location fields. Coordinates and map selection are
-alternatives when search fails; no browser geolocation is requested.
+opens address search. Search requests only location fields. Map selection is the
+fallback when search fails; no browser geolocation is requested. Coordinate input
+fields have been removed from the simplified private flow.
 
-A selected blue marker requires explicit assessment confirmation. The returned
-orange building requires a separate confirmation before any panels are drawn;
-the viewport and text distinguish both locations. Editing coordinates, moving the
+A selected blue marker requires one explicit **Confirm roof & preview** action.
+The owner-requested private revision removes the second confirmation. Obvious
+returned-building mismatches show no panels; diagnostic markers disappear when
+the preliminary layout is shown. Editing the address, moving the
 pin or choosing another search result immediately invalidates the old assessment,
 including while Places details are pending. Late responses are discarded. Wrong,
 changed or unclear roofs, quota failures and unavailable maps retain a manual
@@ -343,3 +346,58 @@ alongside the Solar-specific source statement. Native map attribution must remai
 visible; final real-device review is still required. See Google's
 [Solar attribution policy](https://developers.google.com/maps/documentation/solar/policies),
 checked 18 October 2026.
+
+## Reference-module layout and panel visibility (private revision)
+
+The owner accepted the matched overhead SS Mall image as the visual target for
+the website and authorized official manufacturer dimensions. Public activation
+remains disabled. The general matched-imagery service is not implemented; the
+current retained image is specific to SS Mall.
+
+The reference is **Waaree AHNAY Bi-55-550: 550 W, 2.272 by 1.133 m**, verified on
+18 October 2026 against the [official datasheet](https://waaree.com/upload/media/datasheet_bi_55_520_550_12_03012025_1756379026.pdf).
+It is a specific documented model, not a universal panel size, inventory promise,
+partnership or procurement decision. The nearest whole-panel count changes with
+selected capacity; module dimensions never stretch:
+
+| Selected capacity | Reference panels | Array DC nameplate |
+| ----------------- | ---------------- | ------------------ |
+| 3 kW              | 5                | 2.75 kWp           |
+| 5 kW              | 9                | 4.95 kWp           |
+| 7 kW              | 13               | 7.15 kWp           |
+| 10 kW             | 18               | 9.90 kWp           |
+
+`moduleLayout` builds **new centers and footprints** inside an intact rectangular
+provider-candidate patch. It tries at most three bounded patch searches. The patch
+helper retains a surrounding candidate ring and rejects unsupported counts,
+incomplete grids and nearly flat segments with undefined azimuth. Its 100,000
+operation budget includes cell lookup, bucket candidates, overlap pairs and corner
+checks. Geometry remains within returned building bounds. The final rectangle is
+inset 0.25 m from the candidate patch; that is a model filter, not a code setback.
+
+A disclosed 20 mm roof-plane module gap is projected by roof pitch along the slope.
+It is only a visualization assumption, not an approved mounting clearance. The
+[Waaree installation manual](https://waaree.com/upload/media/wel_installation_manual_04_2024_c_compressed_1754071109.pdf)
+recommends at least 10 to 10.5 mm between modules for thermal expansion; mounting
+hardware and the full installation still require project-specific design. The
+concept follows the modeled roof plane: raised racks, row shading, access routes,
+obstacles, drainage, loads and structural suitability are not established. An
+engineer must check those and the actual mounting manual on site.
+
+The reference layout hides Google's original configuration's energy and savings.
+Those numbers return only when explicitly comparing the unmodified Google first-N
+configuration. New module geometry is never passed to yield or enquiry calculations.
+If a candidate patch cannot support the module grid, the UI explicitly says so and
+shows the original Google model instead. Failure to place a grid is not a finding
+that the physical roof has no room. `Closer view` changes camera framing only.
+
+For SS Mall, the 5 kW selection produced a 3 by 3 array: nine 550 W modules,
+4.95 kWp. All 729 sampled footprint points fell on the retained mask. The current
+conservative patch filter could not propose the 7/10 kW reference grids on that
+roof; it returns the labeled original-model fallback. No feasibility or clearance
+claim follows from these samples. The approved single Maps load displayed the new
+geometry on matching Google imagery; no new Solar or Places request was needed.
+
+References: [Google configuration and orientation contract](https://developers.google.com/maps/documentation/solar/reference/rest/v1/buildingInsights/findClosest),
+[roof coverage limitations](https://developers.google.com/maps/documentation/solar/search-buildings),
+and [NREL site-assessment guidance](https://docs.nrel.gov/docs/fy10osti/46078.pdf).

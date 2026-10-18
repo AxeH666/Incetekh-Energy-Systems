@@ -296,6 +296,24 @@ const money = (value: number) =>
             label={kw === 10 ? 'Talk to an expert' : `Explore ${kw} kW`}
             message={`Hi Incetekh, I am interested in a ${kw}${kw === 10 ? ' kW or larger' : ' kW'} solar system. Can we discuss a free site visit?`}
           />
+          <div translate="no" lang="en" data-preview-entry hidden>
+            <a
+              class="button preview-link"
+              href="/solar-preview/"
+              data-capacity-preview={kw}
+            >
+              Preview {kw} kW on my roof
+            </a>
+            <p class="result-note">
+              {kw === 10 ? '10 kW starting point · ' : ''}English preview ·
+              preliminary assessment
+            </p>
+            <p
+              class="result-note"
+              data-preview-handoff-status
+              role="status"
+            ></p>
+          </div>
         </article>
       ))}
     </div>
@@ -503,6 +521,12 @@ const money = (value: number) =>
     background: #fff;
     color: #18382e;
     align-self: start;
+  }
+  .size-options [data-preview-entry] {
+    margin-top: 0.75rem;
+  }
+  .size-options .result-note {
+    color: var(--color-muted);
   }
   .calculator-result :global(:focus-visible) {
     outline-color: #ee865e;

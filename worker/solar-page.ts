@@ -58,7 +58,7 @@ export async function solarPage(request: Request, env: SolarPageEnv) {
   const nonce = crypto.randomUUID().replaceAll('-', '');
   response.headers.set(
     'Content-Security-Policy',
-    `default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-ancestors 'none'; script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' blob:; style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com; img-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com data:; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com https://challenges.cloudflare.com data: blob:; font-src 'self' https://fonts.gstatic.com; frame-src https://*.google.com https://challenges.cloudflare.com; worker-src blob:`,
+    `default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-ancestors 'none'; script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' blob:; style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com; img-src 'self' blob: https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com data:; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com https://challenges.cloudflare.com data: blob:; font-src 'self' https://fonts.gstatic.com; frame-src https://*.google.com https://challenges.cloudflare.com; worker-src blob:`,
   );
   return new HTMLRewriter()
     .on('meta', {

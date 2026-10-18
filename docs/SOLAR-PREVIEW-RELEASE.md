@@ -108,3 +108,21 @@ approved reconciliation procedure.
 Public readiness: **No**, until the live-data, configuration, device and owner
 acceptance gates above are actually passed. Merged disabled code is not evidence
 that real rooftop alignment or production acceptance succeeded.
+
+## Website release requested 18 October 2026
+
+The owner has now requested deployment to the real website and residential use.
+This supersedes the earlier local-only preference. The reviewed capacity handoff,
+simplified address flow and reference-module layout can be deployed with the
+runtime flag disabled while the general matched-imagery service and production
+configuration are completed. The SS Mall saved image and private review endpoints
+are not published. Public address search supports residential addresses; a user
+must confirm the roof, and neither exact house-number resolution nor Solar
+coverage is guaranteed.
+
+The isolated preview script budget is now 25 KB (approximately 24 KB measured),
+covering the bounded module-packing algorithm and matched-image validation. The
+15 KB shared-script budget and assertion excluding the preview bundle from the
+homepage remain unchanged. The 2.1 MB shared-asset budget excludes the separately
+capped preview script (combined maximum 2.125 MB). This is an explicit performance budget change, not
+permission to load mapping code on the homepage.

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { previewWorker } from './support/solar-preview-worker.mjs';
+import { gridRoof } from './fixtures/grouped-roof';
 import { solarFixture } from './fixtures/solar.mjs';
 import { normalizeSolar } from '../worker/solar';
 import AxeBuilder from '@axe-core/playwright';
@@ -99,9 +100,19 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     page: import('@playwright/test').Page,
     latitude = '15',
   ) {
-    await page.getByLabel('Latitude', { exact: true }).fill(latitude);
-    await page.getByLabel('Longitude', { exact: true }).fill('79');
-    await page.getByRole('button', { name: 'Move selection' }).click();
+    await page.locator('synthetic-place-search').evaluate((element, lat) => {
+      element.dispatchEvent(
+        Object.assign(new Event('gmp-select'), {
+          placePrediction: {
+            toPlace: () => ({
+              location: { lat: () => Number(lat), lng: () => 79 },
+              fetchFields: async () => {},
+            }),
+          },
+        }),
+      );
+    }, latitude);
+    await expect(page.locator('#assess-property')).toBeEnabled();
   }
   test('disabled page makes no provider calls and has no nonexistent locale links', async ({
     page,
@@ -109,7 +120,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
   }) => {
     const calls = await setup(page, false);
     await expect(
-      page.getByRole('button', { name: 'Open property map' }),
+      page.getByRole('button', { name: 'Enter your address' }),
     ).toBeHidden();
     expect(calls.maps()).toBe(0);
     expect(calls.assessments()).toBe(0);
@@ -127,7 +138,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     }
   });
   for (const width of [390, 1440])
-    test(`requires both building confirmations and reuses map at ${width}px`, async ({
+    test(`address lookup and one confirmation reuse the map at ${width}px`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 900 });
@@ -135,23 +146,33 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       page.on('pageerror', (error) => errors.push(error.message));
       const calls = await setup(page);
       expect(calls.maps()).toBe(0);
-      await page.getByRole('button', { name: 'Open property map' }).click();
+      await page.getByRole('button', { name: 'Enter your address' }).click();
       await expect(page.locator('#property-controls')).toBeVisible();
-      await select(page);
+      await page
+        .getByRole('textbox', { name: 'Enter your full address' })
+        .fill('15 Example Street, Proddatur');
+      await page
+        .getByRole('button', {
+          name: '15 Example Street, Proddatur (test address)',
+        })
+        .click();
       expect(calls.assessments()).toBe(0);
       await page
-        .getByRole('button', { name: 'This is my building — assess roof' })
+        .getByRole('button', { name: 'Confirm roof & preview' })
         .click();
-      await expect(page.locator('#returned-building')).toBeVisible();
-      await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
-      await page
-        .getByRole('button', { name: 'This returned roof is correct' })
-        .click();
+      await expect(page.locator('#returned-building')).toBeHidden();
+      await expect(page.locator('#assess-property')).toBeDisabled();
+      await expect(page.getByLabel('Latitude', { exact: true })).toHaveCount(0);
+      await page.locator('#roof-results summary').click();
       await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
       await expect(page.locator('#bill-summary-text')).toContainText(
         '3 kW bill-based target',
       );
       await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+      await expect(page.locator('#module-unavailable')).toBeVisible();
+      await expect(page.locator('#module-unavailable')).toContainText(
+        'not a Waaree installation layout',
+      );
       await expect(page.locator('#result-dc')).toHaveText('4,800 kWh DC/year');
       await expect(page.locator('#result-ac')).toHaveText('4,080 kWh AC/year');
       await expect(page.locator('#result-value')).toHaveText('₹2,720/month');
@@ -183,7 +204,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       });
       await page
         .getByRole('button', {
-          name: 'Roof changed, unclear or panels misplaced',
+          name: "Panels don't match my roof",
         })
         .click();
       await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
@@ -197,7 +218,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
         ),
       ).toBe(true);
     });
-  test('moving selection discards an in-flight assessment; editing coordinates invalidates confirmation', async ({
+  test('moving selection discards an in-flight assessment; editing an address invalidates confirmation', async ({
     page,
   }) => {
     await setup(page);
@@ -213,31 +234,27 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
         })
         .catch(() => {});
     });
-    await page.getByRole('button', { name: 'Open property map' }).click();
+    await page.getByRole('button', { name: 'Enter your address' }).click();
     await select(page);
-    await page
-      .getByRole('button', { name: 'This is my building — assess roof' })
-      .click();
+    await page.getByRole('button', { name: 'Confirm roof & preview' }).click();
     await expect(page.locator('#preview-status')).toContainText('Assessing');
     await select(page, '15.001');
     finish();
     await expect(page.locator('#returned-building')).toBeHidden();
     await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
-    await page.getByLabel('Latitude', { exact: true }).fill('15.002');
+    await page.locator('synthetic-place-search').dispatchEvent('input');
     await expect(
-      page.getByRole('button', { name: 'This is my building — assess roof' }),
+      page.getByRole('button', { name: 'Confirm roof & preview' }),
     ).toBeDisabled();
   });
   test('new Places selection immediately invalidates the old roof while details load', async ({
     page,
   }) => {
     await setup(page);
-    await page.getByRole('button', { name: 'Open property map' }).click();
+    await page.getByRole('button', { name: 'Enter your address' }).click();
     await select(page);
-    await page
-      .getByRole('button', { name: 'This is my building — assess roof' })
-      .click();
-    await expect(page.locator('#returned-building')).toBeVisible();
+    await page.getByRole('button', { name: 'Confirm roof & preview' }).click();
+    await expect(page.locator('#roof-results')).toBeVisible();
     await page.locator('synthetic-place-search').evaluate((element) => {
       let done!: () => void;
       const fields = new Promise<void>((resolve) => {
@@ -257,29 +274,283 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     });
     await expect(page.locator('#returned-building')).toBeHidden();
     await expect(
-      page.getByRole('button', { name: 'This is my building — assess roof' }),
+      page.getByRole('button', { name: 'Confirm roof & preview' }),
     ).toBeDisabled();
     await page.evaluate(() =>
       (window as unknown as { completePlace(): void }).completePlace(),
     );
-    await expect(page.locator('#selection-label')).toContainText('15.010000');
+    await expect(page.locator('#selection-label')).toContainText(
+      'Is the pin on your roof?',
+    );
     await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
     await expect(
-      page.getByRole('button', { name: 'This is my building — assess roof' }),
+      page.getByRole('button', { name: 'Confirm roof & preview' }),
     ).toBeEnabled();
+  });
+  test('a different returned building shows no panels and a successful preview cannot be requested twice', async ({
+    page,
+  }) => {
+    const calls = await setup(page);
+    await page.locator('#open-map').click();
+    await select(page, '15.01');
+    await page.locator('#assess-property').click();
+    await expect(page.locator('#returned-building')).toBeVisible();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    await select(page);
+    await page.locator('#assess-property').click();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+    await expect(page.locator('#assess-property')).toBeDisabled();
+    await page.locator('#assess-property').dispatchEvent('click');
+    expect(calls.assessments()).toBe(2);
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+  });
+  test('an assessment finishing after session expiry cannot restore consent or panels', async ({
+    page,
+  }) => {
+    await setup(page);
+    let finish!: () => void;
+    const waiting = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    await page.route('**/api/solar-assessments', async (route) => {
+      await waiting;
+      await route
+        .fulfill({
+          json: {
+            ...normalizeSolar(solarFixture()),
+            reference: 'expired-request',
+          },
+        })
+        .catch(() => {});
+    });
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await expect(page.locator('#preview-status')).toContainText('Assessing');
+    await page.clock.setFixedTime(new Date(Date.now() + 31 * 60 * 1000));
+    finish();
+    await expect(page.locator('#preview-status')).toContainText(
+      'missing or expired',
+    );
+    await expect(page.locator('#preview-context-consent')).toBeDisabled();
+    await expect(page.locator('[data-site-visit-form]')).not.toHaveAttribute(
+      'data-preview-context',
+    );
+    await expect(page.locator('#assess-property')).toBeDisabled();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+  });
+  test('grouped draft hides unrelated generation estimates and closer view does not request another assessment', async ({
+    page,
+  }) => {
+    await setup(page);
+    let assessments = 0;
+    await page.route('**/api/solar-assessments', (route) => {
+      assessments++;
+      return route.fulfill({
+        json: {
+          status: 'available',
+          data_available: true,
+          roof: gridRoof(),
+          reference: 'group-test',
+        },
+      });
+    });
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await expect(page.locator('#grouped-layout-note')).toBeVisible();
+    await expect(page.locator('#module-assumptions')).toContainText(
+      'Energy and savings are not shown',
+    );
+    await expect(page.locator('#roof-results')).toBeHidden();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(5);
+    await page
+      .getByRole('button', { name: 'Closer view', exact: true })
+      .click();
+    await expect(
+      page.getByRole('button', { name: 'Whole roof', exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole('button', { name: 'Compare Google model', exact: true })
+      .click();
+    await expect(page.locator('#roof-results')).toBeVisible();
+    await expect(page.locator('#result-dc')).toContainText('4,800');
+    await page
+      .getByRole('button', { name: 'Try grouped layout', exact: true })
+      .click();
+    await expect(page.locator('#roof-results')).toBeHidden();
+    expect(assessments).toBe(1);
+    await page
+      .getByRole('textbox', { name: 'Enter your full address' })
+      .fill('Changed address');
+    await expect(page.locator('#grouped-layout-note')).toBeHidden();
+    await expect(page.locator('#roof-controls')).toBeHidden();
+  });
+  test('matching roof imagery stays under toggled panels and clears on a changed selection', async ({
+    page,
+  }) => {
+    await setup(page);
+    let imageRequests = 0;
+    await page.route('**/api/solar-imagery/test-roof.png', (route) => {
+      imageRequests++;
+      return route.fulfill({
+        contentType: 'image/png',
+        body: Buffer.from(
+          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1kAAAAASUVORK5CYII=',
+          'base64',
+        ),
+      });
+    });
+    await page.route('**/api/solar-assessments', (route) =>
+      route.fulfill({
+        json: {
+          ...normalizeSolar(solarFixture()),
+          reference: 'image-test',
+          roofImage: {
+            url: '/api/solar-imagery/test-roof.png',
+            imageryDate: '2021-03-02',
+            bounds: {
+              south: 14.998,
+              west: 78.998,
+              north: 15.002,
+              east: 79.002,
+            },
+          },
+        },
+      }),
+    );
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+    await expect(page.locator('[data-mock-roof-image]')).toHaveCount(1);
+    await expect(page.locator('#solar-source')).toContainText(
+      'Includes solar data from Google',
+    );
+    await expect(page.locator('#solar-source')).toContainText('2021-03-02');
+    const imageUrl = await page
+      .locator('[data-mock-roof-image]')
+      .getAttribute('data-mock-roof-image');
+    expect(imageUrl).toMatch(/^blob:/);
+    expect(imageRequests).toBe(1);
+    await page.locator('#before-solar').click();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    await expect(page.locator('[data-mock-roof-image]')).toHaveCount(1);
+    await select(page, '15.0001');
+    await expect(page.locator('[data-mock-roof-image]')).toHaveCount(0);
+    expect(
+      await page.evaluate(async (url) => {
+        try {
+          await fetch(url!);
+          return true;
+        } catch {
+          return false;
+        }
+      }, imageUrl),
+    ).toBe(false);
+  });
+  test('changing address during image loading cannot restore stale panels', async ({
+    page,
+  }) => {
+    await setup(page);
+    let release!: () => void;
+    let requested!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const started = new Promise<void>((resolve) => {
+      requested = resolve;
+    });
+    await page.route('**/api/solar-imagery/pending.png', async (route) => {
+      requested();
+      await pending;
+      await route.fulfill({
+        contentType: 'image/png',
+        body: Buffer.from(
+          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1kAAAAASUVORK5CYII=',
+          'base64',
+        ),
+      });
+    });
+    await page.route('**/api/solar-assessments', (route) =>
+      route.fulfill({
+        json: {
+          ...normalizeSolar(solarFixture()),
+          reference: 'pending-image',
+          roofImage: {
+            url: '/api/solar-imagery/pending.png',
+            imageryDate: '2021-03-02',
+            bounds: {
+              south: 14.998,
+              west: 78.998,
+              north: 15.002,
+              east: 79.002,
+            },
+          },
+        },
+      }),
+    );
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await started;
+    await page
+      .getByRole('textbox', { name: 'Enter your full address' })
+      .fill('Another address');
+    release();
+    await expect(page.locator('#assess-property')).toBeDisabled();
+    await expect(page.locator('#roof-results')).toBeHidden();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    await expect(page.locator('[data-mock-roof-image]')).toHaveCount(0);
+  });
+  test('mismatched or unavailable roof imagery cannot leave panels visible', async ({
+    page,
+  }) => {
+    await setup(page);
+    await page.locator('#open-map').click();
+    for (const imageryDate of ['2020-01-01', '2021-03-02']) {
+      await page.route('**/api/solar-assessments', (route) =>
+        route.fulfill({
+          json: {
+            ...normalizeSolar(solarFixture()),
+            reference: 'bad-image',
+            roofImage: {
+              url: '/api/solar-imagery/unavailable.png',
+              imageryDate,
+              bounds: {
+                south: 14.998,
+                west: 78.998,
+                north: 15.002,
+                east: 79.002,
+              },
+            },
+          },
+        }),
+      );
+      await page.route('**/api/solar-imagery/unavailable.png', (route) =>
+        route.fulfill({ status: 404, body: '' }),
+      );
+      await select(page);
+      await page.locator('#assess-property').click();
+      await expect(page.locator('#preview-status')).toContainText(
+        'could not finish',
+      );
+      await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+      await expect(page.locator('[data-mock-roof-image]')).toHaveCount(0);
+    }
   });
   test('coverage/budget failures keep the manual visit path', async ({
     page,
   }) => {
     await setup(page);
-    await page.getByRole('button', { name: 'Open property map' }).click();
+    await page.getByRole('button', { name: 'Enter your address' }).click();
     await select(page);
     for (const status of ['no_coverage', 'budget_exhausted']) {
       await page.route('**/api/solar-assessments', (route) =>
         route.fulfill({ json: { status, data_available: false } }),
       );
       await page
-        .getByRole('button', { name: 'This is my building — assess roof' })
+        .getByRole('button', { name: 'Confirm roof & preview' })
         .click();
       await expect(page.locator('#preview-status')).toContainText(
         status === 'no_coverage'
@@ -296,10 +567,9 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     page,
   }) => {
     await setup(page, true, 50000);
-    await page.getByRole('button', { name: 'Open property map' }).click();
+    await page.getByRole('button', { name: 'Enter your address' }).click();
     await select(page);
     await page.locator('#assess-property').click();
-    await page.locator('#accept-roof').click();
     await expect(page.locator('#bill-summary-text')).toContainText(
       'Commercial · 53 kW',
     );
@@ -368,6 +638,51 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await expect(page.locator('input[value="commercial"]')).toBeChecked();
     expect(calls.maps()).toBe(0);
   });
+  test('capacity-card preview keeps chosen size distinct from bill recommendation', async ({
+    page,
+  }) => {
+    await setup(page, true, null);
+    await page.goto('/');
+    await page.locator('#solar-bill').fill('200');
+    await page.locator('[data-capacity-preview="5"]').click();
+    await expect(page).toHaveURL('/solar-preview/');
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      '1 kW bill-based target',
+    );
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      'Your selected system: 5 kW',
+    );
+    await expect(page.locator('#visit-plan')).toHaveValue('5kw');
+    await page.reload();
+    await expect(page.locator('#bill-summary-text')).toContainText(
+      'Your selected system: 5 kW',
+    );
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.locator('#assess-property').click();
+    await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+    await expect(page.locator('#roof-limited')).toBeVisible();
+    await expect(page.locator('#roof-comparison')).toContainText(
+      'Your selected system: 5 kW',
+    );
+    await page.locator('#back-calculator').click();
+    await expect(page.locator('#solar-bill')).toHaveValue('200');
+    await page.locator('[data-preview-link]').click();
+    await expect(page.locator('#bill-summary-text')).not.toContainText(
+      'Your selected system',
+    );
+  });
+  test('public-disabled entry hides every preview button and explains direct links', async ({
+    page,
+  }) => {
+    await setup(page, false, null);
+    await expect(page.locator('#preview-status')).toContainText(
+      'not publicly enabled',
+    );
+    await page.goto('/');
+    await expect(page.locator('[data-preview-entry]:visible')).toHaveCount(0);
+    await expect(page.locator('#solar-bill')).toBeEnabled();
+  });
   test('unavailable storage leaves calculator usable and does not navigate', async ({
     page,
   }) => {
@@ -380,9 +695,9 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await page.goto('/');
     await page.locator('[data-preview-link]').click();
     await expect(page).toHaveURL('/');
-    await expect(page.locator('[data-preview-handoff-status]')).toContainText(
-      'temporary session storage',
-    );
+    await expect(
+      page.locator('[data-solar-calculator] [data-preview-handoff-status]'),
+    ).toContainText('temporary session storage');
     await page.locator('#solar-bill').fill('3000');
     await expect(page.locator('[data-result="kw"]')).toHaveText('4');
   });
@@ -400,10 +715,12 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await route.fulfill({ status: 201, json: { code: 'received', id } });
     });
     await page.locator('#open-map').click();
+    await page.locator('#preview-visit').click();
     await page.locator('#visit-name').fill('Synthetic pending visitor');
     await page.locator('#visit-phone').fill('9876543210');
     await page.locator('#visit-location').fill('Customer-entered location');
     const consent = page.locator('#preview-context-consent');
+    await page.locator('#preview-visit').click();
     const form = page.locator('[data-site-visit-form]');
     await form.locator('button[type="submit"]').click();
     await expect(form).toHaveAttribute('aria-busy', 'true');
@@ -418,7 +735,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     });
     await form.locator('button[type="submit"]').click();
     await expect(form).toHaveAttribute('aria-busy', 'true');
-    await page.getByLabel('Latitude', { exact: true }).fill('15.1');
+    await page.locator('synthetic-place-search').dispatchEvent('input');
     await expect(consent).toBeDisabled();
     finish();
     await expect(form).not.toHaveAttribute('aria-busy', 'true');
@@ -444,7 +761,6 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await page.locator('#open-map').click();
     await select(page);
     await page.locator('#assess-property').click();
-    await page.locator('#accept-roof').click();
     await page.locator('#preview-visit').click();
     await page.locator('#visit-name').fill('Synthetic Visitor');
     await page.locator('#visit-phone').fill('9876543210');
@@ -511,12 +827,11 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await page.locator('#open-map').click();
     await select(page);
     await page.locator('#assess-property').click();
-    await page.locator('#reject-roof').click();
+    await page.locator('#unusable-roof').click();
     await expect(page.locator('#roof-results')).toBeHidden();
     await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
     await select(page);
     await page.locator('#assess-property').click();
-    await page.locator('#accept-roof').click();
     await page.evaluate(() =>
       window.dispatchEvent(new Event('incetekh:maps-unavailable')),
     );
@@ -529,6 +844,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       '3 kW bill-based target',
     );
     await expect(page.locator('#assess-property')).toBeDisabled();
+    await page.locator('#preview-visit').click();
     await expect(page.locator('[data-site-visit-form]')).toBeVisible();
     expect(calls.maps()).toBe(1);
   });
@@ -651,8 +967,11 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await page.locator('#open-map').click();
       await select(page);
       await page.locator('#assess-property').click();
-      await page.locator('#accept-roof').click();
       await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');
+      await expect(page.locator('#module-unavailable')).toBeVisible();
+      await expect(page.locator('#module-unavailable')).toContainText(
+        'not a Waaree installation layout',
+      );
       await expect(page.locator('#roof-limited')).toBeVisible();
       await page.locator('#preview-visit').click();
       await page.locator('#visit-name').fill('Synthetic complete journey');
