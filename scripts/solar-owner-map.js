@@ -79,37 +79,31 @@ class LocalCircle {
     if (map) map.svg.append(this.node);
   }
 }
-class LocalPlace extends HTMLElement {
-  connectedCallback() {
-    if (this.childNodes.length) return;
-    const input = document.createElement('input');
-    input.setAttribute('aria-label', 'Enter your full address');
-    input.placeholder = 'Try the simulated example address';
-    input.style.cssText =
-      'padding:14px;width:100%;box-sizing:border-box;min-height:48px';
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = 'Select the simulated example roof';
-    button.addEventListener('click', () => {
-      const event = new Event('gmp-select');
-      event.placePrediction = {
-        toPlace: () => ({
-          location: { lat: () => 15, lng: () => 79 },
-          fetchFields: async () => {},
-        }),
-      };
-      this.dispatchEvent(event);
-    });
-    this.append(input, button);
-  }
-}
-customElements.define('local-owner-place', LocalPlace);
 window.google = {
   maps: {
     Map: LocalMap,
     Polygon: LocalPolygon,
     Circle: LocalCircle,
-    importLibrary: async () => ({ PlaceAutocompleteElement: LocalPlace }),
+    importLibrary: async () => ({
+      AutocompleteSessionToken: class {},
+      AutocompleteSuggestion: {
+        fetchAutocompleteSuggestions: async () => ({
+          suggestions: [
+            {
+              placePrediction: {
+                text: {
+                  toString: () => 'Simulated example roof (not a real address)',
+                },
+                toPlace: () => ({
+                  location: { lat: () => 15, lng: () => 79 },
+                  fetchFields: async () => {},
+                }),
+              },
+            },
+          ],
+        }),
+      },
+    }),
   },
 };
 window.incetekhMapsReady();

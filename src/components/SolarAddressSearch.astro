@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site';
+const contactLink = `${site.whatsapp}?text=${encodeURIComponent('Hi Incetekh Energy, I need help locating my property for a solar preview. Please help me get started.')}`;
 ---
 
 <div id="property-search" aria-label="Search for an address or business">
@@ -45,7 +46,7 @@ import { site } from '../data/site';
         Try a nearby landmark, tap your roof on the map, or speak with our team.
       </p>
       <div class="address-contact">
-        <a href={site.whatsapp}>Chat on WhatsApp</a>
+        <a href={contactLink}>Chat on WhatsApp</a>
         <a href={`tel:${site.phone}`}>Call Incetekh</a>
       </div>
     </div>

@@ -337,9 +337,20 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await page.locator('#address-input').fill('Unlisted home address');
       const search = page.locator('#property-search');
       await expect(search.getByRole('status')).toHaveText('No results found.');
-      await expect(
-        search.getByRole('link', { name: 'Chat on WhatsApp' }),
-      ).toHaveAttribute('href', 'https://wa.me/919441259786');
+      const contact = new URL(
+        (await search
+          .getByRole('link', { name: 'Chat on WhatsApp' })
+          .getAttribute('href'))!,
+      );
+      expect(contact.origin + contact.pathname).toBe(
+        'https://wa.me/919441259786',
+      );
+      expect(contact.searchParams.get('text')).toContain(
+        'help locating my property',
+      );
+      expect(contact.searchParams.get('text')).not.toContain(
+        'Unlisted home address',
+      );
       await expect(
         search.getByRole('link', { name: 'Call Incetekh' }),
       ).toHaveAttribute('href', 'tel:+919441259786');
