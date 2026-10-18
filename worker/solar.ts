@@ -3,6 +3,18 @@ export interface Coordinates {
   latitude: number;
   longitude: number;
 }
+// Broad India envelope, including islands. This is a bounded input guard,
+// not an exact national border, Solar coverage or site-visit eligibility check.
+export function inSolarRegion(point: Coordinates): boolean {
+  return (
+    Number.isFinite(point.latitude) &&
+    Number.isFinite(point.longitude) &&
+    point.latitude >= 6 &&
+    point.latitude <= 38 &&
+    point.longitude >= 68 &&
+    point.longitude <= 98
+  );
+}
 export interface SolarRoof {
   center: Coordinates;
   bounds: { sw: Coordinates; ne: Coordinates };

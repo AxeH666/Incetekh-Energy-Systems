@@ -100,21 +100,230 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
   async function select(
     page: import('@playwright/test').Page,
     latitude = '15',
+    longitude = '79',
   ) {
-    await page.locator('synthetic-place-search').evaluate((element, lat) => {
+    await page.locator('synthetic-place-search').evaluate(
+      (element, point) => {
+        element.dispatchEvent(
+          Object.assign(new Event('gmp-select'), {
+            placePrediction: {
+              toPlace: () => ({
+                location: {
+                  lat: () => Number(point.latitude),
+                  lng: () => Number(point.longitude),
+                },
+                fetchFields: async () => {},
+              }),
+            },
+          }),
+        );
+      },
+      { latitude, longitude },
+    );
+    await expect(page.locator('#assess-property')).toBeEnabled();
+  }
+  test('India-wide search accepts Udupi, northern and island locations without claiming roof coverage', async ({
+    page,
+  }) => {
+    const calls = await setup(page);
+    const sent: unknown[] = [];
+    await page.route('**/api/solar-assessments', (route) => {
+      const { latitude, longitude } = route.request().postDataJSON();
+      sent.push({ latitude, longitude });
+      return route.fulfill({
+        json: { status: 'no_coverage', data_available: false },
+      });
+    });
+    await page.locator('#open-map').click();
+    const options = await page.evaluate(
+      () => (window as any).syntheticAutocompleteOptions,
+    );
+    expect(options.includedRegionCodes).toEqual(['in']);
+    expect(options.locationRestriction).toBeUndefined();
+    const points = [
+      { latitude: 13.33467, longitude: 74.74617 },
+      { latitude: 28.61, longitude: 77.21 },
+      { latitude: 11.62, longitude: 92.73 },
+    ];
+    for (const point of points) {
+      await select(page, String(point.latitude), String(point.longitude));
+      await expect(page.locator('#selection-label')).toContainText(
+        'Is the pin on your roof?',
+      );
+      expect(
+        JSON.parse(
+          (await page
+            .locator('[data-site-visit-form]')
+            .getAttribute('data-preview-context'))!,
+        ),
+      ).toMatchObject(point);
+      await page.locator('#assess-property').click();
+      await expect(page.locator('#preview-status')).toContainText(
+        'Solar data is unavailable',
+      );
+      await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    }
+    expect(sent).toEqual(points);
+    expect(calls.maps()).toBe(1);
+  });
+  for (const failure of ['timeout', 'rejected', 'missing', 'outside'] as const)
+    test(`address lookup ${failure} clears locating and permits manual recovery`, async ({
+      page,
+    }) => {
+      await page.clock.install();
+      const calls = await setup(page);
+      await page.locator('#open-map').click();
+      await page
+        .locator('synthetic-place-search')
+        .evaluate((element, failure) => {
+          element.dispatchEvent(
+            Object.assign(new Event('gmp-select'), {
+              placePrediction: {
+                toPlace: () => ({
+                  location:
+                    failure === 'missing'
+                      ? undefined
+                      : { lat: () => 40, lng: () => 79 },
+                  fetchFields: () =>
+                    failure === 'timeout'
+                      ? new Promise<void>((resolve) => {
+                          (window as any).finishOldLookup = resolve;
+                        })
+                      : failure === 'rejected'
+                        ? Promise.reject(new Error('Synthetic lookup failure'))
+                        : Promise.resolve(),
+                }),
+              },
+            }),
+          );
+        }, failure);
+      if (failure === 'timeout') {
+        await expect(page.locator('#selection-label')).toContainText(
+          'Locating',
+        );
+        await page.clock.runFor(15001);
+      }
+      await expect(page.locator('#selection-label')).toContainText(
+        failure === 'outside'
+          ? 'Choose a location in India'
+          : 'Search could not locate',
+      );
+      await expect(page.locator('#assess-property')).toBeDisabled();
+      await page.evaluate(() =>
+        (window as any).syntheticMapClick({
+          latLng: { lat: () => 13.33467, lng: () => 74.74617 },
+        }),
+      );
+      await expect(page.locator('#assess-property')).toBeEnabled();
+      if (failure === 'timeout')
+        await page.evaluate(() => (window as any).finishOldLookup());
+      await expect(page.locator('#selection-label')).toContainText(
+        'Is the pin on your roof?',
+      );
+      expect(
+        JSON.parse(
+          (await page
+            .locator('[data-site-visit-form]')
+            .getAttribute('data-preview-context'))!,
+        ),
+      ).toMatchObject({ latitude: 13.33467, longitude: 74.74617 });
+      expect(calls.assessments()).toBe(0);
+    });
+  for (const recovery of [
+    'manual',
+    'new-address',
+    'edit',
+    'search-error',
+    'map-failure',
+  ] as const)
+    test(`late address lookup cannot overwrite ${recovery}`, async ({
+      page,
+    }) => {
+      await page.clock.install();
+      await setup(page);
+      await page.locator('#open-map').click();
+      await page.locator('synthetic-place-search').evaluate((element) => {
+        element.dispatchEvent(
+          Object.assign(new Event('gmp-select'), {
+            placePrediction: {
+              toPlace: () => ({
+                location: { lat: () => 15, lng: () => 79 },
+                fetchFields: () =>
+                  new Promise<void>((resolve) => {
+                    (window as any).finishOldLookup = resolve;
+                  }),
+              }),
+            },
+          }),
+        );
+      });
+      await expect(page.locator('#selection-label')).toContainText('Locating');
+      if (recovery === 'manual')
+        await page.evaluate(() =>
+          (window as any).syntheticMapClick({
+            latLng: { lat: () => 13.33467, lng: () => 74.74617 },
+          }),
+        );
+      else if (recovery === 'new-address')
+        await select(page, '13.33467', '74.74617');
+      else if (recovery === 'edit')
+        await page.locator('synthetic-place-search').dispatchEvent('input');
+      else if (recovery === 'search-error')
+        await page.locator('synthetic-place-search').dispatchEvent('gmp-error');
+      else
+        await page.evaluate(() =>
+          window.dispatchEvent(new Event('incetekh:maps-unavailable')),
+        );
+      const label = await page.locator('#selection-label').textContent();
+      const status = await page.locator('#preview-status').textContent();
+      await page.evaluate(() => (window as any).finishOldLookup());
+      await page.clock.runFor(15001);
+      await expect(page.locator('#selection-label')).toHaveText(label!);
+      await expect(page.locator('#preview-status')).toHaveText(status!);
+      if (recovery === 'manual' || recovery === 'new-address') {
+        await expect(page.locator('#assess-property')).toBeEnabled();
+        expect(
+          JSON.parse(
+            (await page
+              .locator('[data-site-visit-form]')
+              .getAttribute('data-preview-context'))!,
+          ),
+        ).toMatchObject({ latitude: 13.33467, longitude: 74.74617 });
+      } else await expect(page.locator('#assess-property')).toBeDisabled();
+    });
+  test('an address lookup finishing after session expiry cannot restore selection', async ({
+    page,
+  }) => {
+    const calls = await setup(page);
+    await page.locator('#open-map').click();
+    await page.locator('synthetic-place-search').evaluate((element) => {
       element.dispatchEvent(
         Object.assign(new Event('gmp-select'), {
           placePrediction: {
             toPlace: () => ({
-              location: { lat: () => Number(lat), lng: () => 79 },
-              fetchFields: async () => {},
+              location: { lat: () => 13.33467, lng: () => 74.74617 },
+              fetchFields: () =>
+                new Promise<void>((resolve) => {
+                  (window as any).finishExpiredLookup = resolve;
+                }),
             }),
           },
         }),
       );
-    }, latitude);
-    await expect(page.locator('#assess-property')).toBeEnabled();
-  }
+    });
+    await expect(page.locator('#selection-label')).toContainText('Locating');
+    await page.clock.setFixedTime(new Date(Date.now() + 31 * 60 * 1000));
+    await page.evaluate(() => (window as any).finishExpiredLookup());
+    await expect(page.locator('#preview-status')).toContainText(
+      'missing or expired',
+    );
+    await expect(page.locator('#assess-property')).toBeDisabled();
+    await expect(page.locator('[data-site-visit-form]')).not.toHaveAttribute(
+      'data-preview-context',
+    );
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    expect(calls.assessments()).toBe(0);
+  });
   test('disabled page makes no provider calls and has no nonexistent locale links', async ({
     page,
     request,

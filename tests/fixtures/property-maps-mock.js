@@ -1,7 +1,8 @@
 // Test-only Google substitute. Never real imagery, never network access.
 class SyntheticPlace extends HTMLElement {
-  constructor() {
+  constructor(options) {
     super();
+    window.syntheticAutocompleteOptions = options;
   }
   connectedCallback() {
     if (this.childNodes.length) return;
