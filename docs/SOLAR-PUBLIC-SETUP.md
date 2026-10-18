@@ -97,6 +97,24 @@ Rollback disables Solar only. Keep additive schema, usage counters and enquiries
 No private retained SS Mall imagery becomes a public fixture. Privacy, attribution
 and retention requirements in SOLAR-PREVIEW.md remain applicable.
 
+### Map interaction correction
+
+The owner reported a successful live rooftop preview, followed by losing the
+panels and repeated human checks when clicking the map to zoom. Map clicks had
+been treated as new selections even while a preview was loading or displayed.
+Those clicks now leave the confirmed preview intact. To select another roof,
+choose another address or use “Panels don't match my roof” before tapping a roof.
+Moving an unsubmitted pin reuses the current human check; a consumed token is
+reset only for a retry or another explicit assessment. A successful preview hides
+the check. No security verification is bypassed and no automatic Google retry is
+introduced. Progress, expiry and failure messages appear beside confirmation.
+
+Saved live SS Mall data replayed through the real page and Worker CSP rendered
+nine reference-module panels without browser errors or new provider requests.
+This replay and the owner's successful attempt do not establish residential
+coverage, physical-device acceptance or the corrected live interaction by
+themselves; verify zooming and explicit reselection after the correction deploys.
+
 Official guidance: [Google key restrictions](https://developers.google.com/maps/api-security-best-practices),
 [Solar coverage limitations](https://developers.google.com/maps/documentation/solar/coverage).
 Usage is pay-as-you-go; Google recommends daily quotas for cost control:
