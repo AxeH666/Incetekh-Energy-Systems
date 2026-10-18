@@ -8,10 +8,14 @@
     "run_worker_first": ["/api/*", "/solar-preview", "/solar-preview/*"],
     "not_found_handling": "404-page",
   },
-  // Production activation is a separate owner-authorized release after PR #29.
+  // Solar stays disabled until approved usage limits and live acceptance.
   "vars": {
     "SOLAR_PREVIEW_ENABLED": "false",
     "SOLAR_MATCHED_IMAGERY_ENABLED": "false",
+    "SOLAR_ALLOWED_ORIGIN": "https://incetekhenergy.com",
+    // Proposed trial limits; inactive while SOLAR_PREVIEW_ENABLED is false.
+    "SOLAR_DAILY_LIMIT": "10",
+    "SOLAR_MONTHLY_LIMIT": "100",
     "LEAD_CAPTURE_ENABLED": "true",
     "LEAD_CAPTURE_ENV": "production",
     "LEAD_ALLOWED_ORIGIN": "https://incetekhenergy.com",
@@ -36,6 +40,12 @@
       "name": "LEAD_RATE_LIMIT",
       "namespace_id": "2026101502",
       "simple": { "limit": 5, "period": 60 },
+    },
+    {
+      // Unused in the account inventory; separate from both lead namespaces.
+      "name": "SOLAR_RATE_LIMIT",
+      "namespace_id": "2026101801",
+      "simple": { "limit": 3, "period": 60 },
     },
   ],
   "previews": {
