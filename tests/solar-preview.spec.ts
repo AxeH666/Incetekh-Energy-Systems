@@ -331,9 +331,157 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await expect(page.locator('#returned-building')).toBeHidden();
     await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
     await page.locator('synthetic-place-search').dispatchEvent('input');
+    await expect(page.locator('#preview-status')).toHaveText(
+      'Choose an address suggestion to locate your roof.',
+    );
     await expect(
       page.getByRole('button', { name: 'Confirm roof & preview' }),
     ).toBeDisabled();
+  });
+  for (const width of [390, 1440])
+    test(`assessment progress and failure stay beside confirmation at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await setup(page);
+      let finish!: () => void;
+      const waiting = new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+      await page.route('**/api/solar-assessments', async (route) => {
+        await waiting;
+        await route.fulfill({
+          json: { status: 'unusable_geometry', data_available: false },
+        });
+      });
+      await page.locator('#open-map').click();
+      await select(page);
+      const button = page.locator('#assess-property');
+      await button.click();
+      await expect(button).toHaveText('Preparing your preview…');
+      await expect(button).toHaveAttribute('aria-busy', 'true');
+      await expect(button).toBeDisabled();
+      const status = page.locator('#preview-status');
+      await expect(status).toContainText('Assessing');
+      expect(
+        await status.evaluate((node) => node.previousElementSibling?.id),
+      ).toBe('assess-property');
+      finish();
+      await expect(status).toContainText('cannot support a reliable layout');
+      await expect(status).toBeInViewport();
+      await expect(button).toHaveText('Confirm roof & preview');
+      await expect(button).toHaveAttribute('aria-busy', 'false');
+      await expect(button).toBeEnabled();
+      await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    });
+  test('map zoom clicks preserve a loading or completed preview without repeating verification', async ({
+    page,
+  }) => {
+    await setup(page);
+    let finish!: () => void;
+    const waiting = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    let attempts = 0;
+    await page.route('**/api/solar-assessments', async (route) => {
+      attempts++;
+      await waiting;
+      await route.fulfill({
+        json: {
+          ...normalizeSolar(solarFixture()),
+          reference: 'map-interaction',
+        },
+      });
+    });
+    await page.locator('#open-map').click();
+    await page.evaluate(() => {
+      const state = window as unknown as { securityResets: number };
+      state.securityResets = 0;
+      const reset = window.turnstile!.reset;
+      window.turnstile!.reset = (id: string) => {
+        state.securityResets++;
+        reset(id);
+      };
+    });
+    const mapClick = () =>
+      page.evaluate(() => {
+        const state = window as unknown as {
+          syntheticMapClick(event: {
+            latLng: { lat(): number; lng(): number };
+          }): void;
+        };
+        state.syntheticMapClick({ latLng: { lat: () => 15, lng: () => 79 } });
+      });
+    const resets = () =>
+      page.evaluate(
+        () => (window as unknown as { securityResets: number }).securityResets,
+      );
+    await select(page);
+    await mapClick();
+    await mapClick();
+    expect(await resets()).toBe(0);
+    await page.evaluate(() => {
+      const state = window as unknown as {
+        syntheticWidgets: Record<
+          string,
+          Record<string, (...args: string[]) => void>
+        >;
+      };
+      state.syntheticWidgets.solar_assessment['expired-callback']();
+    });
+    await expect(page.locator('#assess-property')).toBeDisabled();
+    await expect(page.locator('#preview-status')).toContainText(
+      'security check expired',
+    );
+    await page.evaluate(() => {
+      const state = window as unknown as {
+        syntheticWidgets: Record<string, { callback(token: string): void }>;
+      };
+      state.syntheticWidgets.solar_assessment.callback('synthetic-renewed');
+    });
+    await page.locator('#assess-property').click();
+    await expect(page.locator('#assess-property')).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
+    await mapClick();
+    await mapClick();
+    await expect(page.locator('#preview-status')).toContainText('Assessing');
+    expect(await resets()).toBe(0);
+    await page.evaluate(() => {
+      const state = window as unknown as {
+        syntheticWidgets: Record<string, Record<string, () => void>>;
+      };
+      state.syntheticWidgets.solar_assessment['error-callback']();
+      state.syntheticWidgets.solar_assessment['expired-callback']();
+    });
+    await expect(page.locator('#preview-status')).toContainText('Assessing');
+    finish();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+    await expect(page.locator('#solar-security')).toHaveAttribute('hidden', '');
+    await page.evaluate(() => {
+      const state = window as unknown as {
+        syntheticWidgets: Record<string, Record<string, () => void>>;
+      };
+      state.syntheticWidgets.solar_assessment['error-callback']();
+      state.syntheticWidgets.solar_assessment['expired-callback']();
+    });
+    await expect(page.locator('#preview-status')).toContainText(
+      'Preliminary rooftop concept',
+    );
+    await mapClick();
+    await mapClick();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+    await expect(page.locator('#assess-property')).toBeHidden();
+    expect(await resets()).toBe(0);
+    expect(attempts).toBe(1);
+    // Explicitly rejecting the roof still permits a new selection and challenge.
+    await page.locator('#unusable-roof').click();
+    await mapClick();
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
+    await expect(page.locator('#solar-security')).not.toHaveAttribute('hidden');
+    await expect(page.locator('#assess-property')).toBeEnabled();
+    expect(await resets()).toBe(1);
   });
   test('new Places selection immediately invalidates the old roof while details load', async ({
     page,
@@ -420,6 +568,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     await expect(page.locator('#preview-status')).toContainText(
       'missing or expired',
     );
+    await expect(page.locator('#preview-status')).toBeVisible();
     await expect(page.locator('#preview-context-consent')).toBeDisabled();
     await expect(page.locator('[data-site-visit-form]')).not.toHaveAttribute(
       'data-preview-context',

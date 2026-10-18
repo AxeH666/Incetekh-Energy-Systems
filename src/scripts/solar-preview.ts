@@ -92,6 +92,7 @@ let pending = false,
   generation = 0,
   searchGeneration = 0,
   token = '',
+  challengeUsed = false,
   widgetId: string | undefined;
 let controller: AbortController | undefined;
 let mapFailed = false;
@@ -102,6 +103,11 @@ function show(message: string, focus = false) {
 function updateButton() {
   assess.disabled = !selected || !token || pending || mapFailed || !!assessment;
   assess.hidden = !!assessment;
+  byId('solar-security').hidden = !!assessment;
+  assess.textContent = pending
+    ? 'Preparing your preview…'
+    : 'Confirm roof & preview';
+  assess.setAttribute('aria-busy', String(pending));
 }
 function discardRoof() {
   matchedRoof = undefined;
@@ -164,6 +170,8 @@ function freshSession() {
   discardRoof();
   updateButton();
   byId('preview-intro').hidden = true;
+  // Keep the expiry explanation visible when the property controls are hidden.
+  byId('preview-intro').before(status);
   byId('property-controls').hidden = true;
   show(
     'Your calculator estimate is missing or expired. Return to the calculator to start again, or book a free site visit.',
@@ -195,8 +203,13 @@ function choose(point: Coordinates, recenter = true) {
   pending = false;
   discardRoof();
   selected = point;
-  token = '';
-  if (widgetId) window.turnstile?.reset(widgetId);
+  // Verification is for this action, not a coordinate. Moving an unsubmitted
+  // pin must not repeatedly restart a challenge already in progress or passed.
+  if (challengeUsed && widgetId) {
+    token = '';
+    challengeUsed = false;
+    window.turnstile?.reset(widgetId);
+  }
   const center = { lat: point.latitude, lng: point.longitude };
   selectedMarker?.setCenter(center);
   selectedMarker?.setMap(view?.map);
@@ -226,9 +239,10 @@ function security(sitekey: string) {
   const fail = () => {
     token = '';
     updateButton();
-    show(
-      'The security check is unavailable. Please use the free site visit option.',
-    );
+    if (!pending && !assessment)
+      show(
+        'The security check is unavailable. Please use the free site visit option.',
+      );
   };
   const render = () => {
     if (!window.turnstile) return fail();
@@ -243,6 +257,10 @@ function security(sitekey: string) {
       'expired-callback': () => {
         token = '';
         updateButton();
+        if (selected && !pending && !assessment)
+          show(
+            'Your security check expired. Please verify again to preview your roof.',
+          );
       },
       'error-callback': () => {
         fail();
@@ -274,6 +292,7 @@ async function search(api: PropertyMaps) {
       updateButton();
       byId('selection-label').textContent =
         'Choose an address suggestion to locate your roof.';
+      show('Choose an address suggestion to locate your roof.');
     });
     element.addEventListener('gmp-error', () =>
       show('Address search is unavailable. Tap your roof on the map instead.'),
@@ -331,6 +350,7 @@ assess.addEventListener('click', async () => {
   const point = { ...selected };
   const submittedToken = token;
   token = '';
+  challengeUsed = true;
   pending = true;
   discardRoof();
   updateButton();
@@ -425,8 +445,12 @@ assess.addEventListener('click', async () => {
     if (revision === generation) {
       pending = false;
       syncEnquiryContext();
+      if (widgetId && !assessment && challengeUsed) {
+        token = '';
+        challengeUsed = false;
+        window.turnstile?.reset(widgetId);
+      }
       updateButton();
-      if (widgetId) window.turnstile?.reset(widgetId);
     }
   }
 });
@@ -584,6 +608,8 @@ async function initialize() {
           if (current.enabled !== true) throw new Error('Disabled');
           const api = (await loadGoogleMaps(current.mapsKey)) as PropertyMaps;
           byId('property-controls').hidden = false;
+          // Keep progress and failures beside the action, including on phones.
+          assess.after(status);
           view = createSolarMap(byId('solar-map'), api, {
             lat: 15.5,
             lng: 79.5,
@@ -599,6 +625,9 @@ async function initialize() {
             clickable: false,
           });
           view.map.addListener('click', (point) => {
+            // Map clicks also occur during double-click/tap zoom. A confirmed
+            // or loading preview changes only via an explicit new selection.
+            if (assessment || pending) return;
             if (point.latLng)
               choose(
                 { latitude: point.latLng.lat(), longitude: point.latLng.lng() },
