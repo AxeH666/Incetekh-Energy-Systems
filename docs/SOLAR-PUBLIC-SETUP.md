@@ -150,6 +150,32 @@ Acceptance uses the returned building's actual coordinates and unchanged mask
 checks; panels are never translated to the original pin. This offers confirmation
 of Google's candidate, not proof that Google returned the intended house.
 
+### Slow-download correction
+
+The owner then reported a generic browser failure after roughly a minute.
+The page previously shared one 55-second deadline across server response,
+imagery download, module loading and image preparation. That timing is consistent
+with its timeout, but the precise failing network stage was not captured; do not
+describe this as a confirmed provider or browser crash. A replay using the actual
+deployed page/assets and saved SS Mall data rendered nine panels.
+
+The request now has a separate header deadline. Its response is read with a
+12 MB size bound, 20-second inactivity limit and 120-second total download limit,
+with received-data progress. Image-module loading and preparation have a separate
+30-second cancellation signal (cooperative during image decoding). Navigation and
+expiry still cancel obsolete work; no request is automatically repeated. Timeout,
+download, preparation and map-display failures have distinct recovery messages.
+
+Data Layers now requests the building bounds plus a 5 m border, within a
+20–100 m radius, at the unchanged 0.25 m pixel size. Large buildings still have
+to pass the existing coverage check. A single approved SS Mall imagery diagnostic
+used one Data Layers and two TIFF requests, with no Insights or Maps call. The
+50 m radius returned matching 2023-01-14 imagery: RGB 405,500 bytes and mask
+3,069 bytes, versus 1,642,005 and 10,670 bytes in the previous 100 m response.
+This reduces the two-image payload by about 75%; it is not a measured guarantee
+of end-user latency. The live owner result after deployment remains an acceptance
+gate. Google documents configurable [radius and pixel size](https://developers.google.com/maps/documentation/solar/reference/rest/v1/dataLayers/get).
+
 Official guidance: [Google key restrictions](https://developers.google.com/maps/api-security-best-practices),
 [Solar coverage limitations](https://developers.google.com/maps/documentation/solar/coverage).
 Usage is pay-as-you-go; Google recommends daily quotas for cost control:

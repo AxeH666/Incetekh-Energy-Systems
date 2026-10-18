@@ -10,6 +10,7 @@ import {
   type SolarResult,
   type Coordinates,
 } from '../../worker/solar';
+import { abortable, readSolarResponse } from '../lib/solar-response';
 import {
   readSolarSession,
   billEstimate,
@@ -372,7 +373,8 @@ assess.addEventListener('click', async () => {
   updateButton();
   const attemptController = new AbortController();
   controller = attemptController;
-  const timeout = setTimeout(() => attemptController.abort(), 55000);
+  let phase: 'request' | 'download' | 'image' | 'layout' = 'request';
+  let timeout = setTimeout(() => attemptController.abort(), 55000);
   show('Assessing the confirmed property…');
   try {
     const response = await fetch('/api/solar-assessments', {
@@ -382,7 +384,18 @@ assess.addEventListener('click', async () => {
       signal: attemptController.signal,
       cache: 'no-store',
     });
-    const result = (await response.json()) as SolarResult & {
+    clearTimeout(timeout);
+    phase = 'download';
+    const result = (await readSolarResponse(
+      response,
+      attemptController,
+      (bytes) => {
+        if (revision === generation && !mapFailed)
+          show(
+            `Loading roof image… ${(bytes / 1000000).toFixed(1)} MB received.`,
+          );
+      },
+    )) as SolarResult & {
       reference: string;
       selectedLocation: Coordinates;
       roofImage?: RoofImage;
@@ -413,7 +426,13 @@ assess.addEventListener('click', async () => {
       return;
     }
     if (result.roofRaster) {
-      const { loadSolarRaster } = await import('../lib/solar-raster');
+      phase = 'image';
+      show('Preparing your roof image…');
+      timeout = setTimeout(() => attemptController.abort(), 30000);
+      const { loadSolarRaster } = await abortable(
+        import('../lib/solar-raster'),
+        attemptController.signal,
+      );
       const raster = await loadSolarRaster(
         result.roofRaster,
         result.roof,
@@ -425,9 +444,12 @@ assess.addEventListener('click', async () => {
       }
       view.setRoofImage(raster);
       matchedRoof = raster;
+      clearTimeout(timeout);
       // Release encoded provider bytes after decoding; never put them in storage.
       delete result.roofRaster;
     } else if (result.roofImage) {
+      phase = 'image';
+      timeout = setTimeout(() => attemptController.abort(), 30000);
       const roofImage = await loadRoofImage(
         result.roofImage,
         result.roof,
@@ -438,7 +460,9 @@ assess.addEventListener('click', async () => {
         return;
       }
       view.setRoofImage(roofImage);
+      clearTimeout(timeout);
     }
+    phase = 'layout';
     if (selection === 'candidate') {
       candidate = result;
       byId('selection-label').textContent =
@@ -467,8 +491,18 @@ assess.addEventListener('click', async () => {
   } catch {
     if (revision === generation && !mapFailed) {
       discardRoof();
+      console.warn('solar_preview_failed', {
+        stage: phase,
+        timedOut: attemptController.signal.aborted,
+      });
       show(
-        'The assessment could not finish. No layout is shown. Please try later or book a free site visit.',
+        attemptController.signal.aborted
+          ? 'The roof preview timed out while loading. Please check your connection and try again, or book a free site visit.'
+          : phase === 'image'
+            ? 'The roof image could not be prepared. No layout is shown. Please try again or book a free site visit.'
+            : phase === 'layout'
+              ? 'The roof could not be displayed on the map. Please reload the page or book a free site visit.'
+              : 'The roof assessment could not be downloaded. Please check your connection and try again, or book a free site visit.',
         true,
       );
     }

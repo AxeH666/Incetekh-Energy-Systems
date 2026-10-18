@@ -218,7 +218,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
         await expect(page.locator('#preview-status')).toContainText(
           mode === 'off-roof'
             ? 'layout is unusable'
-            : 'assessment could not finish',
+            : 'roof image could not be prepared',
         );
         await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
         await expect(page.locator('#roof-results')).toBeHidden();
@@ -602,6 +602,76 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
         await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
       }
     });
+  test('a progressing roof response can finish after the old 55-second deadline without another assessment', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await setup(page);
+    await page.locator('#open-map').click();
+    await select(page);
+    await page.evaluate(
+      (body) => {
+        const original = window.fetch;
+        Object.assign(window, { syntheticSlowAssessments: 0 });
+        window.fetch = async (input, init) => {
+          if (input !== '/api/solar-assessments') return original(input, init);
+          const state = window as unknown as {
+            syntheticSlowAssessments: number;
+          };
+          state.syntheticSlowAssessments++;
+          const bytes = new TextEncoder().encode(body);
+          const timers: ReturnType<typeof setTimeout>[] = [];
+          return new Response(
+            new ReadableStream({
+              start(controller) {
+                for (let i = 0; i < 4; i++)
+                  timers.push(
+                    setTimeout(
+                      () => {
+                        controller.enqueue(
+                          bytes.slice(
+                            Math.floor((i * bytes.length) / 4),
+                            Math.floor(((i + 1) * bytes.length) / 4),
+                          ),
+                        );
+                        if (i === 3) controller.close();
+                      },
+                      (i + 1) * 15000,
+                    ),
+                  );
+              },
+              cancel() {
+                for (const timer of timers) clearTimeout(timer);
+              },
+            }),
+            { headers: { 'Content-Type': 'application/json' } },
+          );
+        };
+      },
+      JSON.stringify({
+        ...normalizeSolar(solarFixture()),
+        reference: '00000000-0000-4000-8000-000000000001',
+        selectedLocation: { latitude: 15, longitude: 79 },
+      }),
+    );
+    await page.locator('#assess-property').click();
+    for (let i = 0; i < 3; i++) {
+      await page.clock.runFor(15000);
+      await expect(page.locator('#preview-status')).toContainText(
+        'Loading roof image',
+      );
+    }
+    await page.clock.runFor(15000);
+    await expect(page.locator('[data-mock-panel]')).toHaveCount(8);
+    await expect(page.locator('#roof-results')).toBeVisible();
+    expect(
+      await page.evaluate(
+        () =>
+          (window as unknown as { syntheticSlowAssessments: number })
+            .syntheticSlowAssessments,
+      ),
+    ).toBe(1);
+  });
   test('failed building highlight clears the candidate and permits a fresh assessment', async ({
     page,
   }) => {
@@ -616,7 +686,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
     );
     await page.locator('#assess-property').click();
     await expect(page.locator('#preview-status')).toContainText(
-      'could not finish',
+      'could not be displayed',
     );
     await expect(page.locator('#confirm-detected-roof')).toBeHidden();
     await expect(page.locator('[data-mock-roof-image]')).toHaveCount(0);
@@ -875,7 +945,7 @@ test.describe('property selector with real Worker CSP and mocked providers', () 
       await select(page);
       await page.locator('#assess-property').click();
       await expect(page.locator('#preview-status')).toContainText(
-        'could not finish',
+        'could not be prepared',
       );
       await expect(page.locator('[data-mock-panel]')).toHaveCount(0);
       await expect(page.locator('[data-mock-roof-image]')).toHaveCount(0);
