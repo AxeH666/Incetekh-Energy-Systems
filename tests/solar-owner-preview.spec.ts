@@ -52,8 +52,11 @@ test('private local preview is usable without external calls and rejects foreign
       'Your selected system: 5 kW',
     );
     await page.locator('#open-map').click();
+    await page.locator('#address-input').fill('Simulated example');
     await page
-      .getByRole('button', { name: 'Select the simulated example roof' })
+      .getByRole('option', {
+        name: 'Simulated example roof (not a real address)',
+      })
       .click();
     await page.locator('#assess-property').click();
     await expect(page.locator('#result-capacity')).toHaveText('3.2 kW');

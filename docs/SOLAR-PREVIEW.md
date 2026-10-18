@@ -71,6 +71,22 @@ lookup; late results cannot restore an old selection. Google does not expose
 request cancellation here: aborting ends our wait, not the provider's network call.
 Roof matching, masks, geometry and the existing no-coverage fallback are unchanged.
 
+The address field uses the existing Places (New) Autocomplete Data API, with a
+350 ms typing debounce, session tokens and a 15-second suggestion timeout. The
+Google widget does not expose an empty-results event; the custom keyboard-accessible
+list renders `No results found.` only for a successful empty response. Network,
+timeout and detail-lookup failures have separate recovery messages. WhatsApp and
+telephone links appear within the search panel and use the existing business
+contacts without putting the typed address in a URL, storage or an enquiry.
+Tokens rotate after selection/clearing or three minutes; selected place details
+still request only `location`. Late results cannot overwrite manual roof selection.
+The search module loads only after the user opens the map.
+
+Implementation references: [Autocomplete Data API and session tokens](https://developers.google.com/maps/documentation/javascript/place-autocomplete-data)
+and [Google Maps attribution](https://developers.google.com/maps/documentation/javascript/policies).
+`public/brand/google-maps.svg` is the unchanged dark gray logo from Google's
+official attribution asset download, displayed at 98 × 18 px with clear space.
+
 After security verification, one SQLite statement reserves both daily and monthly
 allowance in an additive `solar_usage` table. Its UTC periods come from SQLite,
 so a delayed request cannot reset the counter using an older caller date.

@@ -1,6 +1,7 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import SiteVisitForm from '../components/SiteVisitForm.astro';
+import SolarAddressSearch from '../components/SolarAddressSearch.astro';
 ---
 
 <SiteLayout
@@ -58,14 +59,7 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
         </button>
       </div>
       <div id="property-controls" hidden>
-        <div
-          id="property-search"
-          aria-label="Search for an address or business"
-        ></div>
-        <p>
-          Select your address from the suggestions, or zoom to your roof and tap
-          it directly on the map.
-        </p>
+        <SolarAddressSearch />
         <p id="selection-label">No property selected.</p>
         <div id="solar-map" aria-label="Google satellite property map"></div>
         <div id="solar-security"></div>
@@ -312,14 +306,6 @@ import SiteVisitForm from '../components/SiteVisitForm.astro';
   }
   summary::marker {
     color: var(--color-green);
-  }
-  #property-search {
-    max-width: 640px;
-    margin-bottom: var(--space-3);
-  }
-  #property-search + p {
-    font-size: var(--text-small);
-    color: var(--color-muted);
   }
   #selection-label {
     margin-top: var(--space-4);
